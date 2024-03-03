@@ -1,0 +1,1453 @@
+import React, { 
+    createContext, useContext, useState, useEffect, useRef, Fragment
+} from "react";
+
+import { useParams, Link, useNavigate} from "react-router-dom";
+import { useForm } from 'react-hook-form';
+
+import axios from 'axios';
+
+import { 
+    Stack, InputLabel, MenuItem, FormControl, Select, ToggleButton, ToggleButtonGroup, TextField,
+    Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, ListItemText, ListItemButton, List,
+    Divider, AppBar, Toolbar, IconButton, Typography, CloseIcon, Slide, SearchIconWrapper, StyledInputBase,
+    InputBase
+} from '@mui/material'
+
+import SearchIcon from '@mui/icons-material/Search';
+
+import { styled, alpha } from '@mui/material/styles';
+
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
+
+import "../css/App.css";
+import add from "../pictures/add.svg"
+import about from "../pictures/about.svg"
+import next from "../pictures/next.svg"
+import search from "../pictures/search.svg"
+import update from "../pictures/update.svg"
+import remove from "../pictures/delete.svg"
+import barChart from "../pictures/bar chart.svg"
+import reset from "../pictures/reset.svg"
+
+import TreeList from "../datastructures/TreeList"
+import LinkedList from "../datastructures/LinkedList"
+import DynamicArray from "../datastructures/DynamicArray";
+
+import LastActionResult from "./LastActionResult";
+
+//data context
+const DialogContext = createContext();
+export const LastActionDialog = createContext();
+
+const CRUD = ({display, charts}) => {
+    const navigate = useNavigate();
+    
+    const [addModal, setAddModal] = useState([])
+    const [getModal, setGetModal] = useState([])
+    const [deleteModal, setDeleteModal] = useState([])
+
+    const [maxIndex, setMaxIndex] = useState([])
+    const [dstructures, setdstructures] = useState([{}, {}, {}])
+
+    const[messageModal, setMessageModal] = useState([])
+    const[messageModalContent, setMessageModalContent] = useState({type:"Confirmation", message:"Confirmation Message", buttonContent:"Confirm", from:{}})
+
+    // for reset button dialog
+    const [resetDialog, setResetDialog] = useState(false)
+
+    // for GENERAL last action result
+    const [lastActionDialog, setLastActionDialog] = React.useState(false); 
+
+    const executeQuery = (query, parameters, access) => { 
+        return new Promise((resolve, reject) => {
+            // requests
+            if (access === 'read') {
+              //ipcRenderer.send('execute-sql-r', query);
+            } else if (access === 'write') {
+              //ipcRenderer.send('execute-sql-w', query, parameters);
+            } else if (access === 'update'){
+              //ipcRenderer.send('execute-sql-u', query, parameters);
+            } 
+            
+            // results
+            // ipcRenderer.once('sql-results-read', (event, result) => {
+            //   console.log('SQL Results:', result);
+            //   resolve(result)
+            // });
+        
+            // ipcRenderer.once('sql-error', (event, error) => {
+            //   reject(error);
+            // });
+        });
+    };
+
+    let retrieveDS = (result) => {
+        let dsarr = []
+ 
+        for(let i = 0; i < result.length; i++){
+            let dsinstance
+
+            if(result[i].DSName_CLSC === "Tree List"){
+                dsinstance = TreeList.parse(result[i].JSONData)
+            }else if(result[i].DSName_CLSC === "Doubly Linked List"){
+                dsinstance = LinkedList.parse(result[i].JSONData)
+            }else if(result[i].DSName_CLSC === "Dynamic Array"){
+                dsinstance = DynamicArray.parse(result[i].JSONData)
+            }
+
+            let dsobject = {
+                ds: dsinstance,
+                dsid: result[i].DSID_CLSC, 
+                dsbatch: result[i].DSBatch, 
+                dsname: result[i].DSName_CLSC, 
+                threaded: result[i].Threaded, 
+                frequency: result[i].Frequency || result[i].Capacity,
+                type: result[i].Type,
+                userpivot: result[i].UserAddedPivot,
+                datecreated: result[i].DateCreated,
+                dsdata: result[i].JSONData,
+                speedms: result[i].SpeedMS,
+                threads: result[i].ThreadsUsed,
+                size: result[i].Size,
+                space: result[i].SpaceOccupied,
+                spaceAdded: result[i].SpaceAdded,
+                sizeAdded: result[i].SizeAdded,
+                pointersAdded: result[i].PointersAdded,
+                actiontype: result[i].ActionType,
+                actioninput: result[i].StartingIndex,
+                actioncount: result[i].EndIndex_Count,
+                inputparameters: result[i].Direction,
+                speednotation: result[i].SpeedNotation,
+                spacenotation: result[i].SpaceNotation,
+                sizepointers: result[i].SizePointers
+            }
+
+            dsarr.push(dsobject)
+        }
+
+ 
+        setdstructures(dsarr)
+    }
+
+    const updatedsdetails = (result) => {
+        setdstructures([...result])
+    }
+
+    useEffect(() => {
+        // get the user details from login page
+        const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+
+        if(!userDetails){
+            navigate('/');
+        }
+
+        setAddModal(document.querySelector('#add-modal'))
+        setGetModal(document.querySelector('#get-modal'))
+        setDeleteModal(document.querySelector('#delete-modal'))
+        setMessageModal(document.querySelector('#message-modal'))
+        
+        const fetchData = async () => {
+            try {                
+                //get the last actions and datastructure 
+                let response = await axios.post('http://localhost:3001/analytics', {userDetails});
+
+                console.log(response, "response")
+
+                await retrieveDS(response.data);
+                setMaxIndex(response.data[0].Size === null ? -1 : response.data[0].Size-1 )
+            } catch (error) {
+              console.error('SQL Error:', error);
+            }
+        };
+
+        fetchData()
+    }, [])
+
+    return(
+        <DialogContext.Provider value={[resetDialog, setResetDialog, dstructures, setdstructures, retrieveDS, setMaxIndex]}>
+        <LastActionDialog.Provider value={[lastActionDialog, setLastActionDialog]}>
+            <section className={`${display} bg-[#f8f8fa] h-full w-full rounded-ss-[20px] flex flex-col rounded-ee-[8px]`}>
+                <SortHeader />
+                <ResetDialog />
+                <LastActionResult />
+
+                <div className='flex flex-1'>
+                    <ActionSideBar addModal={addModal} getModal={getModal} deleteModal={deleteModal} messageModal={messageModal} modalContent={{messageModalContent, setMessageModalContent}}/>
+                    
+                    <AddDialog addModal={addModal} maxIndex={{maxIndex, setMaxIndex}} datastructures={{dstructures, setdstructures}} updatedsdetails={updatedsdetails} executeQuery={executeQuery}/>
+                    <GetDialog getModal={getModal} maxIndex={{maxIndex, setMaxIndex}} datastructures={{dstructures, setdstructures}} updatedsdetails={updatedsdetails} executeQuery={executeQuery}/>
+                    <DeleteDialog deleteModal={deleteModal} maxIndex={{maxIndex, setMaxIndex}} datastructures={{dstructures, setdstructures}} updatedsdetails={updatedsdetails} executeQuery={executeQuery}/>
+                    <ConfirmDialog messageModal={messageModal} content={{messageModalContent, setMessageModalContent}} ds={{dstructures, setdstructures, retrieveDS, setMaxIndex}} executeQuery={executeQuery} charts={charts}/>
+        
+                    <div className='flex-1 relative max-h-full max-w-full overflow-hidden'>
+                        <main className='absolute h-full w-full overflow-y-scroll px-2 my-1'>
+                            <DSDetails dsDetails={dstructures[0]}/>
+                            <DSDetails dsDetails={dstructures[1]}/>
+                            <DSDetails dsDetails={dstructures[2]}/>
+                            <DSDetails dsDetails={{}}/>
+                            <DSDetails dsDetails={{}}/>
+                        </main>
+                    </div> 
+                </div>
+            </section>
+        </LastActionDialog.Provider>
+        </DialogContext.Provider>
+    )
+}
+
+const AddDialog = ({addModal, maxIndex, datastructures, updatedsdetails, executeQuery}) =>{
+    const formRef = useRef(null);
+
+    const [selectedRadio, setSelectedRadio] = useState('');
+    const [indexInput, setIndexInput] = useState('');
+    const [countInput, setCountInput] = useState('');
+
+    const [isRadioDisabled, setRadioDisabled] = useState([`block`, false, false]);
+    
+    let submitModal = () =>{
+        addModal.close()
+    }
+
+    const handleRadioChange = (event) => {
+        setSelectedRadio(event.target.value);
+    };
+
+    const handleInputChange = (event) =>{
+        setIndexInput(event.target.value)
+    }
+
+    const handleInputChangeCount = (event) => {
+        setCountInput(event.target.value)
+    }
+
+    const compareBigO = (firstBigO, secondBigO) => {
+        // Map Big O notations to their corresponding growth rates
+        const growthRates = {
+          'O(1)': 1,
+          'O(log n)': 2,
+          'O(n)': 3,
+          'O(n log n)': 4,
+          'O(n^2)': 5,
+          // Add more as needed
+        };
+      
+        // Retrieve growth rates for the provided Big O notations
+        const firstRate = growthRates[firstBigO];
+        const secondRate = growthRates[secondBigO];
+      
+        // Check if the provided Big O notations are valid
+        if (firstBigO == undefined) {
+          return secondBigO
+        }
+      
+        // Compare the growth rates and determine which one is slower or higher
+        if (firstRate < secondRate) {
+          return secondBigO;
+        } else if (firstRate > secondRate) {
+          return firstBigO;
+        } else {
+          return firstBigO;
+        }
+    }
+
+    const add = async (datastructures, index, count, parameter) => {
+        index = index == '' ? 0 : parseInt(index)
+        count = parseInt(count)
+        parameter = parameter == '' ? "Add Start" : parameter
+
+        let updatedds = datastructures.dstructures
+ 
+        let initialSize = updatedds[0].ds.size() 
+
+        for(let i = 0; i < datastructures.dstructures.length; i++){
+            let speedms = 0
+            let speednotation
+            let spacenotation
+            let threads = 0
+            let space
+            let frequency
+            let capacity
+            let sizepointers
+            let size
+            let sizeAdded = 0
+            let spaceAdded = 0
+            let pointersAdded = 0
+
+            if(initialSize === 0){
+                for(let j = 0; j < count; j++){
+                    let actionresult = datastructures.dstructures[i].ds.add(0)
+                    threads +=  actionresult.threads
+                    space = actionresult.space
+                    frequency = actionresult.frequency ? actionresult.frequency : null
+                    capacity = actionresult.capacity ? actionresult.capacity : null
+                    sizepointers = actionresult.sizepointers
+                    size = actionresult.size
+                    speedms += actionresult.speedms
+                    speednotation = compareBigO(speednotation, actionresult.speednotation)
+                    spacenotation = compareBigO(spacenotation, actionresult.spacenotation)
+                    sizeAdded += actionresult.sizeAdded
+                    spaceAdded += actionresult.spaceAdded
+                    pointersAdded += actionresult.pointersAdded
+                }
+            }else if(parameter === "Add After"){
+                for(let j = index; j < index + count; j++){
+                    let actionresult = datastructures.dstructures[i].ds.addAfterIndex(j, 0)
+                    threads +=  actionresult.threads
+                    space = actionresult.space
+                    frequency = actionresult.frequency ? actionresult.frequency : null
+                    capacity = actionresult.capacity ? actionresult.capacity : null
+                    sizepointers = actionresult.sizepointers
+                    size = actionresult.size
+                    speedms += actionresult.speedms
+                    speednotation = compareBigO(speednotation, actionresult.speednotation)
+                    spacenotation = compareBigO(spacenotation, actionresult.spacenotation)
+                    sizeAdded += actionresult.sizeAdded
+                    spaceAdded += actionresult.spaceAdded
+                    pointersAdded += actionresult.pointersAdded
+                }   
+            }else{
+                console.log("Add Before");
+            }
+
+
+            updatedds[i].speedms = Math.floor(speedms * 1e6) / 1e6
+            updatedds[i].speednotation = speednotation
+            updatedds[i].spacenotation = spacenotation
+            updatedds[i].threads = threads
+            updatedds[i].space = space
+            updatedds[i].frequency = frequency
+            updatedds[i].capacity = capacity
+            updatedds[i].sizepointers = sizepointers
+            updatedds[i].size = size
+            updatedds[i].sizeAdded = sizeAdded
+            updatedds[i].spaceAdded = spaceAdded
+            updatedds[i].pointersAdded = pointersAdded
+            updatedds[i].actiontype = "Add"
+            updatedds[i].actioninput = index
+            updatedds[i].actioncount = count
+            updatedds[i].inputparameters = parameter
+         
+            let JSONData = updatedds[i].ds.toJSON()
+            let DSID = updatedds[i].dsid
+
+            // add results to actionresults table
+            let insertActionResults = await axios.post('http://localhost:3001/analytics/add/insertActionResults', {actionResults : updatedds[i]});
+
+            // udpate JSONData column of datstructures table
+            let updateJSONData = await axios.post('http://localhost:3001/analytics/add/updateJSONData', {JSONData, DSID});
+
+            // // // update capacity
+            if(updatedds[i].dsname === "Dynamic Array"){
+                let updateCapacity = await axios.post('http://localhost:3001/analytics/add/updateCapacity', {DSData : updatedds[i]});
+            }  
+        }
+
+        maxIndex.setMaxIndex(maxIndex.maxIndex += count)
+        updatedsdetails(updatedds)
+    }
+
+    const handleSubmit = (event) => {
+        event.preventDefault(); 
+
+        const index = indexInput;
+        const count = countInput
+        const parameter = selectedRadio;
+
+        add(datastructures, index, count, parameter)
+
+        setSelectedRadio('')
+        setIndexInput('')
+        setCountInput('')
+        event.target.reset()
+        submitModal()
+    };
+
+    useEffect(() => {
+        let size = datastructures.dstructures[0].size;
+
+        if(size === 0 || size == undefined){
+            setRadioDisabled([`hidden`, true, true])
+        }else{
+            setRadioDisabled([`block`, false, false])
+        }
+
+    }, [datastructures.dstructures])
+
+    return(
+        <dialog id="add-modal" className="p-5 ring-1 ring-gray-400">
+            <form ref={formRef} onSubmit={handleSubmit}>
+                <div className="flex flex-col gap-4">
+                    <div>
+                        <h2 className="text-base font-semibold leading-7 text-gray-900">Adding a node</h2>
+                        <p className="mt-1 text-sm leading-6 text-gray-600">This action will be applied to every datastructure.</p>
+                    </div>
+                    
+                    <div className="relative">
+                        <label htmlFor="add-index" className={`${isRadioDisabled[0]} bg-white text-sm font-medium leading-6 text-gray-900`}>Starting Index (max index is {maxIndex.maxIndex === -1 ? 0 : maxIndex.maxIndex})</label>
+                        <input required type="number" name="index" value={indexInput} onChange={handleInputChange} disabled={isRadioDisabled[1]} min={0} max={maxIndex.maxIndex === -1 ? 0 : maxIndex.maxIndex} placeholder={"e.g. '8'"} id="add-index" autoComplete="given-name" 
+                        className={`${isRadioDisabled[0]} w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 
+                        ring-inset ring-gray-300 placeholder:text-gray-400 border-none focus:ring-2 focus:ring-inset outline-none focus:ring-indigo-400 sm:text-sm sm:leading-6`}/>
+                    </div>
+
+                    <div className="relative">
+                        <label htmlFor="add-index-count" className=" bg-white text-sm font-medium leading-6 text-gray-900">Count (number of item to be added)</label>
+                        <input required type="number" name="count" value={countInput} onChange={handleInputChangeCount} min={1} placeholder={"e.g. '10'"} id="add-index-count" autoComplete="given-name" className="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 
+                        ring-inset ring-gray-300 placeholder:text-gray-400 border-none focus:ring-2 focus:ring-inset outline-none focus:ring-indigo-400 sm:text-sm sm:leading-6"/>
+                    </div>
+
+                    <div className="flex gap-5 ">
+                        <div className="flex items-center gap-x-3 cursor-pointer">
+                            <input required id="push-everything" name="add-parameter" value="Add Before" onClick={handleRadioChange} type="radio" disabled={isRadioDisabled[1]} 
+                            className={`${isRadioDisabled[0]} cursor-pointer h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600`}/>
+                            <label htmlFor="push-everything" className={`${isRadioDisabled[0]} cursor-pointer text-sm font-medium leading-6 text-gray-900`}>Add Before</label>
+                        </div>
+
+                        <div className="flex items-center gap-x-3 cursor-pointer">
+                            <input id="push-email" name="add-parameter" value="Add After" type="radio" onClick={handleRadioChange} disabled={isRadioDisabled[1]} 
+                            className={`${isRadioDisabled[0]} cursor-pointer h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600`}/>
+                            <label htmlFor="push-email" className={`${isRadioDisabled[0]} cursor-pointer text-sm font-medium leading-6 text-gray-900`}>Add After</label>
+                        </div>
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-end gap-x-6">
+                        <button onClick={submitModal} type="button" className="text-sm font-semibold leading-6 text-gray-900">Cancel</button>
+                        <button  type="submit" className="rounded-md w-[100px] bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm 
+                        hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Add</button>
+                    </div>
+                </div>
+            </form> 
+        </dialog>
+    )
+}
+
+const GetDialog = ({getModal, maxIndex, datastructures, updatedsdetails, executeQuery}) =>{
+    const formRef = useRef(null);
+
+    const [indexInput, setIndexInput] = useState('');
+    const [countInput, setCountInput] = useState('');
+
+    let submitModal = () =>{
+        getModal.close()
+    }
+
+    const handleInputChange = (event) =>{
+        setIndexInput(event.target.value)
+    }
+
+    const handleInputChangeCount = (event) => {
+        setCountInput(event.target.value)
+    }
+
+    const compareBigO = (firstBigO, secondBigO) => {
+        // Map Big O notations to their corresponding growth rates
+        const growthRates = {
+          'O(1)': 1,
+          'O(log n)': 2,
+          'O(n)': 3,
+          'O(n log n)': 4,
+          'O(n^2)': 5,
+          // Add more as needed
+        };
+      
+        // Retrieve growth rates for the provided Big O notations
+        const firstRate = growthRates[firstBigO];
+        const secondRate = growthRates[secondBigO];
+      
+        // Check if the provided Big O notations are valid
+        if (firstBigO == undefined) {
+          return secondBigO
+        }
+      
+        // Compare the growth rates and determine which one is slower or higher
+        if (firstRate < secondRate) {
+          return secondBigO;
+        } else if (firstRate > secondRate) {
+          return firstBigO;
+        } else {
+          return firstBigO;
+        }
+    }
+
+
+    const get = async (datastructures, index, count) => {
+        let updatedds = datastructures.dstructures
+
+        for(let i = 0; i < datastructures.dstructures.length; i++){
+            let speedms = 0
+            let speednotation
+            let spacenotation
+            let threads = 0
+            let space
+            let frequency
+            let capacity 
+            let sizepointers
+            let size
+            let sizeAdded = 0
+            let spaceAdded = 0
+            let pointersAdded = 0
+            let parameter
+
+            if(index >= count){
+                parameter = "Get After"
+
+                for(let j = index; j >= count; j--){ 
+                    let actionresult = datastructures.dstructures[i].ds.get(j)
+                    threads +=  actionresult.threads
+                    space = actionresult.space
+                    frequency = actionresult.frequency ? actionresult.frequency : null
+                    capacity = actionresult.capacity ? actionresult.capacity : null
+                    sizepointers = actionresult.sizepointers
+                    size = actionresult.size
+                    speedms += actionresult.speedms
+                    speednotation = compareBigO(speednotation, actionresult.speednotation)
+                    spacenotation = compareBigO(spacenotation, actionresult.spacenotation)
+                    sizeAdded += actionresult.sizeAdded
+                    spaceAdded += actionresult.spaceAdded
+                    pointersAdded += actionresult.pointersAdded
+                }
+            }else if(index < count){
+                parameter = "Get Before"
+
+                for(let j = index; j <= count; j++){
+                    let actionresult = datastructures.dstructures[i].ds.get(j)
+                    threads +=  actionresult.threads
+                    space = actionresult.space
+                    frequency = actionresult.frequency ? actionresult.frequency : null
+                    capacity = actionresult.capacity ? actionresult.capacity : null
+                    sizepointers = actionresult.sizepointers
+                    size = actionresult.size
+                    speedms += actionresult.speedms
+                    speednotation = compareBigO(speednotation, actionresult.speednotation)
+                    spacenotation = compareBigO(spacenotation, actionresult.spacenotation)
+                    sizeAdded += actionresult.sizeAdded
+                    spaceAdded += actionresult.spaceAdded
+                    pointersAdded += actionresult.pointersAdded
+                }
+            }
+
+            updatedds[i].speedms = Math.floor(speedms * 1e6) / 1e6
+            updatedds[i].speednotation = speednotation
+            updatedds[i].spacenotation = spacenotation
+            updatedds[i].threads = threads
+            updatedds[i].space = space
+            updatedds[i].frequency = frequency
+            updatedds[i].capacity = capacity
+            updatedds[i].sizepointers = sizepointers
+            updatedds[i].size = size
+            updatedds[i].sizeAdded = sizeAdded
+            updatedds[i].spaceAdded = spaceAdded
+            updatedds[i].pointersAdded = pointersAdded
+            updatedds[i].actiontype = "Get"
+            updatedds[i].actioninput = index
+            updatedds[i].actioncount = count
+            updatedds[i].inputparameters = parameter
+
+            // insert into action results
+            // let insertqry = `
+            // INSERT INTO 
+            // actionresults (dsid, dsname, actiontype, actioninput, actioncount, inputparameters, speedms, speednotaion, size, sizepointers, space, spacenotation, threads, sizeAdded, spaceAdded, pointersAdded) 
+            // VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+            
+            // let insertParameters = [updatedds[i].dsid, updatedds[i].dsname, "Get", index, count, parameter, updatedds[i].speedms, updatedds[i].speednotation, updatedds[i].size, updatedds[i].sizepointers, 
+            //                         updatedds[i].space, updatedds[i].spacenotation, updatedds[i].threads, updatedds[i].sizeAdded, updatedds[i].spaceAdded, updatedds[i].pointersAdded];
+            // executeQuery(insertqry, insertParameters, "write")
+
+            // add results to actionresults table
+            let insertActionResults = await axios.post('http://localhost:3001/analytics/add/insertActionResults', {actionResults : updatedds[i]});
+        }
+
+        updatedsdetails(updatedds)
+    }
+
+    const handleSubmit = (event) => {
+        event.preventDefault(); 
+
+        let index = parseInt(indexInput);
+        let count = parseInt(countInput)
+
+        let ds = datastructures.dstructures[0].ds
+
+        if(count >= ds.size()){
+            count = ds.size() - 1
+        }else if(count < 0){
+            count = 0
+        }
+
+        get(datastructures, index, count)
+
+        setIndexInput('')
+        setCountInput('')
+        event.target.reset()
+        submitModal()
+    };
+
+    useEffect(() => {
+        //formRef.current.addEventListener('submit', handleSubmit);
+    }, [])
+
+    return(
+        <dialog id="get-modal" className="p-5 ring-1 ring-gray-400">
+            <form ref={formRef} onSubmit={handleSubmit}>
+                <div className="flex flex-col gap-5">
+                    <div>
+                        <h2 className="text-base font-semibold leading-7 text-gray-900">Getting a Node</h2>
+                        <p className="mt-1 text-sm leading-6 text-gray-600">This action will be applied to every datastructure.</p>
+                    </div>
+                    
+                    <div className="relative">
+                        <label htmlFor="get-index" className=" bg-white text-sm font-medium leading-6 text-gray-900">From Index (max index is {maxIndex.maxIndex === -1 ? 0 : maxIndex.maxIndex})</label>
+                        <input type="number" name="index" value={indexInput} onChange={handleInputChange} min={0} max={maxIndex.maxIndex === -1 ? 0 : maxIndex.maxIndex} placeholder={"e.g. '8'"} id="get-index" autoComplete="given-name" className="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 
+                        ring-inset ring-gray-300 placeholder:text-gray-400 border-none focus:ring-2 focus:ring-inset outline-none focus:ring-indigo-400 sm:text-sm sm:leading-6"/>
+                    </div>
+
+                    <div className="relative">
+                        <label htmlFor="get-index-count" className=" bg-white text-sm font-medium leading-6 text-gray-900">To Index</label>
+                        <input type="number" name="count" value={countInput} onChange={handleInputChangeCount} min={0} placeholder={"e.g. '10'"} id="get-index-count" autoComplete="given-name" className="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 
+                        ring-inset ring-gray-300 placeholder:text-gray-400 border-none focus:ring-2 focus:ring-inset outline-none focus:ring-indigo-400 sm:text-sm sm:leading-6"/>
+                    </div>
+
+                    <div className="mt-6 flex items-center justify-end gap-x-6">
+                        <button onClick={submitModal} type="button" className="text-sm font-semibold leading-6 text-gray-900">Cancel</button>
+                        <button  type="submit" className="rounded-md w-[100px] bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm 
+                        hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Get</button>
+                    </div>
+                </div>
+            </form> 
+        </dialog>
+    )
+}
+
+const DeleteDialog = ({deleteModal, maxIndex, datastructures, updatedsdetails, executeQuery}) =>{
+    const formRef = useRef(null);
+
+    const [indexInput, setIndexInput] = useState('');
+    const [countInput, setCountInput] = useState('');
+
+    let submitModal = () =>{
+        deleteModal.close()
+    }
+
+    const handleInputChange = (event) =>{
+        setIndexInput(event.target.value)
+    }
+
+    const handleInputChangeCount = (event) => {
+        setCountInput(event.target.value)
+    }
+
+    const compareBigO = (firstBigO, secondBigO) => {
+        // Map Big O notations to their corresponding growth rates
+        const growthRates = {
+          'O(1)': 1,
+          'O(log n)': 2,
+          'O(n)': 3,
+          'O(n log n)': 4,
+          'O(n^2)': 5,
+          // Add more as needed
+        };
+      
+        // Retrieve growth rates for the provided Big O notations
+        const firstRate = growthRates[firstBigO];
+        const secondRate = growthRates[secondBigO];
+      
+        // Check if the provided Big O notations are valid
+        if (firstBigO == undefined) {
+          return secondBigO
+        }
+      
+        // Compare the growth rates and determine which one is slower or higher
+        if (firstRate < secondRate) {
+          return secondBigO;
+        } else if (firstRate > secondRate) {
+          return firstBigO;
+        } else {
+          return firstBigO;
+        }
+    }
+
+    const remove = async (datastructures, index, count) => {
+        let updatedds = datastructures.dstructures
+
+        for(let i = 0; i < datastructures.dstructures.length; i++){
+            let speedms = 0
+            let speednotation
+            let spacenotation
+            let threads = 0
+            let space
+            let frequency
+            let capacity
+            let sizepointers
+            let size
+            let sizeAdded = 0
+            let spaceAdded = 0
+            let pointersAdded = 0
+            let parameter
+
+            if(index >= count){
+                parameter = "Delete After"
+
+                for(let j = index; j >= count; j--){ 
+                    let actionresult = datastructures.dstructures[i].ds.delete(count)
+                    threads +=  actionresult.threads
+                    space = actionresult.space
+                    frequency = actionresult.frequency ? actionresult.frequency : null
+                    capacity = actionresult.capacity ? actionresult.capacity : null
+                    sizepointers = actionresult.sizepointers
+                    size = actionresult.size
+                    speedms += actionresult.speedms
+                    speednotation = compareBigO(speednotation, actionresult.speednotation)
+                    spacenotation = compareBigO(spacenotation, actionresult.spacenotation)
+                    sizeAdded += actionresult.sizeAdded
+                    spaceAdded += actionresult.spaceAdded
+                    pointersAdded += actionresult.pointersAdded
+                    
+                }
+            }else if(index < count){
+                parameter = "Delete Before"
+
+                for(let j = index; j <= count; j++){
+                    let actionresult = datastructures.dstructures[i].ds.delete(index)
+                    threads +=  actionresult.threads
+                    space = actionresult.space
+                    frequency = actionresult.frequency ? actionresult.frequency : null
+                    capacity = actionresult.capacity ? actionresult.capacity : null
+                    sizepointers = actionresult.sizepointers
+                    size = actionresult.size
+                    speedms += actionresult.speedms
+                    speednotation = compareBigO(speednotation, actionresult.speednotation)
+                    spacenotation = compareBigO(spacenotation, actionresult.spacenotation)
+                    sizeAdded += actionresult.sizeAdded
+                    spaceAdded += actionresult.spaceAdded
+                    pointersAdded += actionresult.pointersAdded
+                }
+            }
+
+            updatedds[i].speedms = Math.floor(speedms * 1e6) / 1e6
+            updatedds[i].speednotation = speednotation
+            updatedds[i].spacenotation = spacenotation
+            updatedds[i].threads = threads
+            updatedds[i].space = space
+            updatedds[i].frequency = frequency
+            updatedds[i].capacity = capacity
+            updatedds[i].sizepointers = sizepointers
+            updatedds[i].size = size
+            updatedds[i].sizeAdded = sizeAdded
+            updatedds[i].spaceAdded = spaceAdded
+            updatedds[i].pointersAdded = pointersAdded
+            updatedds[i].actiontype = "Delete"
+            updatedds[i].actioninput = index
+            updatedds[i].actioncount = count
+            updatedds[i].inputparameters = parameter
+
+            // let insertqry = `
+            // INSERT INTO 
+            // actionresults (dsid, dsname, actiontype, actioninput, actioncount, inputparameters, speedms, speednotaion, size, sizepointers, space, spacenotation, threads, sizeAdded, spaceAdded, pointersAdded) 
+            // VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+            
+            // let insertParameters = [updatedds[i].dsid, updatedds[i].dsname, "Delete", index, count, parameter, updatedds[i].speedms, updatedds[i].speednotation, updatedds[i].size, updatedds[i].sizepointers, 
+            //                         updatedds[i].space, updatedds[i].spacenotation, updatedds[i].threads, updatedds[i].sizeAdded, updatedds[i].spaceAdded, updatedds[i].pointersAdded];
+            // executeQuery(insertqry, insertParameters, "write")
+
+            // let dsjson = updatedds[i].ds.toJSON()
+            // let updateqry = 'UPDATE dsdetails SET dsdata = ? WHERE dsid = ?'
+            // let updateParameters = [dsjson, updatedds[i].dsid]
+            // executeQuery(updateqry, updateParameters, "update")
+
+            let JSONData = updatedds[i].ds.toJSON()
+            let DSID = updatedds[i].dsid
+
+            // add results to actionresults table
+            let insertActionResults = await axios.post('http://localhost:3001/analytics/add/insertActionResults', {actionResults : updatedds[i]});
+
+            // udpate JSONData column of datstructures table
+            let updateJSONData = await axios.post('http://localhost:3001/analytics/add/updateJSONData', {JSONData, DSID}); 
+        }
+
+        maxIndex.setMaxIndex(updatedds[0].ds.size() -1) 
+        console.log("asdasdasd")
+        updatedsdetails(updatedds)
+    }
+
+    const handleSubmit = (event) => {
+        event.preventDefault(); 
+
+        let index = parseInt(indexInput);
+        let count = parseInt(countInput)
+
+        let ds = datastructures.dstructures[0].ds
+
+        if(count >= ds.size()){
+            count = ds.size() - 1
+        }else if(count < 0){
+            count = 0
+        }
+
+        remove(datastructures, index, count)
+
+        setIndexInput('')
+        setCountInput('')
+        event.target.reset()
+        submitModal()
+    };
+
+    useEffect(() => {
+        //formRef.current.addEventListener('submit', handleSubmit);
+    }, [])
+
+    return(
+        <dialog id="delete-modal" className="p-5 ring-1 ring-gray-400">
+            <form ref={formRef} onSubmit={handleSubmit}>
+                <div className="flex flex-col gap-5">
+                    <div>
+                        <h2 className="text-base font-semibold leading-7 text-gray-900">Deleting a node</h2>
+                        <p className="mt-1 text-sm leading-6 text-gray-600">This action will apply to every datastructure.</p>
+                    </div>
+                    
+                    <div className="relative">
+                        <label htmlFor="delete-index" className=" bg-white text-sm font-medium leading-6 text-gray-900">From Index (max index is {maxIndex.maxIndex === -1 ? 0 : maxIndex.maxIndex})</label>
+                        <input type="number" name="index" value={indexInput} onChange={handleInputChange} min={0} max={maxIndex.maxIndex === -1 ? 0 : maxIndex.maxIndex} placeholder={"e.g. '8'"} id="delete-index" autoComplete="given-name" className="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 
+                        ring-inset ring-gray-300 placeholder:text-gray-400 border-none focus:ring-2 focus:ring-inset outline-none focus:ring-indigo-400 sm:text-sm sm:leading-6"/>
+                    </div>
+
+                    <div className="relative">
+                        <label htmlFor="delete-index-count" className=" bg-white text-sm font-medium leading-6 text-gray-900">To Index</label>
+                        <input type="number" name="count" value={countInput} onChange={handleInputChangeCount} min={0} placeholder={"e.g. '10'"} id="delete-index-count" autoComplete="given-name" className="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 
+                        ring-inset ring-gray-300 placeholder:text-gray-400 border-none focus:ring-2 focus:ring-inset outline-none focus:ring-indigo-400 sm:text-sm sm:leading-6"/>
+                    </div>
+
+                    <div className="mt-6 flex items-center justify-end gap-x-6">
+                        <button onClick={submitModal} type="button" className="text-sm font-semibold leading-6 text-gray-900">Cancel</button>
+                        <button  type="submit" className="rounded-md w-[100px] bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm 
+                        hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Delete</button>
+                    </div>
+                </div>
+            </form> 
+        </dialog>
+    )
+}
+
+const ConfirmDialog = ({messageModal, content, ds, executeQuery, charts}) =>{
+    const formRef = useRef(null);
+
+    let submitModal = () =>{
+        messageModal.close()
+    }
+
+    const DataOptionsTemplate = () => {
+        const options = {
+            plugins: { 
+              title: {
+                display: true,
+                text: "",
+                font: {
+                  size: 15,
+                },
+                margin: {
+                  top: 20,
+                },
+              },
+            },
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: 'Data Structures', 
+                  color: 'black',
+                  font: {
+                    size: 10,
+                  },
+                },
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: 'Speed in millisecond', 
+                  color: 'black',
+                  font: {
+                    size: 10,
+                  },
+                },
+                ticks: {
+                    callback: function (value, index, values) {
+                      // Format the tick value to display up to 6 decimals
+                      return Math.floor(value * 1e6) / 1e6
+                    },
+                },
+              },
+            },
+        };
+    
+        let data = {
+            labels: [""],
+            datasets: []
+        }
+    
+        return [data, options]
+    }
+
+    const handleSubmit = (event) => {
+        event.preventDefault(); 
+        
+        let from = content.messageModalContent.from 
+
+        if(from === "CRUD-Reset"){
+            let dscount = ds.dstructures.length
+            let batch
+
+            const getHighestBatch = async () =>{
+                let batchqry = `SELECT COALESCE(MAX(dsbatch), 0) + 1 as dsbatch FROM dsdetails`
+                let result = await executeQuery(batchqry, [], 'read');
+                batch = result[0].dsbatch
+
+                for(let i = 0; i < dscount; i++){
+                    //dsbatch, dsname, threaded, frequency, type, userpivot, datecreated, dsdata
+                    //ds={{dstructures, setdstructures, retrieveDS, setMaxIndex}}
+                    let dsname = ds.dstructures[i].dsname
+                    let threaded = ds.dstructures[i].threaded
+                    let frequency = dsname === "Doubly Linked List" ? 0 : 100
+                    let type = ds.dstructures[i].type
+                    let userpivot = ds.dstructures[i].userpivot
+                    let datecreated = "12-31-2022 2:30 PM"
+                    let dsdata 
+
+                    if(dsname === "Tree List")
+                        dsdata = new TreeList(100).toJSON()
+                    else if(dsname === "Doubly Linked List")
+                        dsdata = new LinkedList(100).toJSON()
+                    else if(dsname === "Dynamic Array")
+                        dsdata = new DynamicArray(100).toJSON()
+                    
+                    let parameters = [
+                        batch, 
+                        dsname, 
+                        threaded, 
+                        frequency, 
+                        type, 
+                        userpivot,
+                        datecreated,
+                        dsdata
+                    ];
+    
+                    let insertqry = `INSERT INTO dsdetails 
+                                    (dsbatch, dsname, threaded, frequency, type, userpivot, datecreated, dsdata) 
+                                    VALUES (?, ?, ?, ?, ?, ?, ?, ? )`
+    
+                    result = await executeQuery(insertqry, parameters, 'write');
+                }
+
+                let qry = `
+                SELECT ds.*, ar.actionnumber, ar.actiontype, ar.actioninput, ar.actioncount, ar.inputparameters, ar.speedms, ar.speednotaion, ar.size, ar.sizepointers, ar.space, ar.spacenotation, ar.threads, ar.sizeAdded, ar.spaceAdded, ar.pointersAdded
+                FROM dsdetails ds
+                LEFT JOIN (
+                    SELECT *
+                    FROM actionresults ar_inner
+                    WHERE ar_inner.actionnumber = (
+                        SELECT MAX(actionnumber)
+                        FROM actionresults
+                        WHERE dsid = ar_inner.dsid
+                    )
+                ) ar ON ds.dsid = ar.dsid
+                WHERE ds.dsbatch = ${batch};`;
+
+                result = await executeQuery(qry, [1,2,3], 'read');
+                ds.retrieveDS(result);
+                ds.setMaxIndex(result[0].size === null ? -1 : result[0].size-1)
+            }
+
+            getHighestBatch()
+        }else if(from === "CRUD-Flatten"){
+
+            const fetch = async () => {
+                
+              
+                let dstructures = ds.dstructures
+                let dsCount = dstructures.length
+                let actiontype = dstructures[0].actiontype
+                let actioninput = dstructures[0].actioninput
+                let actioncount = dstructures[0].actioncount
+                let actionparameters = dstructures[0].actionparameters
+                let initialListSize = dstructures[0].size - dstructures[0].sizeAdded
+                let initialArraySize = dstructures[2].frequency - dstructures[2].sizeAdded
+                let colors = ["#a8c7ff", "#ff9696", "#96ffcc"]
+                let datasets
+
+                //speed related
+                let speedArr = DataOptionsTemplate()
+                datasets = []
+                speedArr[1].plugins.title.text = [`Speed of ${actiontype} Action From Index ${actioninput} to ${actioncount};`, `Initial List Size: ${initialListSize}, Array Size: ${initialArraySize}`] ;
+                speedArr[1].scales.x.title.text = "Data Structures";
+                speedArr[1].scales.y.title.text = "Speed in Millisecond";
+
+                for(let i = 0; i < dsCount; i++){
+                    let dataObject = {
+                        label: dstructures[i].dsname,
+                        data: [dstructures[i].speedms],
+                        backgroundColor: colors[i]
+                    }
+
+                    datasets.push(dataObject)
+                }
+
+                speedArr[0].datasets = datasets
+                charts.setLastSpeedBarData(speedArr[0])
+                charts.setLastSpeedBarDataOptions(speedArr[1])
+
+                
+                // size related
+                let sizeArr = DataOptionsTemplate()
+                datasets = []
+                sizeArr[1].plugins.title.text = [`Size Added from ${actiontype}ing Index ${actioninput} to ${actioncount};`, `Initial List Size: ${initialListSize}, Array Size: ${initialArraySize}`] ;
+                sizeArr[1].scales.x.title.text = "Data Structures";
+                sizeArr[1].scales.y.title.text = "Number of Size Added";
+
+                for(let i = 0; i < dsCount; i++){
+                    let dataObject = {
+                        label: dstructures[i].dsname,
+                        data: [dstructures[i].sizeAdded],
+                        backgroundColor: colors[i]
+                    }
+
+                    datasets.push(dataObject)
+                }
+
+                sizeArr[0].datasets = datasets
+                charts.setLastSizeBarData(sizeArr[0])
+                charts.setLastSizeBarDataOptions(sizeArr[1])
+
+                // space related
+                let spaceArr = DataOptionsTemplate()
+                datasets = []
+                spaceArr[1].plugins.title.text = [`Memory Added from ${actiontype}ing Index ${actioninput} to ${actioncount};`, `Initial List Size: ${initialListSize}, Array Size: ${initialArraySize}`] ;
+                spaceArr[1].scales.x.title.text = "Data Structures";
+                spaceArr[1].scales.y.title.text = "Memory Added in Bytes";
+
+                for(let i = 0; i < dsCount; i++){
+                    let dataObject = {
+                        label: dstructures[i].dsname,
+                        data: [dstructures[i].spaceAdded],
+                        backgroundColor: colors[i]
+                    }
+
+                    datasets.push(dataObject)
+                }
+
+                spaceArr[0].datasets = datasets
+                charts.setLastSpaceBarData(spaceArr[0])
+                charts.setLastSpaceBarDataOptions(spaceArr[1])
+
+                // threads related
+                let threadsArr = DataOptionsTemplate()
+                datasets = []
+                threadsArr[1].plugins.title.text = [`Total Threads Used from ${actiontype}ing Index ${actioninput} to ${actioncount};`, `Initial List Size: ${initialListSize}, Array Size: ${initialArraySize}`] ;
+                threadsArr[1].scales.x.title.text = "Data Structures";
+                threadsArr[1].scales.y.title.text = "Count of Threads";
+
+                for(let i = 0; i < dsCount; i++){
+                    let dataObject = {
+                        label: dstructures[i].dsname,
+                        data: [dstructures[i].threads],
+                        backgroundColor: colors[i]
+                    }
+
+                    datasets.push(dataObject)
+                }
+
+                threadsArr[0].datasets = datasets
+                charts.setLastThreadsBarData(threadsArr[0])
+                charts.setLastThreadsBarDataOptions(threadsArr[1])
+
+
+                let chartPanel = document.querySelector("#Charts")
+                chartPanel.click()
+            }
+
+            fetch()
+        }
+
+        submitModal()
+    };
+
+    useEffect(() => {
+        //console.log(content.messageModalContent, 'content')
+    }, [])
+
+    return(
+        <dialog id="message-modal" className="p-5 ring-1 ring-gray-400">
+            <form ref={formRef} onSubmit={handleSubmit}>
+                <div className="flex flex-col gap-5">
+                    <div>
+                        <h2 className="text-base font-semibold leading-7 text-gray-900">{content.messageModalContent.type}</h2>
+                        <p className="mt-1 text-sm leading-6 text-gray-600">{content.messageModalContent.message}</p>
+                    </div>
+                    
+                    <div className="mt-6 flex items-center justify-end gap-x-6">
+                        <button onClick={submitModal} type="button" className="text-sm font-semibold leading-6 text-gray-900">Cancel</button>
+                        <button  type="submit" className="rounded-md w-[100px] bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm 
+                        hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">{content.messageModalContent.buttonContent}</button>
+                    </div>
+                </div>
+            </form> 
+        </dialog>
+    )
+}
+
+const ResetDialog = () => { 
+    const 
+        [resetDialog, setResetDialog, 
+        dstructures, setdstructures, 
+        retrieveDS, 
+        setMaxIndex] = useContext(DialogContext)
+    
+    const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+    const accountID = userDetails.AccountID
+    
+    const onConfirm = async () => {        
+        //getting the current highest batch of an account
+        let getHighestBatch = await axios.post('http://localhost:3001/analytics/reset/getHighestBatch', {accountID});
+        let highestBatch = getHighestBatch.data[0].DSBatch
+
+        //create new instance of datastructures in 'datastructures' table
+        let treelist = new TreeList(100)
+        let treeliststr = treelist.toJSON()
+        
+        let linkedlist = new LinkedList()
+        let linkedliststr = linkedlist.toJSON()
+        
+        let dynamicarray = new DynamicArray(100)
+        let dynamicarraystr = dynamicarray.toJSON()
+
+        let batch = highestBatch + 1
+        let data = {accountID, batch,  treeliststr, linkedliststr, dynamicarraystr}
+
+        let initializeDS = await axios.post('http://localhost:3001/analytics/reset/initializeDS', {data});
+
+        //update last used batch from accounts table
+        let updateLastUsedDSBatch = await axios.post('http://localhost:3001/analytics/reset/updateLastUsedDSBatch', {data});
+
+        //get the last actions and datastructure 
+        let response = await axios.post('http://localhost:3001/analytics', {userDetails});
+        let newDataStructures = response.data
+
+        //update states
+        retrieveDS(newDataStructures);
+        setMaxIndex(0)
+
+        // close the dialog
+        handleClose()
+    }
+
+    const handleClose = () => {
+        setResetDialog(false)
+    }
+
+    return (
+        <Fragment>
+            <Dialog
+                open={resetDialog}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                {"Confirmation to reset"}
+                </DialogTitle>
+                <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                    Resetting the datastructures will revert back all datastructures in its initial state.
+                </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                <Button onClick={handleClose}>Cancel</Button>
+                <Button onClick={onConfirm} autoFocus>
+                    Confirm
+                </Button>
+                </DialogActions>
+            </Dialog>
+        </Fragment>
+    )
+}
+
+const DSDetails = ({dsDetails}) => {
+
+    const print = () => {
+        console.log(dsDetails)
+    }
+
+    useEffect(() => {
+        const slider = document.querySelectorAll('.items');
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        slider.forEach(makeDragScroll)
+
+        function makeDragScroll(slider){
+            slider.addEventListener('mousedown', (e) => {
+                isDown = true;
+                slider.classList.add('active');
+                startX = e.pageX - slider.offsetLeft;
+                scrollLeft = slider.scrollLeft;
+                slider.style.cursor='grabbing'
+            });
+            slider.addEventListener('mouseleave', () => {
+                isDown = false;
+                slider.classList.remove('active');
+                slider.style.cursor='grab'
+            });
+            slider.addEventListener('mouseup', () => {
+                isDown = false;
+                slider.classList.remove('active');
+                slider.style.cursor='grab'
+            });
+            slider.addEventListener('mousemove', (e) => {
+                if(!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - slider.offsetLeft;
+                const walk = (x - startX); //scroll-fast
+                slider.scrollLeft = scrollLeft - walk;
+            });
+        }
+    }, [])
+
+
+    return( 
+        <section className='bg-gradient-to-l from-slate-200 to-[#f5efef] rounded-md max-w-full 
+        w-full h-[200px] min-h-[200px] my-5 flex overflow-x-scroll gap-20 shadow items cursor-grab'>
+            <div className='h-full min-w-[400px] flex flex-col relative'>
+                <img src={about} onClick={print} className='w-[1.6rem] absolute left-1 top-1 cursor-pointer'></img>
+                <div className='flex-[2] flex justify-center items-center text-[1.5rem] font-bold font-sans text-gray-700'>
+                    <h1>{dsDetails.dsname}</h1>
+                </div>
+
+                <div className='flex-[1] grid grid-cols-2 grid-rows-3 justify-items-left text-sm left-12 relative text-gray-500'>
+                    <h4>Threaded: <span className='font-bold text-gray-600 text-md float'>{dsDetails.threaded === 0 ? "FALSE" : "TRUE"}</span></h4>
+                    <h4>{dsDetails.dsname === "Dynamic Array" ? "Capacity:" : "Frequency:"} <span className='font-bold text-gray-600 text-md'>{dsDetails.frequency || dsDetails.capacity || 0}</span></h4>
+                    <h4>Type: <span className='font-bold text-gray-600 text-md'>{dsDetails.type}</span></h4>
+                    {dsDetails.dsname === "Dynamic Array" ? null : <h4>User-added Pivot: <span className='font-bold text-gray-600 text-md'>{dsDetails.userpivot}</span></h4>}
+                </div>
+            </div>
+            
+            <div className='h-full flex gap-10 py-4 px-4'>
+                <DSDetailsItems title={["Speed", "Time Complexity"]} value={[dsDetails.speedms, dsDetails.speednotation]} unit={["milliseconds", "Big-O"]}/>
+                <DSDetailsItems title={dsDetails.dsname !== "Dynamic Array" ? ["Size", "Pivot Count", "Size Added", "Pointers Added"] : ["Size", "Capacity Added"]} value={dsDetails.dsname !== "Dynamic Array" ? [dsDetails.size, dsDetails.sizepointers, dsDetails.sizeAdded, dsDetails.pointersAdded] : [dsDetails.size, dsDetails.sizeAdded]} unit={["count", "count", "count", "count"]}/>
+                <DSDetailsItems title={["Threads"]} value={[dsDetails.threads]} unit={["count"]}/>
+                <DSDetailsItems title={["Memory", "Space Complexity", "Memory Added"]} value={[dsDetails.space, dsDetails.spacenotation, dsDetails.spaceAdded]} unit={["bytes", "Big-O", "bytes"]}/>
+            </div>
+        </section>
+    )
+}
+
+const DSDetailsItems = ({title, value, unit}) => {
+    const [index, setIndex] = useState(0)
+
+    const speedNext = () => {
+        let size = value.length
+
+        if(index === size-1){
+            setIndex(0)
+        }else{
+            setIndex(index + 1)
+        }
+    }
+
+    return(
+        <div className='relative bg-[#ffffff80] min-h-full w-[200px] min-w-[200px] rounded-lg flex flex-col shadow1'>
+            <img src={about} className='w-[1.5rem] absolute left-1 top-1 cursor-pointer'></img>
+            <img src={next} onClick={speedNext} className='w-[1.6rem] absolute right-1 top-1 cursor-pointer'></img>
+            <div className='flex flex-col w-full h-full justify-center items-center flex-[7]'>
+                <h1 className='flex-[8] flex justify-center items-center text-[1.5rem] font-bold relative top-3'>
+                    {value[index] === null ? "N/A" : value[index]}
+                </h1>
+                <h2 className='flex-[3] text-gray-500'>
+                    {unit[index]}
+                </h2>
+            </div>
+
+            <div className='shadow w-full h-full flex-[3] flex justify-center items-center bg-slate-300 rounded-es-lg rounded-ee-lg font-semibold text-gray-800'>
+                <h2 className=''>
+                    {title[index]}
+                </h2>
+            </div>
+        </div>
+    ) 
+}
+
+const SortHeader = () => {
+    const [age, setAge] = React.useState(''); // for dropdowns or filters
+
+    //styles
+    const Search = styled('div')(({ theme }) => ({
+        position: 'relative',
+        borderRadius: theme.shape.borderRadius,
+        height : '45px',
+        backgroundColor: alpha('#e7eef6', 1),
+        '&:hover': {
+          backgroundColor: alpha('#dfe9f5', 1),
+        },
+        marginLeft: 0,
+        width: '100%',
+        [theme.breakpoints.up('sm')]: {
+          marginLeft: theme.spacing(1),
+          width: 'auto',
+        },
+      }));
+      
+      const SearchIconWrapper = styled('div')(({ theme }) => ({
+        padding: theme.spacing(0, 2),
+        height: '100%',
+        position: 'absolute',
+        pointerEvents: 'none',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }));
+      
+      const StyledInputBase = styled(InputBase)(({ theme }) => ({
+        color: 'inherit',
+        width: '100%',
+        '& .MuiInputBase-input': {
+          padding: theme.spacing(1.5, 1, 0, 0),
+          // vertical padding + font size from searchIcon
+          paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+          transition: theme.transitions.create('width'),
+          [theme.breakpoints.up('sm')]: {
+            width: '12ch',
+            '&:focus': {
+              width: '20ch',
+            },
+          },
+        },
+      }));
+
+    const handleChange = (event) => { // dropdowns or filters
+        setAge(event.target.value);
+    };
+
+    const [alignment, setAlignment] = React.useState('web');
+
+    const handleAlignmentChange = (event, newAlignment) => {
+        setAlignment(newAlignment);
+    };
+    
+    return(
+        <section className='bg-[#f8f8fa] h-16 w-full flex rounded-ss-[8px] shadow z-10'>
+            <div className='min-w-[13rem] bg-[#d2d3da] rounded-ss-[8px]'></div>
+
+            <div className="flex w-full">
+                <Stack direction="row" justifyContent="flex-start" alignItems="center" spacing={3} marginX={4} width={"100%"}>
+                    <FormControl sx={{ minWidth: 200 }} size="small">
+                        <InputLabel id="demo-select-small-label">Sort by</InputLabel>
+                        <Select
+                            labelId="demo-select-small-label"
+                            id="demo-select-small"
+                            value={age}
+                            label="Sort by"
+                            onChange={handleChange}
+                        >
+                            <MenuItem value="">
+                            <em>None</em>
+                            </MenuItem>
+                            <MenuItem value={10}>Ten</MenuItem>
+                            <MenuItem value={20}>Twenty</MenuItem>
+                            <MenuItem value={30}>Thirty</MenuItem>
+                        </Select>
+                    </FormControl>
+
+                    <FormControl sx={{ minWidth: 200 }} size="small">
+                        <InputLabel id="demo-select-small-label">Group by</InputLabel>
+                        <Select
+                            labelId="demo-select-small-label"
+                            id="demo-select-small"
+                            value={age}
+                            label="Group by"
+                            onChange={handleChange}
+                        >
+                            <MenuItem value="">
+                            <em>None</em>
+                            </MenuItem>
+                            <MenuItem value={10}>Ten</MenuItem>
+                            <MenuItem value={20}>Twenty</MenuItem>
+                            <MenuItem value={30}>Thirty</MenuItem>
+                        </Select>
+                    </FormControl>
+
+                    <ToggleButtonGroup
+                        color="primary"
+                        value={alignment}
+                        exclusive
+                        onChange={handleAlignmentChange}
+                        aria-label="Platform"
+                        sx={{height: "65%"}}
+                        >
+                        <ToggleButton value="web">Ascending</ToggleButton>
+                        <ToggleButton value="ios">Descending</ToggleButton>
+                    </ToggleButtonGroup>
+                </Stack>
+
+                <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={0} marginX={3} width={"100%"}>
+                    {/* <TextField
+                        id="filled-search"
+                        label="Search data structure"
+                        type="search"
+                        variant="filled"
+                        sx={{width: 250, backgroundColor: "rgba(221, 232, 246, .2)"}}
+                        size="small"
+                    /> */}
+
+                    <Search size="large">
+                        <SearchIconWrapper>
+                        <SearchIcon />
+                        </SearchIconWrapper>
+                        <StyledInputBase
+                        placeholder="Search…"
+                        inputProps={{ 'aria-label': 'search' }}
+                        />
+                    </Search>
+                </Stack>
+            </div>
+        </section>
+    )
+}
+
+const ActionSideBar = ({addModal, getModal, deleteModal, messageModal, modalContent}) => {
+    return(
+        <section className="bg-[#d9dde5] w-52 h-full flex flex-col p-2 px-3 gap-3"> 
+            <ActionSideBarItem logo={add} title="Add" hoverColor="hover:bg-[#b3c4b8]" modal={addModal}/>
+            <ActionSideBarItem logo={update} title="Get / Update" hoverColor="hover:bg-[#87b8ccab]" modal={getModal}/>
+            <ActionSideBarItem logo={remove} title="Delete" hoverColor="hover:bg-[#d17992ab]" modal={deleteModal}/>
+            <div className="mx-auto w-[75%] h-[1px] m-1 bg-[rgba(0,0,0,.1)]"></div>
+            <ActionSideBarItem logo={barChart} title="Flatten" hoverColor="hover:bg-[#d17992ab]" modal={messageModal} modalContent={modalContent}/>
+            <ActionSideBarItem logo={reset} title="Reset" hoverColor="hover:bg-[#d17992ab]" modal={messageModal} modalContent={modalContent}/>
+        </section>
+    )
+}
+
+const ActionSideBarItem = (props) => {
+    const [resetDialog, setResetDialog] = useContext(DialogContext)
+    const [lastActionDialog, setLastActionDialog] = useContext(LastActionDialog)
+
+    // previous version of dialog
+    let openModal = () => {
+       if(props.title==="Reset"){
+            setResetDialog(true)
+       }else if(props.title==="Flatten"){
+            setLastActionDialog(true)
+       }else{
+            props.modal.showModal(); 
+       }
+    }
+
+    return(  
+        <div onClick={openModal} className={`flex p-4 gap-2 items-center bg-[#ffffff80] ${props.hoverColor}
+        cursor-pointer rounded transition-all duration-200 shadow-sm ring-1 ring-[#f8f8fa] ring-inset`}>
+            <img src={props.logo} className='w-[1.6rem]'></img>
+            <span className='text-[rgba(0,0,0,.6)] font-bold text-md text-stroke'>{props.title}</span>
+        </div>         
+    )
+}
+ 
+export default CRUD;
