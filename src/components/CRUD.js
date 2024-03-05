@@ -138,6 +138,7 @@ const CRUD = ({display, charts}) => {
     }
 
     useEffect(() => {
+    
         // get the user details from login page
         const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
@@ -585,10 +586,6 @@ const GetDialog = ({getModal, maxIndex, datastructures, updatedsdetails, execute
         submitModal()
     };
 
-    useEffect(() => {
-        //formRef.current.addEventListener('submit', handleSubmit);
-    }, [])
-
     return(
         <dialog id="get-modal" className="p-5 ring-1 ring-gray-400">
             <form ref={formRef} onSubmit={handleSubmit}>
@@ -768,7 +765,7 @@ const DeleteDialog = ({deleteModal, maxIndex, datastructures, updatedsdetails, e
         }
 
         maxIndex.setMaxIndex(updatedds[0].ds.size() -1) 
-        console.log("asdasdasd")
+
         updatedsdetails(updatedds)
     }
 
@@ -794,9 +791,6 @@ const DeleteDialog = ({deleteModal, maxIndex, datastructures, updatedsdetails, e
         submitModal()
     };
 
-    useEffect(() => {
-        //formRef.current.addEventListener('submit', handleSubmit);
-    }, [])
 
     return(
         <dialog id="delete-modal" className="p-5 ring-1 ring-gray-400">
@@ -1071,9 +1065,6 @@ const ConfirmDialog = ({messageModal, content, ds, executeQuery, charts}) =>{
         submitModal()
     };
 
-    useEffect(() => {
-        //console.log(content.messageModalContent, 'content')
-    }, [])
 
     return(
         <dialog id="message-modal" className="p-5 ring-1 ring-gray-400">
@@ -1178,6 +1169,7 @@ const DSDetails = ({dsDetails}) => {
     }
 
     useEffect(() => {
+  
         const slider = document.querySelectorAll('.items');
         let isDown = false;
         let startX;

@@ -1,10 +1,13 @@
 const mysql = require('mysql');
 
 const con = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'custom_list'
+    host: process.env.DB_HOST  || 'localhost',
+    user: process.env.DB_USERNAME || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'custom_list',
+    waitForConnection: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
 con.connect((err) => {

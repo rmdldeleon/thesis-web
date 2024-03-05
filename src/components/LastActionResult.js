@@ -16,9 +16,14 @@ import Typography from '@mui/material/Typography';
 import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
 
+import {Box, Paper} from '@mui/material'
+import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
+
+
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
+
 
 export default function LastActionResult() {
     const [lastActionDialog, setLastActionDialog] = useContext(LastActionDialog) 
@@ -55,7 +60,36 @@ export default function LastActionResult() {
           </Toolbar>
         </AppBar>
 
-        <BarsDataset />
+        <div className='w-full h-[45vh] min-h-[300px] flex gap-5 p-10 box-border'>
+          {/* charts div */}
+          <div className='flex flex-col bg-[#f0f2f5] h-full flex-[8] shadow2 box-border'>
+              <div className='flex relative items-center justify-center h-full'>
+                  {/* y axis */}
+                  <div className='flex items-center justify-center whitespace-nowrap w-[30px]'>
+                      <h3 className='transform -rotate-90'>Speed in milliseconds</h3>
+                  </div>
+
+                  {/* chart */}
+                  <div className='h-full w-full'>
+                      <BarsDataset />
+                  </div>
+              </div>
+
+              {/* x axis */}
+              <div className='flex items-center justify-center relative bottom-[15px]'>
+                  <h3 className=''>Data structures</h3>
+              </div>
+          </div>
+          
+          <div className='flex-[2] h-full bg-[#f0f2f5] shadow2 py-3 px-7 box-border'>
+            <h2>asdsad </h2>
+            <h2>asdsad </h2>
+            <h2>asdsad </h2>
+            <h2>asdsad </h2>
+            <h2>asdsad </h2>
+          </div>
+        </div>
+    
 
         <List>
           <ListItemButton>
