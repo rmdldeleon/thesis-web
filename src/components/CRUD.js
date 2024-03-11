@@ -38,10 +38,12 @@ import LinkedList from "../datastructures/LinkedList"
 import DynamicArray from "../datastructures/DynamicArray";
 
 import LastActionResult from "./LastActionResult";
+import SpeedResult from "./SpeedResult"
 
 //data context
 const DialogContext = createContext();
 export const LastActionDialog = createContext();
+export const SpeedDialog = createContext();
 
 const CRUD = ({display, charts}) => {
     const navigate = useNavigate();
@@ -51,7 +53,7 @@ const CRUD = ({display, charts}) => {
     const [deleteModal, setDeleteModal] = useState([])
 
     const [maxIndex, setMaxIndex] = useState([])
-    const [dstructures, setdstructures] = useState([{}, {}, {}])
+    const [dstructures, setdstructures] = useState([{a:"adasd"}, {}, {}])
 
     const[messageModal, setMessageModal] = useState([])
     const[messageModalContent, setMessageModalContent] = useState({type:"Confirmation", message:"Confirmation Message", buttonContent:"Confirm", from:{}})
@@ -61,6 +63,12 @@ const CRUD = ({display, charts}) => {
 
     // for GENERAL last action result
     const [lastActionDialog, setLastActionDialog] = React.useState(false); 
+
+    // for speed dialog
+    const [speedDialog, setSpeedDialog] = useState(false)
+
+    // index of opened dialog
+    const [openedDSDetails, setOpenedDSDetails] = useState()
 
     const executeQuery = (query, parameters, access) => { 
         return new Promise((resolve, reject) => {
@@ -123,7 +131,8 @@ const CRUD = ({display, charts}) => {
                 inputparameters: result[i].Direction,
                 speednotation: result[i].SpeedNotation,
                 spacenotation: result[i].SpaceNotation,
-                sizepointers: result[i].SizePointers
+                sizepointers: result[i].SizePointers,
+                JSONResults: result[i].JSONResults
             }
 
             dsarr.push(dsobject)
@@ -138,7 +147,6 @@ const CRUD = ({display, charts}) => {
     }
 
     useEffect(() => {
-    
         // get the user details from login page
         const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
@@ -158,7 +166,7 @@ const CRUD = ({display, charts}) => {
 
                 console.log(response, "response")
 
-                await retrieveDS(response.data);
+                await retrieveDS(response.data);            
                 setMaxIndex(response.data[0].Size === null ? -1 : response.data[0].Size-1 )
             } catch (error) {
               console.error('SQL Error:', error);
@@ -170,11 +178,13 @@ const CRUD = ({display, charts}) => {
 
     return(
         <DialogContext.Provider value={[resetDialog, setResetDialog, dstructures, setdstructures, retrieveDS, setMaxIndex]}>
-        <LastActionDialog.Provider value={[lastActionDialog, setLastActionDialog]}>
+        <LastActionDialog.Provider value={[lastActionDialog, setLastActionDialog, dstructures]}>
+        <SpeedDialog.Provider value={[speedDialog, setSpeedDialog, dstructures, openedDSDetails, setOpenedDSDetails]}>
             <section className={`${display} bg-[#f8f8fa] h-full w-full rounded-ss-[20px] flex flex-col rounded-ee-[8px]`}>
                 <SortHeader />
                 <ResetDialog />
                 <LastActionResult />
+                <SpeedResult />
 
                 <div className='flex flex-1'>
                     <ActionSideBar addModal={addModal} getModal={getModal} deleteModal={deleteModal} messageModal={messageModal} modalContent={{messageModalContent, setMessageModalContent}}/>
@@ -186,15 +196,19 @@ const CRUD = ({display, charts}) => {
         
                     <div className='flex-1 relative max-h-full max-w-full overflow-hidden'>
                         <main className='absolute h-full w-full overflow-y-scroll px-2 my-1'>
-                            <DSDetails dsDetails={dstructures[0]}/>
+                            {/* <DSDetails dsDetails={dstructures[0]}/>
                             <DSDetails dsDetails={dstructures[1]}/>
-                            <DSDetails dsDetails={dstructures[2]}/>
+                            <DSDetails dsDetails={dstructures[2]}/> */}
+                            {dstructures.map((item, index) => (
+                                <DSDetails key={index} dsDetails={item} index={index}/>
+                            ))}
                             <DSDetails dsDetails={{}}/>
                             <DSDetails dsDetails={{}}/>
                         </main>
                     </div> 
                 </div>
             </section>
+        </SpeedDialog.Provider>
         </LastActionDialog.Provider>
         </DialogContext.Provider>
     )
@@ -264,7 +278,13 @@ const AddDialog = ({addModal, maxIndex, datastructures, updatedsdetails, execute
  
         let initialSize = updatedds[0].ds.size() 
 
+        // array for storing all results
+        // will be used to get average
+        let allResults
+
         for(let i = 0; i < datastructures.dstructures.length; i++){
+            allResults = []
+
             let speedms = 0
             let speednotation
             let spacenotation
@@ -280,6 +300,8 @@ const AddDialog = ({addModal, maxIndex, datastructures, updatedsdetails, execute
 
             if(initialSize === 0){
                 for(let j = 0; j < count; j++){
+                    let prevSize = datastructures.dstructures[i].ds.size() // original size before the the action
+
                     let actionresult = datastructures.dstructures[i].ds.add(0)
                     threads +=  actionresult.threads
                     space = actionresult.space
@@ -293,9 +315,16 @@ const AddDialog = ({addModal, maxIndex, datastructures, updatedsdetails, execute
                     sizeAdded += actionresult.sizeAdded
                     spaceAdded += actionresult.spaceAdded
                     pointersAdded += actionresult.pointersAdded
+                    
+                    // for JSONResults
+                    actionresult.prevSize = prevSize
+                    actionresult.currentIndex = j
+                    allResults.push(actionresult)
                 }
             }else if(parameter === "Add After"){
                 for(let j = index; j < index + count; j++){
+                    let prevSize = datastructures.dstructures[i].ds.size() // original size before the the action
+
                     let actionresult = datastructures.dstructures[i].ds.addAfterIndex(j, 0)
                     threads +=  actionresult.threads
                     space = actionresult.space
@@ -309,11 +338,15 @@ const AddDialog = ({addModal, maxIndex, datastructures, updatedsdetails, execute
                     sizeAdded += actionresult.sizeAdded
                     spaceAdded += actionresult.spaceAdded
                     pointersAdded += actionresult.pointersAdded
+                    
+                    // for JSONResults
+                    actionresult.prevSize = prevSize
+                    actionresult.currentIndex = j
+                    allResults.push(actionresult)
                 }   
             }else{
                 console.log("Add Before");
             }
-
 
             updatedds[i].speedms = Math.floor(speedms * 1e6) / 1e6
             updatedds[i].speednotation = speednotation
@@ -331,9 +364,14 @@ const AddDialog = ({addModal, maxIndex, datastructures, updatedsdetails, execute
             updatedds[i].actioninput = index
             updatedds[i].actioncount = count
             updatedds[i].inputparameters = parameter
-         
+
+            // for actionresults table 
+            let JSONResults = JSON.stringify(allResults)
+            updatedds[i].JSONResults = JSONResults
+            
+            // for datastructures table 
             let JSONData = updatedds[i].ds.toJSON()
-            let DSID = updatedds[i].dsid
+            let DSID = updatedds[i].dsid        
 
             // add results to actionresults table
             let insertActionResults = await axios.post('http://localhost:3001/analytics/add/insertActionResults', {actionResults : updatedds[i]});
@@ -347,7 +385,7 @@ const AddDialog = ({addModal, maxIndex, datastructures, updatedsdetails, execute
             }  
         }
 
-        maxIndex.setMaxIndex(maxIndex.maxIndex += count)
+        maxIndex.setMaxIndex(maxIndex.maxIndex += count)    
         updatedsdetails(updatedds)
     }
 
@@ -477,6 +515,10 @@ const GetDialog = ({getModal, maxIndex, datastructures, updatedsdetails, execute
     const get = async (datastructures, index, count) => {
         let updatedds = datastructures.dstructures
 
+        // array for storing all results
+        // will be used to get average
+        let allResults = []
+
         for(let i = 0; i < datastructures.dstructures.length; i++){
             let speedms = 0
             let speednotation
@@ -496,6 +538,8 @@ const GetDialog = ({getModal, maxIndex, datastructures, updatedsdetails, execute
                 parameter = "Get After"
 
                 for(let j = index; j >= count; j--){ 
+                    let prevSize = datastructures.dstructures[i].ds.size() // original size before the the action
+
                     let actionresult = datastructures.dstructures[i].ds.get(j)
                     threads +=  actionresult.threads
                     space = actionresult.space
@@ -509,11 +553,17 @@ const GetDialog = ({getModal, maxIndex, datastructures, updatedsdetails, execute
                     sizeAdded += actionresult.sizeAdded
                     spaceAdded += actionresult.spaceAdded
                     pointersAdded += actionresult.pointersAdded
+
+                     // for JSONResults
+                     actionresult.prevSize = prevSize
+                     allResults.push(actionresult)
                 }
             }else if(index < count){
                 parameter = "Get Before"
 
                 for(let j = index; j <= count; j++){
+                    let prevSize = datastructures.dstructures[i].ds.size() // original size before the the action
+
                     let actionresult = datastructures.dstructures[i].ds.get(j)
                     threads +=  actionresult.threads
                     space = actionresult.space
@@ -527,6 +577,10 @@ const GetDialog = ({getModal, maxIndex, datastructures, updatedsdetails, execute
                     sizeAdded += actionresult.sizeAdded
                     spaceAdded += actionresult.spaceAdded
                     pointersAdded += actionresult.pointersAdded
+
+                    // for JSONResults
+                    actionresult.prevSize = prevSize
+                    allResults.push(actionresult)
                 }
             }
 
@@ -547,15 +601,9 @@ const GetDialog = ({getModal, maxIndex, datastructures, updatedsdetails, execute
             updatedds[i].actioncount = count
             updatedds[i].inputparameters = parameter
 
-            // insert into action results
-            // let insertqry = `
-            // INSERT INTO 
-            // actionresults (dsid, dsname, actiontype, actioninput, actioncount, inputparameters, speedms, speednotaion, size, sizepointers, space, spacenotation, threads, sizeAdded, spaceAdded, pointersAdded) 
-            // VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-            
-            // let insertParameters = [updatedds[i].dsid, updatedds[i].dsname, "Get", index, count, parameter, updatedds[i].speedms, updatedds[i].speednotation, updatedds[i].size, updatedds[i].sizepointers, 
-            //                         updatedds[i].space, updatedds[i].spacenotation, updatedds[i].threads, updatedds[i].sizeAdded, updatedds[i].spaceAdded, updatedds[i].pointersAdded];
-            // executeQuery(insertqry, insertParameters, "write")
+            // for actionresults table 
+            let JSONResults = JSON.stringify(allResults)
+            updatedds[i].JSONResults = JSONResults
 
             // add results to actionresults table
             let insertActionResults = await axios.post('http://localhost:3001/analytics/add/insertActionResults', {actionResults : updatedds[i]});
@@ -669,6 +717,10 @@ const DeleteDialog = ({deleteModal, maxIndex, datastructures, updatedsdetails, e
     const remove = async (datastructures, index, count) => {
         let updatedds = datastructures.dstructures
 
+        // array for storing all results
+        // will be used to get average
+        let allResults = []
+        
         for(let i = 0; i < datastructures.dstructures.length; i++){
             let speedms = 0
             let speednotation
@@ -688,6 +740,8 @@ const DeleteDialog = ({deleteModal, maxIndex, datastructures, updatedsdetails, e
                 parameter = "Delete After"
 
                 for(let j = index; j >= count; j--){ 
+                    let prevSize = datastructures.dstructures[i].ds.size() // original size before the the action
+
                     let actionresult = datastructures.dstructures[i].ds.delete(count)
                     threads +=  actionresult.threads
                     space = actionresult.space
@@ -701,12 +755,17 @@ const DeleteDialog = ({deleteModal, maxIndex, datastructures, updatedsdetails, e
                     sizeAdded += actionresult.sizeAdded
                     spaceAdded += actionresult.spaceAdded
                     pointersAdded += actionresult.pointersAdded
-                    
+
+                    // for JSONResults
+                    actionresult.prevSize = prevSize
+                    allResults.push(actionresult)       
                 }
             }else if(index < count){
                 parameter = "Delete Before"
 
                 for(let j = index; j <= count; j++){
+                    let prevSize = datastructures.dstructures[i].ds.size() // original size before the the action
+
                     let actionresult = datastructures.dstructures[i].ds.delete(index)
                     threads +=  actionresult.threads
                     space = actionresult.space
@@ -720,6 +779,10 @@ const DeleteDialog = ({deleteModal, maxIndex, datastructures, updatedsdetails, e
                     sizeAdded += actionresult.sizeAdded
                     spaceAdded += actionresult.spaceAdded
                     pointersAdded += actionresult.pointersAdded
+
+                    // for JSONResults
+                    actionresult.prevSize = prevSize
+                    allResults.push(actionresult)
                 }
             }
 
@@ -740,20 +803,11 @@ const DeleteDialog = ({deleteModal, maxIndex, datastructures, updatedsdetails, e
             updatedds[i].actioncount = count
             updatedds[i].inputparameters = parameter
 
-            // let insertqry = `
-            // INSERT INTO 
-            // actionresults (dsid, dsname, actiontype, actioninput, actioncount, inputparameters, speedms, speednotaion, size, sizepointers, space, spacenotation, threads, sizeAdded, spaceAdded, pointersAdded) 
-            // VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-            
-            // let insertParameters = [updatedds[i].dsid, updatedds[i].dsname, "Delete", index, count, parameter, updatedds[i].speedms, updatedds[i].speednotation, updatedds[i].size, updatedds[i].sizepointers, 
-            //                         updatedds[i].space, updatedds[i].spacenotation, updatedds[i].threads, updatedds[i].sizeAdded, updatedds[i].spaceAdded, updatedds[i].pointersAdded];
-            // executeQuery(insertqry, insertParameters, "write")
+            // for actionresults table 
+            let JSONResults = JSON.stringify(allResults)
+            updatedds[i].JSONResults = JSONResults
 
-            // let dsjson = updatedds[i].ds.toJSON()
-            // let updateqry = 'UPDATE dsdetails SET dsdata = ? WHERE dsid = ?'
-            // let updateParameters = [dsjson, updatedds[i].dsid]
-            // executeQuery(updateqry, updateParameters, "update")
-
+            // for datstructures table 
             let JSONData = updatedds[i].ds.toJSON()
             let DSID = updatedds[i].dsid
 
@@ -1125,7 +1179,7 @@ const ResetDialog = () => {
 
         //update states
         retrieveDS(newDataStructures);
-        setMaxIndex(0)
+        setMaxIndex(-1)
 
         // close the dialog
         handleClose()
@@ -1162,7 +1216,7 @@ const ResetDialog = () => {
     )
 }
 
-const DSDetails = ({dsDetails}) => {
+const DSDetails = ({dsDetails, index}) => {
 
     const print = () => {
         console.log(dsDetails)
@@ -1224,17 +1278,20 @@ const DSDetails = ({dsDetails}) => {
             </div>
             
             <div className='h-full flex gap-10 py-4 px-4'>
-                <DSDetailsItems title={["Speed", "Time Complexity"]} value={[dsDetails.speedms, dsDetails.speednotation]} unit={["milliseconds", "Big-O"]}/>
-                <DSDetailsItems title={dsDetails.dsname !== "Dynamic Array" ? ["Size", "Pivot Count", "Size Added", "Pointers Added"] : ["Size", "Capacity Added"]} value={dsDetails.dsname !== "Dynamic Array" ? [dsDetails.size, dsDetails.sizepointers, dsDetails.sizeAdded, dsDetails.pointersAdded] : [dsDetails.size, dsDetails.sizeAdded]} unit={["count", "count", "count", "count"]}/>
-                <DSDetailsItems title={["Threads"]} value={[dsDetails.threads]} unit={["count"]}/>
-                <DSDetailsItems title={["Memory", "Space Complexity", "Memory Added"]} value={[dsDetails.space, dsDetails.spacenotation, dsDetails.spaceAdded]} unit={["bytes", "Big-O", "bytes"]}/>
+                <DSDetailsItems dsDetails={dsDetails} dsIndex={index} title={["Speed", "Time Complexity"]} value={[dsDetails.speedms, dsDetails.speednotation]} unit={["milliseconds", "Big-O"]}/>
+                <DSDetailsItems dsDetails={dsDetails} dsIndex={index} title={dsDetails.dsname !== "Dynamic Array" ? ["Size", "Pivot Count", "Size Added", "Pointers Added"] : ["Size", "Capacity Added"]} value={dsDetails.dsname !== "Dynamic Array" ? [dsDetails.size, dsDetails.sizepointers, dsDetails.sizeAdded, dsDetails.pointersAdded] : [dsDetails.size, dsDetails.sizeAdded]} unit={["count", "count", "count", "count"]}/>
+                <DSDetailsItems dsDetails={dsDetails} dsIndex={index} title={["Threads"]} value={[dsDetails.threads]} unit={["count"]}/>
+                <DSDetailsItems dsDetails={dsDetails} dsIndex={index} title={["Memory", "Space Complexity", "Memory Added"]} value={[dsDetails.space, dsDetails.spacenotation, dsDetails.spaceAdded]} unit={["bytes", "Big-O", "bytes"]}/>
             </div>
         </section>
     )
 }
 
-const DSDetailsItems = ({title, value, unit}) => {
+const DSDetailsItems = ({title, value, unit, dsDetails, dsIndex}) => {
     const [index, setIndex] = useState(0)
+    
+    // context for speed dialog - linkedlist
+    const [ speedDialog, setSpeedDialog, dstructures, openedDSDetails, setOpenedDSDetails] = useContext(SpeedDialog)
 
     const speedNext = () => {
         let size = value.length
@@ -1246,9 +1303,16 @@ const DSDetailsItems = ({title, value, unit}) => {
         }
     }
 
+    const openDialog = () =>{
+        if(title[0] === "Speed"){
+            setOpenedDSDetails({dsDetails, dsIndex})
+            setSpeedDialog(true)
+        }
+    }
+
     return(
         <div className='relative bg-[#ffffff80] min-h-full w-[200px] min-w-[200px] rounded-lg flex flex-col shadow1'>
-            <img src={about} className='w-[1.5rem] absolute left-1 top-1 cursor-pointer'></img>
+            <img src={about} onClick={openDialog} className='w-[1.5rem] absolute left-1 top-1 cursor-pointer'></img>
             <img src={next} onClick={speedNext} className='w-[1.6rem] absolute right-1 top-1 cursor-pointer'></img>
             <div className='flex flex-col w-full h-full justify-center items-center flex-[7]'>
                 <h1 className='flex-[8] flex justify-center items-center text-[1.5rem] font-bold relative top-3'>

@@ -1,71 +1,83 @@
 import * as React from 'react';
-import { BarChart } from '@mui/x-charts/BarChart';
-import { axisClasses } from '@mui/x-charts';
+import { useContext, useEffect, useState } from 'react';
+import { LastActionDialog } from './CRUD';
 
-const chartSetting = {
-  // yAxis: [
-  //   {
-  //     label: 'rainfall (mm)',
-  //   },
-  // ],
+import CanvasJSReact from '@canvasjs/react-charts';
+var CanvasJS = CanvasJSReact.CanvasJS;
+var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
-  sx: {
-    // [`.${axisClasses.left} .${axisClasses.label}`]: {
-    //   transform: 'translate(-20px, 0)',
-    // },
+const colors = ['#8884d8', '#82ca9d', '#ffc658'];
 
-  },
-
+const containerProps1 = {
+  width: "100%", // Set width to 100% of the parent element
+  height: "100%", // Set height to 100% of the parent element
 };
-
-const options = {
-  legend: {
-    display: false
-  }
-};
-
-const dataset = [
-  {
-    SMS: 100,
-    a: 'TreeList',
-  },
-  {
-    SMS: 100,
-    a: 'DoublyList',
-  },
-  {
-    SMS: 100,
-    c: 'CircularList',
-  },
-  {
-    SMS: 100,
-    d: 'DynamicArray',
-  },
-  {
-    SMS: 100,
-    e: 'TraditionalArray',
-  },
-];
-
-const valueFormatter = (value) => `${value}mm`;
 
 export default function BarsDataset() {
+  const [lastActionDialog, setLastActionDialog, dstructures] = useContext(LastActionDialog) 
+
+  const dataPoints = () => {
+    let arr = []
+
+    for(let i = 0; i < dstructures.length; i++){
+        let obj = {
+          label: dstructures[i].dsname,
+          y: dstructures[i].speedms
+        } 
+
+        arr.push(obj)
+    }
+    
+    return arr
+  }
+
+  const options = {
+    backgroundColor: "rgba(0,0,0,0)",
+
+    // title: {
+    //   text: "Last Action Resut"
+    // },
+    axisX: {
+      title: "Data Structures" // Add X axis label
+    },
+    axisY: {
+      title: "Speed in Milliseconds", // Add Y axis label
+      
+      labelFormatter: function (e) {
+        return Math.floor(e.value * 1e6) / 1e6 // Format to four decimal places
+      }
+    },
+    data: [
+        {
+          // Change type to "doughnut", "line", "splineArea", etc.
+          type: "column",
+          dataPoints: [
+            { label: "Apple",  y: 10  },
+            { label: "Orange", y: 15  },
+            { label: "Banana", y: 25  },
+            { label: "Mango",  y: 30  },
+            { label: "Grape",  y: 28  }
+          ]
+        }
+    ]
+  }
+
+  const [data, setData] = useState(options)
+
+
+  useEffect(() => {
+      options.data[0].dataPoints = dataPoints()
+      setData(options)
+  }, [dstructures])
+
   return (
-    <BarChart
-      dataset={dataset}
-      xAxis={[
-        { scaleType: 'band', dataKey: 'a' },
-        { scaleType: 'band', dataKey: 'b' },
-        { scaleType: 'band', dataKey: 'c' },
-        { scaleType: 'band', dataKey: 'd' },
-        { scaleType: 'band', dataKey: 'e' },
-      ]}
-
-      series={[
-        { dataKey: 'SMS', label: 'qwe', valueFormatter },
-      ]}
-
-      {...chartSetting}
-    />
+    <div className='w-full h-full'>
+        <CanvasJSChart 
+            options = {data}
+            containerProps={containerProps1}
+          /* onRef={ref => this.chart = ref} */
+        />
+        {/*You can get reference to the chart instance as shown above using onRef. This allows you to access all chart properties and methods*/}
+		</div>
   );
 }

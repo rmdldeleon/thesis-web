@@ -177,7 +177,7 @@ export default class TreeList{
             const endTime = performance.now();
 
             let rawElapsedTime = endTime - startTime;
-            let result = Math.floor(rawElapsedTime * 1e6) / 1e6
+            let result = rawElapsedTime //Math.floor(rawElapsedTime * 1e6) / 1e6
 
             // result
             this.#space += nodeToBeAdded.prev == undefined ? 4 : 6
@@ -251,7 +251,7 @@ export default class TreeList{
         const endTime = performance.now();
 
         let rawElapsedTime = endTime - startTime;
-        let result = Math.floor(rawElapsedTime * 1e6) / 1e6
+        let result = rawElapsedTime //Math.floor(rawElapsedTime * 1e6) / 1e6
 
 
         // result
@@ -332,7 +332,7 @@ export default class TreeList{
         const endTime = performance.now();
 
         let rawElapsedTime = endTime - startTime;
-        let result = Math.floor(rawElapsedTime * 1e6) / 1e6
+        let result = rawElapsedTime //Math.floor(rawElapsedTime * 1e6) / 1e6
 
 
         // result
@@ -512,7 +512,7 @@ export default class TreeList{
         const endTime = performance.now();
 
         let rawElapsedTime = endTime - startTime;
-        let result = Math.floor(rawElapsedTime * 1e6) / 1e6
+        let result = rawElapsedTime //Math.floor(rawElapsedTime * 1e6) / 1e6
 
         // result
         this.#lastAction = "Get"
@@ -700,7 +700,7 @@ export default class TreeList{
         const endTime = performance.now();
 
         let rawElapsedTime = endTime - startTime;
-        let result = Math.floor(rawElapsedTime * 1e6) / 1e6
+        let result = rawElapsedTime //Math.floor(rawElapsedTime * 1e6) / 1e6
 
         // result
         this.#lastAction = "Delete"

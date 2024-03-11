@@ -24,6 +24,7 @@ router.post('/add/updateJSONData', (req, res) => {
 })
 
 router.post('/add/insertActionResults', (req, res) => {
+
     db.insertActionResults(req.body.actionResults, (err, results) => {
         if (err) 
             res.status(500).json({ error: 'Error retrieving data' });
