@@ -1300,6 +1300,10 @@ video {
   font-size: 1.5rem;
 }
 
+.text-\[1rem\] {
+  font-size: 1rem;
+}
+
 .text-base {
   font-size: 1rem;
   line-height: 1.5rem;
@@ -1308,10 +1312,6 @@ video {
 .text-sm {
   font-size: 0.875rem;
   line-height: 1.25rem;
-}
-
-.text-\[1rem\] {
-  font-size: 1rem;
 }
 
 .font-bold {
