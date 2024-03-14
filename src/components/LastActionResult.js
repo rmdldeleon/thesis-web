@@ -99,7 +99,7 @@ export default function LastActionResult() {
               <CloseIcon />
             </IconButton>
             <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-              Sound
+              Last Action Sumamry
             </Typography>
             <Button autoFocus color="inherit" onClick={handleClose}>
               save

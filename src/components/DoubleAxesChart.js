@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useContext, useEffect, useState, useRef } from 'react';
-import { LastActionDialog, SpeedDialog } from './CRUD';
+import { LastActionDialog, SpeedDialog, SizeDialog } from './CRUD';
 
 import CanvasJSReact from '@canvasjs/react-charts';
 var CanvasJS = CanvasJSReact.CanvasJS;
@@ -23,11 +23,29 @@ export default function DoubleAxesChart() {
 
         let JSONResults = JSON.parse(dstructures[openedDSDetails.dsIndex].JSONResults)
 
-        for(let i = 0; i < JSONResults.length || i > 100; i++){
+        for(let i = 0; i < JSONResults.length; i++){
  
             let obj = {
                 x: JSONResults[i].currentIndex,
                 y: JSONResults[i].speedms
+            } 
+
+            arr.push(obj)
+        }    
+        
+        return arr
+    }
+
+    const spaceDataPoints = () => {
+        let arr = []
+
+        let JSONResults = JSON.parse(dstructures[openedDSDetails.dsIndex].JSONResults)
+
+        for(let i = 0; i < JSONResults.length; i++){
+ 
+            let obj = {
+                x: JSONResults[i].currentIndex,
+                y: JSONResults[i].spaceAdded
             } 
 
             arr.push(obj)
@@ -43,16 +61,17 @@ export default function DoubleAxesChart() {
 
         JSONResults = JSON.parse(dstructures[openedDSDetails.dsIndex].JSONResults)
 
-        for(let i = 0; i < JSONResults.length || i > 100; i++){
-            const speednotation = JSONResults[i].speednotation
+        for(let i = 0; i < JSONResults.length; i++){
+            const speednotation = openedDSDetails.currentDialog === "Memory" ? JSONResults[i].spacenotation : JSONResults[i].speednotation
+
             let notationValue = ""
 
             if(speednotation === "O(log n)"){
                 notationValue = 2
             }else if(speednotation === "O(n)"){
-                notationValue = 3
-            }else if(speednotation === "O(1)"){
                 notationValue = 1
+            }else if(speednotation === "O(1)"){
+                notationValue = 3
             }
 
             let obj = {
@@ -88,8 +107,11 @@ export default function DoubleAxesChart() {
         }],
         axisX: {
             title: "States",
-            interval: 2,
-            //valueFormatString: "asd"
+            interval: 1,
+      
+            // labelFormatter: function (e) {
+            //     return "index " + e.value
+            // }
         },
         axisY: {
             title: "Speed in Milliseconds",
@@ -106,9 +128,9 @@ export default function DoubleAxesChart() {
             tickColor: "#51CDA0",
             labelFormatter: function (e) {
                 if(e.value === 1)
-                    return "O(n^2)"
+                    return "O(n)"
                 else if(e.value === 2 )
-                    return "O(Log n)"
+                    return "O(log n)"
                 else if(e.value === 3)
                     return "O(1)"
                 else{
@@ -117,7 +139,15 @@ export default function DoubleAxesChart() {
             }
         },
         toolTip: {
-            shared: true
+            shared: true,
+            contentFormatter: function (e) {
+                let content = "<span style='color: black;'>Index " + e.entries[0].dataPoint.x + "</span><br/>";
+                e.entries.forEach(function (entry) {
+       
+                    content += "<span style='color: " + entry.dataSeries.color + ";'>" + entry.dataSeries.name + ": " + entry.dataPoint.y + "</span><br/>";
+                });
+                return content;
+            }
         },
         legend: {
             cursor: "pointer",
@@ -131,7 +161,7 @@ export default function DoubleAxesChart() {
             }
         },
         data: [{
-            type: "spline",
+            type: "line",
             name: "Speed in Milliseconds",
             showInLegend: true,
             dataPoints: [
@@ -141,7 +171,7 @@ export default function DoubleAxesChart() {
             ]
         },
         {
-            type: "spline",
+            type: "line",
             name: "Notation",
             axisYType: "secondary",
             showInLegend: true,
@@ -157,10 +187,35 @@ export default function DoubleAxesChart() {
 
     useEffect(() => {
         if(openedDSDetails && openedDSDetails.dsDetails.JSONResults){
-            options.data[0].dataPoints = speedmsDataPoints()
-            options.data[1].dataPoints = notationDataPoints()
-            options.axisX.interval = calculateInterval(JSONResults.length)
-            setData(options)
+     
+            if(openedDSDetails.currentDialog === "Speed"){ // if speed is opened
+                options.data[0].dataPoints = speedmsDataPoints()
+                options.data[0].name = "Speed in Milliseconds"
+
+                options.data[1].dataPoints = notationDataPoints()
+
+                options.subtitles[0].text = "Speed in Milliseconds and Notation"
+                
+                options.axisY.title = "Speed in Milliseconds"
+                options.axisX.title = "Index"
+                options.axisX.interval = calculateInterval(JSONResults.length)
+
+                setData(options)
+            }else if (openedDSDetails.currentDialog === "Memory"){
+                options.data[0].dataPoints = spaceDataPoints()
+                options.data[0].name = "Space Added"
+
+                options.data[1].dataPoints = notationDataPoints()
+
+                options.subtitles[0].text = "Size Added and Notation"
+                
+                options.axisY.title = "Space Added"
+                options.axisX.title = "Index"
+                options.axisX.interval = calculateInterval(JSONResults.length)
+
+                setData(options)
+            }
+           
         }
     }, [dstructures])
 

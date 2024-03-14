@@ -4,14 +4,15 @@ const { con } = require('./Connection');
 const insertActionResults = (actionResults, callback) => {
     let ar = actionResults
     let JSONResults = actionResults.JSONResults
-
+    let ActionDate = actionResults.ActionDate
+    
     const values = [ar.dsid, ar.dsname, ar.actiontype, ar.actioninput, ar.actioncount, ar.inputparameters, ar.speedms, ar.speednotation, ar.size, ar.sizepointers, 
-    ar.pointersAdded, ar.sizeAdded, ar.space, ar.spacenotation, ar.spaceAdded, ar.threads, JSONResults]
+    ar.pointersAdded, ar.sizeAdded, ar.space, ar.spacenotation, ar.spaceAdded, ar.threads, JSONResults, ActionDate]
 
     const query = `
         INSERT INTO actionresults (ActionNumber, DSID, DSName, ActionType, StartingIndex, EndIndex_Count, Direction, 
-        SpeedMS, SpeedNotation, Size, SizePointers, PointersAdded, SizeAdded, SpaceOccupied, SpaceNotation, SpaceAdded, ThreadsUsed, JSONResults) 
-        VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`    
+        SpeedMS, SpeedNotation, Size, SizePointers, PointersAdded, SizeAdded, SpaceOccupied, SpaceNotation, SpaceAdded, ThreadsUsed, JSONResults, ActionDate) 
+        VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`    
     
     con.query(query, values, (err, results) => {
         if (err) {

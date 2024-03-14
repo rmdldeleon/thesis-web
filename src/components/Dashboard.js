@@ -1,4 +1,21 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { 
+    createContext, useContext, useState, useEffect, useRef, Fragment
+} from "react";
+
+import { 
+    Stack, InputLabel, MenuItem, FormControl, Select, ToggleButton, ToggleButtonGroup, TextField,
+    Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, ListItemText, ListItemButton, List,
+    Divider, AppBar, Toolbar, IconButton, Typography, CloseIcon, Slide, SearchIconWrapper, StyledInputBase,
+    InputBase
+} from '@mui/material'
+
+import SearchIcon from '@mui/icons-material/Search';
+import { styled, alpha } from '@mui/material/styles';
+
+import { useParams, Link, useNavigate} from "react-router-dom";
+import { useForm } from 'react-hook-form';
+
+import axios from 'axios';
 
 import "../css/App.css";
 import add from "../pictures/add.svg"
@@ -8,104 +25,159 @@ import search from "../pictures/search.svg"
 const Dashboard = ({display}) => {
     return(
         <section className={`${display} bg-[#f8f8fa] h-full w-full rounded-ss-[20px] flex flex-col rounded-ee-[8px]`}>
-            <SortHeader />
-
-            <div className='flex flex-1'>
-                <ActionSideBar />
-                <div className='flex-1 relative max-h-full max-w-full overflow-hidden'>
-                    <main className='absolute h-full w-full overflow-y-scroll px-2 my-1 flex justify-center items-center'>
-                        Dashboard
-                    </main>
-                </div>
+            <div className="bg-[#f8f8fa] h-16 min-h-[4rem] w-full flex rounded-ss-[8px] shadow z-10">
+                <SortHeader />
             </div>
+        
+            <main className="bg-red-100 h-full w-full flex flex-col p-2 gap-3">
+                <section className="bg-yellow-100 w-full h-full flex gap-3 flex-[4] min-h-[300px]">
+                    <div className="w-full h-full bg-gray-100 shadow3 rounded box-border">
+
+                    </div>
+
+                    <div className="w-full h-full bg-gray-100 shadow3 rounded box-border">
+
+                    </div>
+                </section>
+
+                <section className="bg-green-100 w-full h-full flex-[6]">
+
+                </section>
+            </main>
         </section>
     )
 }
 
 const SortHeader = () => {
+    const [age, setAge] = React.useState(''); // for dropdowns or filters
+
+    //styles
+    const Search = styled('div')(({ theme }) => ({
+        position: 'relative',
+        borderRadius: theme.shape.borderRadius,
+        height : '45px',
+        backgroundColor: alpha('#e7eef6', 1),
+        '&:hover': {
+          backgroundColor: alpha('#dfe9f5', 1),
+        },
+        marginLeft: 0,
+        width: '100%',
+        [theme.breakpoints.up('sm')]: {
+          marginLeft: theme.spacing(1),
+          width: 'auto',
+        },
+      }));
+      
+      const SearchIconWrapper = styled('div')(({ theme }) => ({
+        padding: theme.spacing(0, 2),
+        height: '100%',
+        position: 'absolute',
+        pointerEvents: 'none',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }));
+      
+      const StyledInputBase = styled(InputBase)(({ theme }) => ({
+        color: 'inherit',
+        width: '100%',
+        '& .MuiInputBase-input': {
+          padding: theme.spacing(1.5, 1, 0, 0),
+          // vertical padding + font size from searchIcon
+          paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+          transition: theme.transitions.create('width'),
+          [theme.breakpoints.up('sm')]: {
+            width: '12ch',
+            '&:focus': {
+              width: '20ch',
+            },
+          },
+        },
+      }));
+
+    const handleChange = (event) => { // dropdowns or filters
+        setAge(event.target.value);
+    };
+
+    const [alignment, setAlignment] = React.useState('web');
+
+    const handleAlignmentChange = (event, newAlignment) => {
+        setAlignment(newAlignment);
+    };
+    
     return(
-        <section className='bg-[#f8f8fa] h-16 w-full flex rounded-ss-[8px] shadow z-10'>
-            <div className='min-w-[13rem] bg-[#d2d3da] rounded-ss-[8px]'></div>
+        <section className='w-full h-full'>
+            <div className="flex w-full h-full">
+                <Stack direction="row" justifyContent="flex-start" alignItems="center" spacing={3} marginX={4} width={"100%"}>
+                    <FormControl sx={{ minWidth: 200 }} size="small">
+                        <InputLabel id="demo-select-small-label">Sort by</InputLabel>
+                        <Select
+                            labelId="demo-select-small-label"
+                            id="demo-select-small"
+                            value={age}
+                            label="Sort by"
+                            onChange={handleChange}
+                        >
+                            <MenuItem value="">
+                            <em>None</em>
+                            </MenuItem>
+                            <MenuItem value={10}>Ten</MenuItem>
+                            <MenuItem value={20}>Twenty</MenuItem>
+                            <MenuItem value={30}>Thirty</MenuItem>
+                        </Select>
+                    </FormControl>
 
-            <div className="flex w-full">
-                <div className="flex-1 flex justify-start items-center px-4 gap-5">
-                   
-                </div>
+                    <FormControl sx={{ minWidth: 200 }} size="small">
+                        <InputLabel id="demo-select-small-label">Group by</InputLabel>
+                        <Select
+                            labelId="demo-select-small-label"
+                            id="demo-select-small"
+                            value={age}
+                            label="Group by"
+                            onChange={handleChange}
+                        >
+                            <MenuItem value="">
+                            <em>None</em>
+                            </MenuItem>
+                            <MenuItem value={10}>Ten</MenuItem>
+                            <MenuItem value={20}>Twenty</MenuItem>
+                            <MenuItem value={30}>Thirty</MenuItem>
+                        </Select>
+                    </FormControl>
 
-                <div className="flex-1 flex justify-end items-center px-4 ">
-                    
-                </div>
+                    <ToggleButtonGroup
+                        color="primary"
+                        value={alignment}
+                        exclusive
+                        onChange={handleAlignmentChange}
+                        aria-label="Platform"
+                        sx={{height: "65%"}}
+                        >
+                        <ToggleButton value="web">Ascending</ToggleButton>
+                        <ToggleButton value="ios">Descending</ToggleButton>
+                    </ToggleButtonGroup>
+                </Stack>
+
+                <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={0} marginX={3} width={"100%"}>
+                    <Search size="large">
+                        <SearchIconWrapper>
+                        <SearchIcon />
+                        </SearchIconWrapper>
+                        <StyledInputBase
+                        placeholder="Search…"
+                        inputProps={{ 'aria-label': 'search' }}
+                        />
+                    </Search>
+                </Stack>
             </div>
         </section>
     )
 }
 
-const Search = () =>{
-    return(
-        //focus:shadow-[0px_0px_0px_1px_rgba(200,200,200,.5)] 
-            <div className="relative flex items-center justify-center w-[300px] h-[70%]">
-                <input
-                type="search"
-                className="shadow rounded-s-[10px] w-full h-full flex-[9] border-y border-l border-[rgba(0,0,0,.2)] bg-slate-100  px-3
-                text-base font-normal leading-[1.6] outline-none transition duration-200 ease-in-out 
-               focus:text-neutral-600 
-                dark:border-[rgba(0,0,0,.2)] dark:text-neutral-400 dark:placeholder:text-neutral-400 dark:focus:border-primary"
-                placeholder="Search"
-                aria-label="Search"
-                aria-describedby="button-addon1" />
-                
-                <button className="shadow flex items-center justify-center flex-[2] bg-slate-100  h-full rounded-e-[10px] border-y border-r border-[rgba(0,0,0,.2)]">
-                    <svg xmlns="http://www.w3.org/2000/svg" stroke-width="0" stroke="rgba(0,0,0,.5)" fill="rgba(0,0,0, .4)" height="24" viewBox="0 -960 960 960" width="24">
-                        <path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/>
-                    </svg>
-                </button>
-                
-            </div>
-    )
-}
-
-const DropDown = () => {
-    const [open, setOpen] = useState(false)
-
-    let menuRef = useRef()
-
-    useEffect(() => {
-        let handler = (e) => {
-            if(!menuRef.current.contains(e.target)){
-                setOpen(false)
-            }
-        }
-
-        document.addEventListener("click", handler)
-    })
-
-    return(
-        <div className="min-w-[14rem] h-[70%] relative" onClick={() => {setOpen(!open)}} ref={menuRef}>
-            <div className="w-full h-full relative flex justify-center items-center">
-                <button type="button" className="w-full h-full rounded-md bg-slate-100 font-semibold text-gray-600 
-                shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-slate-200" id="menu-button">
-                    Sort By
-                </button>
-                <svg className="absolute right-3 w-5 text-gray-500 cursor-pointer" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-                </svg>
-            </div>
-
-            <div className={`${open ? 'block' : 'hidden'} left-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1
-             ring-black ring-opacity-5 focus:outline-none`} role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
-                <div className="" role="none">
-                    <a href="#" className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-200" role="menuitem" tabindex="-1" id="menu-item-0">Lorem Ipsum Dolor</a>
-                    <a href="#" className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-200" role="menuitem" tabindex="-1" id="menu-item-1">Lorem Ipsum Dolor</a>
-                    <a href="#" className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-200" role="menuitem" tabindex="-1" id="menu-item-2">Lorem Ipsum Dolor</a>
-                </div>
-            </div>
-        </div>
-    ) 
-}
 
 const ActionSideBar = () => {
     return(
-        <section className="bg-[#d9dde5] w-52 h-full flex flex-col p-2 gap-3"> 
+        <section className="bg-[#d9dde5] w-52 h-full flex flex-col p-2 px-3 gap-3"> 
             {/* <ActionSideBarItem title="Add" hoverColor="hover:bg-[#b3c4b8]"/>
             <ActionSideBarItem title="Get" hoverColor="hover:bg-[#87b8ccab]"/>
             <ActionSideBarItem title="Update" hoverColor="hover:bg-[#d2bad6]"/>

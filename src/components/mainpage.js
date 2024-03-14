@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 
 import "../css/App.css";
 import SideBar from "./SideBar";
@@ -8,13 +9,15 @@ import Charts from "./Charts"
 import Dashboard from "./Dashboard";
 
 function App() {
+  const navigate = useNavigate();
+
   const [analyticsOpen, setAnalyticsOpen] = useState('block')
   const [chartsOpen, setChartsOpen] = useState('hidden')
   const [dashboardOpen, setDashboardOpen] = useState('hidden')
   const [cpo, scpo] = useState(() => setAnalyticsOpen)
 
   const [analyticsHighlight, setAnalyticsHighlight] = useState("bg-[#f8f8fa]")
-  const [dashboardHighlight, setDashboardHighlight] = useState("transparent hover:bg-[#00000015]")
+  const [dashboardHighlight, setDashboardHighlight] = useState("transparent hover:bg-[#00000015]") // a.k.a history
   const [chartsHighlight, setChartsHighlight] = useState("transparent hover:bg-[#00000010]")
   const [ch, sch] = useState(() => setAnalyticsHighlight)
 
@@ -191,6 +194,19 @@ function App() {
         },
     },
   })
+
+  useEffect(() => {
+    navigate('/analytics');
+
+    // for back button - redirects user to login
+    const handleBackButton = () => {
+      navigate('/')
+    };
+    window.addEventListener('popstate', handleBackButton);
+    return () => {
+      window.removeEventListener('popstate', handleBackButton);
+    };
+  }, [])
 
   return (
     <div className="App">

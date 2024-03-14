@@ -39,11 +39,17 @@ import DynamicArray from "../datastructures/DynamicArray";
 
 import LastActionResult from "./LastActionResult";
 import SpeedResult from "./SpeedResult"
+import SizeResult from "./SizeResult";
+import ThreadsResult from "./ThreadsResult"
+import MemoryResult from "./MemoryResult";
 
 //data context
 const DialogContext = createContext();
 export const LastActionDialog = createContext();
 export const SpeedDialog = createContext();
+export const SizeDialog = createContext();
+export const ThreadsDialog = createContext();
+export const MemoryDialog = createContext();
 
 const CRUD = ({display, charts}) => {
     const navigate = useNavigate();
@@ -66,6 +72,15 @@ const CRUD = ({display, charts}) => {
 
     // for speed dialog
     const [speedDialog, setSpeedDialog] = useState(false)
+
+    // for size dialog
+    const [ sizeDialog, setSizeDialog ] = useState(false)
+
+    // for threads dialog
+    const [ threadsDialog, setThreadsDialog] = useState(false)
+
+    // for memory dialog
+    const [ memoryDialog, setMemoryDialog ] = useState(false)
 
     // index of opened dialog
     const [openedDSDetails, setOpenedDSDetails] = useState()
@@ -132,7 +147,8 @@ const CRUD = ({display, charts}) => {
                 speednotation: result[i].SpeedNotation,
                 spacenotation: result[i].SpaceNotation,
                 sizepointers: result[i].SizePointers,
-                JSONResults: result[i].JSONResults
+                JSONResults: result[i].JSONResults, 
+                ActionDate: result[i].ActionDate
             }
 
             dsarr.push(dsobject)
@@ -180,11 +196,17 @@ const CRUD = ({display, charts}) => {
         <DialogContext.Provider value={[resetDialog, setResetDialog, dstructures, setdstructures, retrieveDS, setMaxIndex]}>
         <LastActionDialog.Provider value={[lastActionDialog, setLastActionDialog, dstructures]}>
         <SpeedDialog.Provider value={[speedDialog, setSpeedDialog, dstructures, openedDSDetails, setOpenedDSDetails]}>
+        <SizeDialog.Provider value={[sizeDialog, setSizeDialog, dstructures, openedDSDetails, setOpenedDSDetails]}>
+        <ThreadsDialog.Provider value={[threadsDialog, setThreadsDialog, dstructures, openedDSDetails, setOpenedDSDetails]}>
+        <MemoryDialog.Provider value={[memoryDialog, setMemoryDialog, dstructures, openedDSDetails, setOpenedDSDetails]}>
             <section className={`${display} bg-[#f8f8fa] h-full w-full rounded-ss-[20px] flex flex-col rounded-ee-[8px]`}>
                 <SortHeader />
                 <ResetDialog />
                 <LastActionResult />
                 <SpeedResult />
+                <SizeResult />
+                <ThreadsResult />
+                <MemoryResult />
 
                 <div className='flex flex-1'>
                     <ActionSideBar addModal={addModal} getModal={getModal} deleteModal={deleteModal} messageModal={messageModal} modalContent={{messageModalContent, setMessageModalContent}}/>
@@ -208,6 +230,9 @@ const CRUD = ({display, charts}) => {
                     </div> 
                 </div>
             </section>
+        </MemoryDialog.Provider>
+        </ThreadsDialog.Provider>
+        </SizeDialog.Provider>
         </SpeedDialog.Provider>
         </LastActionDialog.Provider>
         </DialogContext.Provider>
@@ -368,10 +393,15 @@ const AddDialog = ({addModal, maxIndex, datastructures, updatedsdetails, execute
             // for actionresults table 
             let JSONResults = JSON.stringify(allResults)
             updatedds[i].JSONResults = JSONResults
+            const currentDate = new Date();
+            const formattedDateTime = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+            updatedds[i].ActionDate = formattedDateTime
             
             // for datastructures table 
             let JSONData = updatedds[i].ds.toJSON()
-            let DSID = updatedds[i].dsid        
+            let DSID = updatedds[i].dsid 
+            
+            console.log(updatedds[i])
 
             // add results to actionresults table
             let insertActionResults = await axios.post('http://localhost:3001/analytics/add/insertActionResults', {actionResults : updatedds[i]});
@@ -555,8 +585,9 @@ const GetDialog = ({getModal, maxIndex, datastructures, updatedsdetails, execute
                     pointersAdded += actionresult.pointersAdded
 
                      // for JSONResults
-                     actionresult.prevSize = prevSize
-                     allResults.push(actionresult)
+                    actionresult.prevSize = prevSize
+                    actionresult.currentIndex = j
+                    allResults.push(actionresult)
                 }
             }else if(index < count){
                 parameter = "Get Before"
@@ -580,6 +611,7 @@ const GetDialog = ({getModal, maxIndex, datastructures, updatedsdetails, execute
 
                     // for JSONResults
                     actionresult.prevSize = prevSize
+                    actionresult.currentIndex = j
                     allResults.push(actionresult)
                 }
             }
@@ -604,6 +636,9 @@ const GetDialog = ({getModal, maxIndex, datastructures, updatedsdetails, execute
             // for actionresults table 
             let JSONResults = JSON.stringify(allResults)
             updatedds[i].JSONResults = JSONResults
+            const currentDate = new Date();
+            const formattedDateTime = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+            updatedds[i].ActionDate = formattedDateTime
 
             // add results to actionresults table
             let insertActionResults = await axios.post('http://localhost:3001/analytics/add/insertActionResults', {actionResults : updatedds[i]});
@@ -758,7 +793,8 @@ const DeleteDialog = ({deleteModal, maxIndex, datastructures, updatedsdetails, e
 
                     // for JSONResults
                     actionresult.prevSize = prevSize
-                    allResults.push(actionresult)       
+                    actionresult.currentIndex = j
+                    allResults.push(actionresult)     
                 }
             }else if(index < count){
                 parameter = "Delete Before"
@@ -782,6 +818,7 @@ const DeleteDialog = ({deleteModal, maxIndex, datastructures, updatedsdetails, e
 
                     // for JSONResults
                     actionresult.prevSize = prevSize
+                    actionresult.currentIndex = j
                     allResults.push(actionresult)
                 }
             }
@@ -806,6 +843,9 @@ const DeleteDialog = ({deleteModal, maxIndex, datastructures, updatedsdetails, e
             // for actionresults table 
             let JSONResults = JSON.stringify(allResults)
             updatedds[i].JSONResults = JSONResults
+            const currentDate = new Date();
+            const formattedDateTime = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+            updatedds[i].ActionDate = formattedDateTime
 
             // for datstructures table 
             let JSONData = updatedds[i].ds.toJSON()
@@ -1293,6 +1333,15 @@ const DSDetailsItems = ({title, value, unit, dsDetails, dsIndex}) => {
     // context for speed dialog - linkedlist
     const [ speedDialog, setSpeedDialog, dstructures, openedDSDetails, setOpenedDSDetails] = useContext(SpeedDialog)
 
+    // context for speed dialog 
+    const [ sizeDialog, setSizeDialog] = useContext(SizeDialog)
+
+    // context for threads dialog
+    const [ threadsDialog, setThreadsDialog ] = useContext(ThreadsDialog)
+
+    //context for memroy dialog 
+    const [ memoryDialog, setMemoryDialog] = useContext(MemoryDialog)
+
     const speedNext = () => {
         let size = value.length
 
@@ -1305,8 +1354,17 @@ const DSDetailsItems = ({title, value, unit, dsDetails, dsIndex}) => {
 
     const openDialog = () =>{
         if(title[0] === "Speed"){
-            setOpenedDSDetails({dsDetails, dsIndex})
+            setOpenedDSDetails({dsDetails, dsIndex, currentDialog : "Speed"})
             setSpeedDialog(true)
+        }else if(title[0] === "Size"){
+            setOpenedDSDetails({dsDetails, dsIndex, currentDialog : "Size"})
+            setSizeDialog(true)
+        }else if(title[0] === "Threads"){
+            setOpenedDSDetails({dsDetails, dsIndex, currentDialog : "Threads"})
+            setThreadsDialog(true)
+        }else if(title[0] === "Memory"){
+            setOpenedDSDetails({dsDetails, dsIndex, currentDialog : "Memory"})
+            setMemoryDialog(true)
         }
     }
 
@@ -1445,15 +1503,6 @@ const SortHeader = () => {
                 </Stack>
 
                 <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={0} marginX={3} width={"100%"}>
-                    {/* <TextField
-                        id="filled-search"
-                        label="Search data structure"
-                        type="search"
-                        variant="filled"
-                        sx={{width: 250, backgroundColor: "rgba(221, 232, 246, .2)"}}
-                        size="small"
-                    /> */}
-
                     <Search size="large">
                         <SearchIconWrapper>
                         <SearchIcon />

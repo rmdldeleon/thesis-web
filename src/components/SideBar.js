@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 
 import "../css/App.css";
 
@@ -15,7 +16,7 @@ const SideBar = ({setHeaderTitle, highlight, setChartsOpen, setAnalyticsOpen, se
         <section className="bg-slate-200 w-20 h-full flex flex-col rounded-es-[8px]"> 
             <div className='flex-1 flex flex-col'>
                 <SideBarItem logo={analytics} title="Analytics" setHeaderTitle={setHeaderTitle} thisHighlight={highlight.analyticsHighlight} highlight={highlight} setAnalyticsOpen = {setAnalyticsOpen} currentPanelOpened ={currentPanelOpened} setCurrentPanelOpened={setCurrentPanelOpened}/>
-                <SideBarItem logo={history} title="Dashboard" setHeaderTitle={setHeaderTitle} thisHighlight={highlight.dashboardHighlight} highlight={highlight} setDashboardOpen={setDashboardOpen} currentPanelOpened = {currentPanelOpened} setCurrentPanelOpened={setCurrentPanelOpened}/>
+                <SideBarItem logo={history} title="History" setHeaderTitle={setHeaderTitle} thisHighlight={highlight.dashboardHighlight} highlight={highlight} setDashboardOpen={setDashboardOpen} currentPanelOpened = {currentPanelOpened} setCurrentPanelOpened={setCurrentPanelOpened}/>
                 <SideBarItem logo={barChart} title="Charts" setHeaderTitle={setHeaderTitle} thisHighlight={highlight.chartsHighlight} highlight={highlight} setChartsOpen = {setChartsOpen} currentPanelOpened = {currentPanelOpened} setCurrentPanelOpened={setCurrentPanelOpened}/>
             </div>
 
@@ -28,6 +29,8 @@ const SideBar = ({setHeaderTitle, highlight, setChartsOpen, setAnalyticsOpen, se
 }
 
 const SideBarItem = (props) =>{
+    const navigate = useNavigate();
+
     let showPanel = () => {
         props.currentPanelOpened('hidden')
         let bg = "bg-[#f8f8fa]"
@@ -44,6 +47,7 @@ const SideBarItem = (props) =>{
             }
 
             props.setHeaderTitle("Analytics")
+            navigate('/analytics');
         }else if(props.title==="Charts"){
             props.setChartsOpen('block')
             props.setCurrentPanelOpened(() => props.setChartsOpen)
@@ -55,7 +59,7 @@ const SideBarItem = (props) =>{
             }
 
             props.setHeaderTitle("Charts")
-        }else if(props.title==="Dashboard"){
+        }else if(props.title==="History"){
             props.setDashboardOpen('block')
             props.setCurrentPanelOpened(() => props.setDashboardOpen)
 
@@ -65,14 +69,16 @@ const SideBarItem = (props) =>{
                 props.highlight.sch(() => props.highlight.setDashboardHighlight)
             }
 
-            props.setHeaderTitle("Dashboard")
+            props.setHeaderTitle("History")
+
+            navigate('/history');
         }
     }
 
     return(
-        <div id={props.title} onClick={showPanel} className={`transition-all  flex flex-col justify-center items-center text-center ${props.thisHighlight} h-[4rem] mx-1 
-        rounded my-1 cursor-pointer gap-1`}>
-            <img src={props.logo} className='w-[1.8rem] '></img>
+        <div id={props.title} onClick={showPanel} className={`transition-all  flex flex-col justify-center items-center text-center ${props.thisHighlight} h-[4rem] w-[72px] mx-1
+        rounded my-1 cursor-pointer gap-1 `}>
+            <img src={props.logo} className='w-[1.8rem]'></img>
             <h4 className='text-[.8rem] text-gray-700'>{props.title}</h4>
         </div>
     )
