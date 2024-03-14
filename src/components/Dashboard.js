@@ -6,10 +6,13 @@ import {
     Stack, InputLabel, MenuItem, FormControl, Select, ToggleButton, ToggleButtonGroup, TextField,
     Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, ListItemText, ListItemButton, List,
     Divider, AppBar, Toolbar, IconButton, Typography, CloseIcon, Slide, SearchIconWrapper, StyledInputBase,
-    InputBase
+    InputBase,
 } from '@mui/material'
 
 import SearchIcon from '@mui/icons-material/Search';
+import DeleteIcon from '@mui/icons-material/Delete';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import { visuallyHidden } from '@mui/utils';
 import { styled, alpha } from '@mui/material/styles';
 
 import { useParams, Link, useNavigate} from "react-router-dom";
@@ -22,26 +25,98 @@ import add from "../pictures/add.svg"
 import about from "../pictures/about.svg"
 import search from "../pictures/search.svg"
 
+import HistoryTable from "./HistoryTable"
+
 const Dashboard = ({display}) => {
     return(
         <section className={`${display} bg-[#f8f8fa] h-full w-full rounded-ss-[20px] flex flex-col rounded-ee-[8px]`}>
-            <div className="bg-[#f8f8fa] h-16 min-h-[4rem] w-full flex rounded-ss-[8px] shadow z-10">
+            {/* <div className="bg-[#f8f8fa] h-16 min-h-[4rem] w-full flex rounded-ss-[8px] shadow z-10">
                 <SortHeader />
-            </div>
+            </div> */}
         
-            <main className="bg-red-100 h-full w-full flex flex-col p-2 gap-3">
-                <section className="bg-yellow-100 w-full h-full flex gap-3 flex-[4] min-h-[300px]">
-                    <div className="w-full h-full bg-gray-100 shadow3 rounded box-border">
+            <main className="h-full w-full flex flex-col p-2 gap-3 bg-red-100">
+                <section className="w-full h-full flex-[4] bg-red-200 flex gap-3">
+                    <div className="w-full h-full bg-gray-100 shadow3 rounded box-border flex flex-col overflow-scroll">
+                        <div className="flex items-center justify-center w-full min-h-[70px] bg-slate-200">
+                            <h1 className="text-[1.5rem] font-bold text-gray-800"> Active Batch </h1>
+                        </div>
 
+                        <div className="h-full w-full">
+                            <List>
+                                <ListItemButton>
+                                    <ListItemText primary={"Batch"} secondary={"a"} />
+                                </ListItemButton>
+
+                                <Divider />
+
+                                <ListItemButton>
+                                    <ListItemText primary={"Size"} secondary={"a"} />
+                                </ListItemButton>
+
+                                <Divider />
+
+                                <ListItemButton>
+                                    <ListItemText primary={"DStructures Count"} secondary={"a"} />
+                                </ListItemButton>
+
+                                <Divider />
+
+                                <ListItemButton>
+                                    <ListItemText primary={"Date Created"} secondary={"a"} />
+                                </ListItemButton>
+
+                                <Divider />
+
+                                <ListItemButton>
+                                    <ListItemText primary={"Last Updated"} secondary={"a"} />
+                                </ListItemButton>
+                            </List>
+                        </div>
                     </div>
 
-                    <div className="w-full h-full bg-gray-100 shadow3 rounded box-border">
+                    <div className="w-full h-full bg-gray-100 shadow3 rounded box-border flex flex-col overflow-scroll">
+                        <div className="flex items-center justify-center min-h-[70px] bg-slate-200">
+                            <h1 className="text-[1.5rem] font-bold text-gray-800"> Last Action </h1>
+                        </div>
 
+                        <div className="h-full w-full bg-re-100">
+                            <List>
+                                <ListItemButton>
+                                    <ListItemText primary={"Previous Size"} secondary={"a"} />
+                                </ListItemButton>
+
+                                <Divider />
+
+                                <ListItemButton>
+                                    <ListItemText primary={"Action"} secondary={"a"} />
+                                </ListItemButton>
+
+                                <Divider />
+
+                                <ListItemButton>
+                                    <ListItemText primary={"Starting Index"} secondary={"a"} />
+                                </ListItemButton>
+
+                                <Divider />
+
+                                <ListItemButton>
+                                    <ListItemText primary={"Ending Index / Count"} secondary={"a"} />
+                                </ListItemButton>
+
+                                <Divider />
+
+                                <ListItemButton>
+                                    <ListItemText primary={"Direction"} secondary={"a"} />
+                                </ListItemButton>
+                            </List>
+                        </div>
                     </div>
                 </section>
 
-                <section className="bg-green-100 w-full h-full flex-[6]">
-
+                <section className="w-full h-full flex-[6]">
+                    <div className="w-full h-full bg-gray-100 shadow rounded box-border">
+                        <HistoryTable />
+                    </div>
                 </section>
             </main>
         </section>
