@@ -43,6 +43,9 @@ import SizeResult from "./SizeResult";
 import ThreadsResult from "./ThreadsResult"
 import MemoryResult from "./MemoryResult";
 
+// imported contexts
+import { dstructuresContext } from "./mainpage";
+
 //data context
 const DialogContext = createContext();
 export const LastActionDialog = createContext();
@@ -53,14 +56,15 @@ export const MemoryDialog = createContext();
 
 const CRUD = ({display, charts}) => {
     const navigate = useNavigate();
-    
+
+    const [ dstructures, setdstructures ] = useContext(dstructuresContext)
+  
     const [addModal, setAddModal] = useState([])
     const [getModal, setGetModal] = useState([])
     const [deleteModal, setDeleteModal] = useState([])
 
     const [maxIndex, setMaxIndex] = useState([])
-    const [dstructures, setdstructures] = useState([{a:"adasd"}, {}, {}])
-
+    
     const[messageModal, setMessageModal] = useState([])
     const[messageModalContent, setMessageModalContent] = useState({type:"Confirmation", message:"Confirmation Message", buttonContent:"Confirm", from:{}})
 
@@ -163,6 +167,7 @@ const CRUD = ({display, charts}) => {
     }
 
     useEffect(() => {
+ 
         // get the user details from login page
         const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
@@ -216,7 +221,7 @@ const CRUD = ({display, charts}) => {
                     <DeleteDialog deleteModal={deleteModal} maxIndex={{maxIndex, setMaxIndex}} datastructures={{dstructures, setdstructures}} updatedsdetails={updatedsdetails} executeQuery={executeQuery}/>
                     <ConfirmDialog messageModal={messageModal} content={{messageModalContent, setMessageModalContent}} ds={{dstructures, setdstructures, retrieveDS, setMaxIndex}} executeQuery={executeQuery} charts={charts}/>
         
-                    <div className='flex-1 relative max-h-full max-w-full overflow-hidden'>
+                    <div className='flex-1 relative max-h-full max-w-full '>
                         <main className='absolute h-full w-full overflow-y-scroll px-2 my-1'>
                             {/* <DSDetails dsDetails={dstructures[0]}/>
                             <DSDetails dsDetails={dstructures[1]}/>
@@ -1302,7 +1307,7 @@ const DSDetails = ({dsDetails, index}) => {
 
     return( 
         <section className='bg-gradient-to-l from-slate-200 to-[#f5efef] rounded-md max-w-full 
-        w-full h-[200px] min-h-[200px] my-5 flex overflow-x-scroll gap-20 shadow items cursor-grab'>
+        w-full h-[200px] min-h-[200px] my-5 flex gap-20 shadow items cursor-grab  overflow-x-hidden'>
             <div className='h-full min-w-[400px] flex flex-col relative'>
                 <img src={about} onClick={print} className='w-[1.6rem] absolute left-1 top-1 cursor-pointer'></img>
                 <div className='flex-[2] flex justify-center items-center text-[1.5rem] font-bold font-sans text-gray-700'>

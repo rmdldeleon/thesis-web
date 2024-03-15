@@ -1,8 +1,6 @@
 import * as React from 'react';
 
-import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
@@ -11,10 +9,10 @@ import { alpha } from '@mui/material/styles';
 
 import DeleteIcon from '@mui/icons-material/Delete';
 
-import PropTypes from 'prop-types';
-
 import { DataGrid } from '@mui/x-data-grid';
-import { divide } from 'lodash';
+
+// imported contexts
+import { dstructuresContext } from "./mainpage";
 
 const customCss = `
   .MuiDataGrid-cell:focus,
@@ -28,87 +26,95 @@ const columns = [
   { 
     field: 'id', 
     headerName: 'ID',
-     width: 90 
+    sortable: true,
+    flex: 1
   },
   {
-    field: 'firstName',
-    headerName: 'First name',
-    width: 150,
-   
+    field: 'batch',
+    headerName: 'Batch',
+    sortable: true,
+    flex: 1
   },
   {
-    field: 'lastName',
-    headerName: 'Last name',
-    width: 150,
-
+    field: 'datastructures',
+    headerName: 'Data Structures',
+    sortable: true,
+    flex: 1
   },
   {
-    field: 'age',
-    headerName: 'Age',
-    type: 'number',
-    width: 110,
-    editable: false
+    field: 'sizecapacity',
+    headerName: 'Size/Capacity',
+    sortable: true,
+    flex: 1
+    //type: 'number',
   },
   {
-    field: 'fullName',
-    headerName: 'Full name',
-    description: 'This column has a value getter and is not sortable.',
-    sortable: false,
-    width: 160,
-    valueGetter: (params) =>
-      `${params.row.firstName || ''} ${params.row.lastName || ''}`,
+    field: 'lastaction',
+    headerName: 'Last Action',
+    sortable: true,
+    flex: 1
+    //description: 'This column has a value getter and is not sortable.',
+    // valueGetter: (params) =>
+    //   `${params.row.firstName || ''} ${params.row.lastName || ''}`,
+  },
+  {
+    field: 'datecreated',
+    headerName: 'Date Created',
+    sortable: true,
+    flex: 1
+  },
+  {
+    field: 'lastupdated',
+    headerName: 'Last Updated',
+    sortable: true,
+    flex: 1
   },
 ];
 
-const rows = [
-  { id: 1, lastName: 'Snow', firstName: 'Jon', age: 14 },
-  { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 31 },
-  { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 31 },
-  { id: 4, lastName: 'Stark', firstName: 'Arya', age: 11 },
-  { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-  { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-  { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-  { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-  { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
+const rowsData = [
+  { id: 1, batch: 1, datastructures: 3, sizecapacity: 0, lastaction: "Add", datecreated: "09/20/24 24:00PM", lastupdated: "09/20/24 24:00PM"},
 ];
 
 export default function HistoryTable() {
-    const [selectedRows, setSelectedRows] = React.useState([]);
+    const [ dstructures, setdstructures ] = React.useContext(dstructuresContext)
 
-    const handleSelectionChange = (newSelection) => {
-      setSelectedRows(newSelection.selectionModel);
+    const [selectedRow, setSelectedRow] = React.useState([]);
+
+    const [rows, setRows] = React.useState(rowsData)
+
+    const handleSelectionChange = (selectedRow) => {
+      setSelectedRow(selectedRow);
     };
-  
-    const handleDelete = () => {
-      console.log("Delete button clicked");
-      // Perform delete action here
-    };
+
+    React.useEffect(() => { // this should run everytime i reset a datastructure 
+      // create the rows and set
+      for(let i = 0; i < dstructures.length; i++){
+          if(dstructures[0].dsbatch){ // if dstructrures is not empty. needed because initial value of dstructures has emtpy objects
+              let id =  i
+              let batch = dstructures[i].dsbatch
+
+          }
+
+          let query = `SELECT * FROM datastructures
+          LEFT JOIN actionresults ON datastructures.DSID = actionresults.DSID;`
+      }
+    }, [dstructures])
 
     return (
-        <>
         <div className='w-full h-full flex flex-col'>
             {/* Toolbar */}
-            <EnhancedTableToolbar numSelected={1} />
+            <EnhancedTableToolbar numSelected={selectedRow ? selectedRow.length : 0} />
 
             <style>{customCss}</style> {/* Inject custom CSS */}
 
             <DataGrid
                 rows={rows}
                 columns={columns}
-                // initialState={{
-                //     pagination: {
-                //       paginationModel: { page: 0},
-                //     },
-                // }}
-
-                // pageSizeOptions={[5, 10]}
                 autoPageSize
-       
-              
-                onSelectionModelChange={handleSelectionChange}
+                onSelectionModelChange={handleSelectionChange}        
             />
         </div>
-        </>
+
   );
 }
 
@@ -137,7 +143,7 @@ function EnhancedTableToolbar(props) {
             variant="subtitle1"
             component="div"
           >
-            {numSelected} selected
+            Batch {numSelected} selected <span className='text-gray-500 text-[.9rem]'>(CTRL + left click to deselect)</span>
           </Typography>
         ) : (
           <Typography
@@ -150,6 +156,15 @@ function EnhancedTableToolbar(props) {
           </Typography>
         )}
   
+        {numSelected > 0 ? (
+          <Tooltip title="Recover">
+            <IconButton onClick={handleDeleteClick}>
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        ) : null}
+
+        
         {numSelected > 0 ? (
           <Tooltip title="Delete">
             <IconButton onClick={handleDeleteClick}>

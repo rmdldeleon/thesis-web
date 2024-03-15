@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, createContext } from "react";
 import { useNavigate } from 'react-router-dom';
 
 import "../css/App.css";
@@ -8,8 +8,12 @@ import CRUD from "./CRUD";
 import Charts from "./Charts"
 import Dashboard from "./Dashboard";
 
+export const dstructuresContext = createContext();
+
 function App() {
   const navigate = useNavigate();
+
+  const [dstructures, setdstructures] = useState([{}, {}, {}])
 
   const [analyticsOpen, setAnalyticsOpen] = useState('block')
   const [chartsOpen, setChartsOpen] = useState('hidden')
@@ -209,22 +213,25 @@ function App() {
   }, [])
 
   return (
-    <div className="App">
-      <div className="flex flex-col h-screen w-screen">
-            {/* <Header headerTitle={headerTitle}/> */}
+    <dstructuresContext.Provider value={[dstructures, setdstructures]}>
+        <div className="App">
+          <div className="flex flex-col h-screen w-screen">
+                {/* <Header headerTitle={headerTitle}/> */}
 
-            <div className="bg-[#e7e9ee] flex flex-1 rounded-es-[8px] rounded-ee-[8px]">
-                <SideBar setHeaderTitle={setHeaderTitle} highlight={{ch, sch, analyticsHighlight, setAnalyticsHighlight, dashboardHighlight, setDashboardHighlight, chartsHighlight, setChartsHighlight}} currentPanelOpened={cpo} setCurrentPanelOpened={scpo} setDashboardOpen={setDashboardOpen} setChartsOpen = {setChartsOpen} setAnalyticsOpen = {setAnalyticsOpen}/>
+                <div className="bg-[#e7e9ee] flex flex-1 rounded-es-[8px] rounded-ee-[8px]">
+                    <SideBar setHeaderTitle={setHeaderTitle} highlight={{ch, sch, analyticsHighlight, setAnalyticsHighlight, dashboardHighlight, setDashboardHighlight, chartsHighlight, setChartsHighlight}} currentPanelOpened={cpo} setCurrentPanelOpened={scpo} setDashboardOpen={setDashboardOpen} setChartsOpen = {setChartsOpen} setAnalyticsOpen = {setAnalyticsOpen}/>
 
-                <main className="flex-1">
-                    <CRUD display = {analyticsOpen} charts={{lastSpeedBarData, setLastSpeedBarData, lastSpeedBarDataOptions, setLastSpeedBarDataOptions, setLastSizeBarData, setLastSizeBarDataOptions, setLastSpaceBarData, setLastSpaceBarDataOptions, setLastThreadsBarData, setLastThreadsBarDataOptions, chartsOpen}}/>
-                    <Dashboard display={dashboardOpen}/>
-                    <Charts display = {chartsOpen} charts={{lastSpeedBarData, lastSpeedBarDataOptions, lastSizeBarData, lastSizeBarDataOptions, lastSpaceBarData, lastSpaceBarDataOptions, lastThreadsBarData, lastThreadsBarDataOptions}}/>
-                </main>
-            </div>
-        </div> 
-    </div>
+                    <main className="flex-1">
+                        <CRUD display = {analyticsOpen} charts={{lastSpeedBarData, setLastSpeedBarData, lastSpeedBarDataOptions, setLastSpeedBarDataOptions, setLastSizeBarData, setLastSizeBarDataOptions, setLastSpaceBarData, setLastSpaceBarDataOptions, setLastThreadsBarData, setLastThreadsBarDataOptions, chartsOpen}}/>
+                        <Dashboard display={dashboardOpen}/>
+                        <Charts display = {chartsOpen} charts={{lastSpeedBarData, lastSpeedBarDataOptions, lastSizeBarData, lastSizeBarDataOptions, lastSpaceBarData, lastSpaceBarDataOptions, lastThreadsBarData, lastThreadsBarDataOptions}}/>
+                    </main>
+                </div>
+            </div> 
+        </div>
+    </dstructuresContext.Provider>
   );
 }
 
 export default App;
+

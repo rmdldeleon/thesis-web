@@ -27,93 +27,98 @@ import search from "../pictures/search.svg"
 
 import HistoryTable from "./HistoryTable"
 
+// imported contexts
+import { dstructuresContext } from "./mainpage";
+
 const Dashboard = ({display}) => {
+    const [ dstructures, setdstructures ] = useContext(dstructuresContext)
+
     return(
-        <section className={`${display} bg-[#f8f8fa] h-full w-full rounded-ss-[20px] flex flex-col rounded-ee-[8px]`}>
+        <section className={`${display} bg-[#f8f8fa] h-full w-full rounded-ss-[8px] flex flex-col rounded-ee-[8px]`}>
             {/* <div className="bg-[#f8f8fa] h-16 min-h-[4rem] w-full flex rounded-ss-[8px] shadow z-10">
                 <SortHeader />
             </div> */}
         
-            <main className="h-full w-full flex flex-col p-2 gap-3 bg-red-100">
-                <section className="w-full h-full flex-[4] bg-red-200 flex gap-3">
-                    <div className="w-full h-full bg-gray-100 shadow3 rounded box-border flex flex-col overflow-scroll">
+            <main className="h-full w-full flex flex-col p-2 gap-3 ">
+                <section className="w-full h-full min-h-[300px] max-h-[50vh] flex-[4] flex gap-3">
+                    <div className="w-full h-full bg-gray-100 shadow3 rounded box-border flex flex-col">
                         <div className="flex items-center justify-center w-full min-h-[70px] bg-slate-200">
                             <h1 className="text-[1.5rem] font-bold text-gray-800"> Active Batch </h1>
                         </div>
 
-                        <div className="h-full w-full">
+                        <div className="h-full w-full overflow-auto">
                             <List>
                                 <ListItemButton>
-                                    <ListItemText primary={"Batch"} secondary={"a"} />
+                                    <ListItemText primary={"Batch"} secondary={dstructures[0].dsbatch} />
                                 </ListItemButton>
 
                                 <Divider />
 
                                 <ListItemButton>
-                                    <ListItemText primary={"Size"} secondary={"a"} />
+                                    <ListItemText primary={"Size"} secondary={dstructures[0].size || 0} />
                                 </ListItemButton>
 
                                 <Divider />
 
                                 <ListItemButton>
-                                    <ListItemText primary={"DStructures Count"} secondary={"a"} />
+                                    <ListItemText primary={"DStructures Count"} secondary={dstructures.length} />
                                 </ListItemButton>
 
                                 <Divider />
 
                                 <ListItemButton>
-                                    <ListItemText primary={"Date Created"} secondary={"a"} />
+                                    <ListItemText primary={"Date Created"} secondary={dstructures[0].datecreated} />
                                 </ListItemButton>
 
                                 <Divider />
 
                                 <ListItemButton>
-                                    <ListItemText primary={"Last Updated"} secondary={"a"} />
+                                    <ListItemText primary={"Last Updated"} secondary={dstructures[0].ActionDate || "No data"} />
                                 </ListItemButton>
                             </List>
                         </div>
                     </div>
 
-                    <div className="w-full h-full bg-gray-100 shadow3 rounded box-border flex flex-col overflow-scroll">
+                    <div className="w-full h-full bg-gray-100 shadow3 rounded box-border flex flex-col">
                         <div className="flex items-center justify-center min-h-[70px] bg-slate-200">
                             <h1 className="text-[1.5rem] font-bold text-gray-800"> Last Action </h1>
                         </div>
 
-                        <div className="h-full w-full bg-re-100">
+                        <div className="h-full w-full bg-re-100 overflow-auto">
                             <List>
                                 <ListItemButton>
-                                    <ListItemText primary={"Previous Size"} secondary={"a"} />
+                                    <ListItemText primary={"Previous Size"} secondary={dstructures[0].JSONResults ? JSON.parse(dstructures[0].JSONResults)[0].prevSize : "No data"} />
                                 </ListItemButton>
 
                                 <Divider />
 
                                 <ListItemButton>
-                                    <ListItemText primary={"Action"} secondary={"a"} />
+                                    <ListItemText primary={"Action"} secondary={dstructures[0].actiontype || "No data"} />
                                 </ListItemButton>
 
                                 <Divider />
 
                                 <ListItemButton>
-                                    <ListItemText primary={"Starting Index"} secondary={"a"} />
+                                    <ListItemText primary={"Starting Index"} secondary={dstructures[0].actioninput || "No data"} />
                                 </ListItemButton>
 
                                 <Divider />
 
                                 <ListItemButton>
-                                    <ListItemText primary={"Ending Index / Count"} secondary={"a"} />
+                                    <ListItemText primary={"Ending Index / Count"} secondary={dstructures[0].actioncount || "No data"} />
                                 </ListItemButton>
 
                                 <Divider />
 
                                 <ListItemButton>
-                                    <ListItemText primary={"Direction"} secondary={"a"} />
+                                    <ListItemText primary={"Direction"} secondary={dstructures[0].inputparameters || "No data"} />
                                 </ListItemButton>
                             </List>
                         </div>
                     </div>
                 </section>
 
-                <section className="w-full h-full flex-[6]">
+                <section className="w-full h-full flex-[6] min-h-[300px]">
                     <div className="w-full h-full bg-gray-100 shadow rounded box-border">
                         <HistoryTable />
                     </div>
@@ -248,7 +253,6 @@ const SortHeader = () => {
         </section>
     )
 }
-
 
 const ActionSideBar = () => {
     return(
