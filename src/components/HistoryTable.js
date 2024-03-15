@@ -14,6 +14,10 @@ import { DataGrid } from '@mui/x-data-grid';
 // imported contexts
 import { dstructuresContext } from "./mainpage";
 
+import axios from 'axios';
+
+
+// data
 const customCss = `
   .MuiDataGrid-cell:focus,
   .MuiDataGrid-cell:active {
@@ -23,15 +27,22 @@ const customCss = `
 `;
 
 const columns = [
-  { 
-    field: 'id', 
-    headerName: 'ID',
+  {
+    field: 'rownumber',
+    headerName: 'Row Number',
     sortable: true,
-    flex: 1
+    flex: 1,
+    hide: true
   },
   {
     field: 'batch',
     headerName: 'Batch',
+    sortable: true,
+    flex: 1
+  },
+  { 
+    field: 'actionnumber', 
+    headerName: 'Action Number',
     sortable: true,
     flex: 1
   },
@@ -42,8 +53,8 @@ const columns = [
     flex: 1
   },
   {
-    field: 'sizecapacity',
-    headerName: 'Size/Capacity',
+    field: 'size',
+    headerName: 'Size',
     sortable: true,
     flex: 1
     //type: 'number',
@@ -72,38 +83,67 @@ const columns = [
 ];
 
 const rowsData = [
-  { id: 1, batch: 1, datastructures: 3, sizecapacity: 0, lastaction: "Add", datecreated: "09/20/24 24:00PM", lastupdated: "09/20/24 24:00PM"},
+  { rownumber: 1, batch: 1, actionnumber: 1, datastructures: 3, size: 0, lastaction: "Add", datecreated: "09/20/24 24:00PM", lastupdated: "09/20/24 24:00PM"},
 ];
 
 export default function HistoryTable() {
+    const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+
     const [ dstructures, setdstructures ] = React.useContext(dstructuresContext)
 
-    const [selectedRow, setSelectedRow] = React.useState([]);
+
+    const [selectedRow, setSelectedRow] = React.useState(undefined);
 
     const [rows, setRows] = React.useState(rowsData)
 
-    const handleSelectionChange = (selectedRow) => {
-      setSelectedRow(selectedRow);
+    const handleSelectionChange = (selectedRowNumber) => {
+      let row = rows.find((row) => row.rownumber === selectedRowNumber[0])
+      setSelectedRow(row);
     };
 
-    React.useEffect(() => { // this should run everytime i reset a datastructure 
-      // create the rows and set
-      for(let i = 0; i < dstructures.length; i++){
-          if(dstructures[0].dsbatch){ // if dstructrures is not empty. needed because initial value of dstructures has emtpy objects
-              let id =  i
-              let batch = dstructures[i].dsbatch
+    const setHistoryTableData = async () => {
+      let AccountID = userDetails.AccountID
 
-          }
+      // get table data
+      let response = await axios.post('http://localhost:3001/history/getHistoryTableData', {AccountID});
 
-          let query = `SELECT * FROM datastructures
-          LEFT JOIN actionresults ON datastructures.DSID = actionresults.DSID;`
+      let arr = []
+
+      for(let i = 0; i < response.data.length; i++){
+        // dont show if item is the current batch used 
+        if(
+          i < dstructures.length && 
+          response.data[i].DSBatch === dstructures[i].dsbatch && 
+          response.data[i].ActionSet === dstructures[i].ActionSet)
+        {
+          continue
+        }
+
+        let rownumber = response.data[i].RowNumber
+        let batch = response.data[i].DSBatch
+        let actionnumber = response.data[i].ActionSet// ActionNumber is name of column but this is actually ActionSet from actionresults
+        let datastructures = dstructures.length // should do this via query instead
+        let size = response.data[i].Size
+        let lastaction = response.data[i].ActionType
+        let datecreated = new Date(response.data[i].DateCreated).toLocaleString();
+        let lastupdated = new Date(response.data[i].ActionDate).toLocaleString();
+
+        arr.push({ rownumber, batch, actionnumber, datastructures, size, lastaction, datecreated, lastupdated})
       }
-    }, [dstructures])
+    
+      setRows(arr)
+    }
+
+    React.useEffect(() => {
+      if (dstructures[0].dsid != undefined) {
+        setHistoryTableData();
+      }
+    }, [dstructures]);
 
     return (
         <div className='w-full h-full flex flex-col'>
             {/* Toolbar */}
-            <EnhancedTableToolbar numSelected={selectedRow ? selectedRow.length : 0} />
+            <EnhancedTableToolbar numSelected={selectedRow ? 1 : 0} selectedRow={selectedRow}/>
 
             <style>{customCss}</style> {/* Inject custom CSS */}
 
@@ -111,15 +151,15 @@ export default function HistoryTable() {
                 rows={rows}
                 columns={columns}
                 autoPageSize
+                getRowId={(row) => row.rownumber} 
                 onSelectionModelChange={handleSelectionChange}        
             />
         </div>
-
-  );
+    );
 }
 
 function EnhancedTableToolbar(props) {
-    const { numSelected } = props;
+    const { numSelected, selectedRow } = props;
     
     const handleDeleteClick = () => {
         console.log("delete clicked")
@@ -143,7 +183,7 @@ function EnhancedTableToolbar(props) {
             variant="subtitle1"
             component="div"
           >
-            Batch {numSelected} selected <span className='text-gray-500 text-[.9rem]'>(CTRL + left click to deselect)</span>
+            Batch {selectedRow.batch}, Action Number {selectedRow.actionnumber} selected <span className='text-gray-500 text-[.9rem]'>(CTRL + left click to deselect)</span>
           </Typography>
         ) : (
           <Typography
@@ -152,7 +192,7 @@ function EnhancedTableToolbar(props) {
             id="tableTitle"
             component="div"
           >
-            Nutrition
+            Versions
           </Typography>
         )}
   

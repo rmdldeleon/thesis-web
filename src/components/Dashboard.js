@@ -55,6 +55,12 @@ const Dashboard = ({display}) => {
                                 <Divider />
 
                                 <ListItemButton>
+                                    <ListItemText primary={"Action Number"} secondary={dstructures[0].ActionSet} />
+                                </ListItemButton>
+
+                                <Divider />
+
+                                <ListItemButton>
                                     <ListItemText primary={"Size"} secondary={dstructures[0].size || 0} />
                                 </ListItemButton>
 

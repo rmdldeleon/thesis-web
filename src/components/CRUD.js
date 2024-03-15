@@ -152,7 +152,8 @@ const CRUD = ({display, charts}) => {
                 spacenotation: result[i].SpaceNotation,
                 sizepointers: result[i].SizePointers,
                 JSONResults: result[i].JSONResults, 
-                ActionDate: result[i].ActionDate
+                ActionDate: result[i].ActionDate,
+                ActionSet: result[i].ActionSet || 0
             }
 
             dsarr.push(dsobject)
@@ -167,9 +168,9 @@ const CRUD = ({display, charts}) => {
     }
 
     useEffect(() => {
- 
         // get the user details from login page
         const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+
 
         if(!userDetails){
             navigate('/');
@@ -221,8 +222,8 @@ const CRUD = ({display, charts}) => {
                     <DeleteDialog deleteModal={deleteModal} maxIndex={{maxIndex, setMaxIndex}} datastructures={{dstructures, setdstructures}} updatedsdetails={updatedsdetails} executeQuery={executeQuery}/>
                     <ConfirmDialog messageModal={messageModal} content={{messageModalContent, setMessageModalContent}} ds={{dstructures, setdstructures, retrieveDS, setMaxIndex}} executeQuery={executeQuery} charts={charts}/>
         
-                    <div className='flex-1 relative max-h-full max-w-full '>
-                        <main className='absolute h-full w-full overflow-y-scroll px-2 my-1'>
+                    <div className='flex-1 relative max-h-full max-w-full py-1 overflow-hidden'>
+                        <main className='absolute h-full w-full overflow-y-scroll px-2'>
                             {/* <DSDetails dsDetails={dstructures[0]}/>
                             <DSDetails dsDetails={dstructures[1]}/>
                             <DSDetails dsDetails={dstructures[2]}/> */}
@@ -394,6 +395,7 @@ const AddDialog = ({addModal, maxIndex, datastructures, updatedsdetails, execute
             updatedds[i].actioninput = index
             updatedds[i].actioncount = count
             updatedds[i].inputparameters = parameter
+            updatedds[i].ActionSet += 1
 
             // for actionresults table 
             let JSONResults = JSON.stringify(allResults)
@@ -1348,6 +1350,7 @@ const DSDetailsItems = ({title, value, unit, dsDetails, dsIndex}) => {
     const [ memoryDialog, setMemoryDialog] = useContext(MemoryDialog)
 
     const speedNext = () => {
+        console.log(dstructures)
         let size = value.length
 
         if(index === size-1){

@@ -6,9 +6,11 @@ const bodyParser = require('body-parser');
 
 // local requirements
 const { con, db } = require('./database/database');
+
 const { loginRoutes } = require('./routers/login');
 const { signupRoutes } = require('./routers/signup')
 const { analyticsRoutes } = require('./routers/analytics')
+const { historyRoutes } = require('./routers/history')
 
 
 // global variables
@@ -24,6 +26,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/login', loginRoutes)
 app.use('/signup', signupRoutes)
 app.use('/analytics', analyticsRoutes)
+app.use('/history', historyRoutes)
 
 // listeners
 app.listen(PORT, () => {
