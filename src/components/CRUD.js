@@ -115,19 +115,33 @@ const CRUD = ({display, charts}) => {
         });
     };
 
-    let retrieveDS = (result) => {
+    let retrieveDS = (result, frequencycapacity) => {
         let dsarr = []
- 
+
         for(let i = 0; i < result.length; i++){
             let dsinstance
-
+      
             if(result[i].DSName_CLSC === "Tree List"){
-                dsinstance = TreeList.parse(result[i].JSONData)
+                if(result[i].JSONData){
+                    dsinstance = TreeList.parse(result[i].JSONData)
+                }else{
+                    dsinstance = new TreeList(frequencycapacity || 100)
+                }
             }else if(result[i].DSName_CLSC === "Doubly Linked List"){
-                dsinstance = LinkedList.parse(result[i].JSONData)
+                if(result[i].JSONData){
+                    dsinstance = LinkedList.parse(result[i].JSONData)
+                }else{
+                    dsinstance = new LinkedList()
+                }
             }else if(result[i].DSName_CLSC === "Dynamic Array"){
-                dsinstance = DynamicArray.parse(result[i].JSONData)
+                if(result[i].JSONData){
+                    dsinstance = DynamicArray.parse(result[i].JSONData)
+                }else{
+                    dsinstance = new DynamicArray(frequencycapacity || 100)
+                }
             }
+
+            let JSONData = dsinstance.toJSON()
 
             let dsobject = {
                 ds: dsinstance,
@@ -135,11 +149,12 @@ const CRUD = ({display, charts}) => {
                 dsbatch: result[i].DSBatch, 
                 dsname: result[i].DSName_CLSC, 
                 threaded: result[i].Threaded, 
-                frequency: result[i].Frequency || JSON.parse(result[i].JSONData).capacity,
+              
                 type: result[i].Type,
                 userpivot: result[i].UserAddedPivot,
                 datecreated: result[i].DateCreated,
-                dsdata: result[i].JSONData,
+                JSONData: result[i].JSONData || JSONData,
+                frequency: result[i].Frequency || JSON.parse(JSONData).capacity,
                 speedms: result[i].SpeedMS,
                 threads: result[i].ThreadsUsed,
                 size: result[i].Size,
@@ -396,6 +411,7 @@ const AddDialog = ({addModal, maxIndex, datastructures, updatedsdetails, execute
             updatedds[i].actioncount = count
             updatedds[i].inputparameters = parameter
             updatedds[i].ActionSet += 1
+            updatedds[i].JSONData = updatedds[i].ds.toJSON()
 
             // for actionresults table 
             let JSONResults = JSON.stringify(allResults)
@@ -403,16 +419,13 @@ const AddDialog = ({addModal, maxIndex, datastructures, updatedsdetails, execute
             const currentDate = new Date();
             const formattedDateTime = currentDate.toISOString().slice(0, 19).replace('T', ' ');
             updatedds[i].ActionDate = formattedDateTime
-            
-            // for datastructures table 
-            let JSONData = updatedds[i].ds.toJSON()
-            let DSID = updatedds[i].dsid 
-            
+
+
             // add results to actionresults table
             let insertActionResults = await axios.post('http://localhost:3001/analytics/add/insertActionResults', {actionResults : updatedds[i]});
 
-            // udpate JSONData column of datstructures table
-            let updateJSONData = await axios.post('http://localhost:3001/analytics/add/updateJSONData', {JSONData, DSID});
+            // // udpate JSONData column of datstructures table
+            // let updateJSONData = await axios.post('http://localhost:3001/analytics/add/updateJSONData', {JSONData, DSID});
 
             // this has been removed since capacity in database is now the initial capacity 
             // // update capacity
@@ -1198,8 +1211,9 @@ const ResetDialog = () => {
     
     const onConfirm = async () => {        
         //getting the current highest batch of an account
-        let getHighestBatch = await axios.post('http://localhost:3001/analytics/reset/getHighestBatch', {accountID});
-        let highestBatch = getHighestBatch.data[0].DSBatch
+        // let getHighestBatch = await axios.post('http://localhost:3001/analytics/reset/getHighestBatch', {accountID});
+        // let highestBatch = getHighestBatch.data[0].DSBatch
+        let highestBatch = dstructures[0].dsbatch
 
         //create new instance of datastructures in 'datastructures' table
         let treelist = new TreeList(100)
@@ -1319,7 +1333,7 @@ const DSDetails = ({dsDetails, index}) => {
                     <h4>Threaded: <span className='font-bold text-gray-600 text-md float'>{dsDetails.threaded === 0 ? "FALSE" : "TRUE"}</span></h4>
                     <h4>{dsDetails.dsname === "Dynamic Array" ? "Capacity:" : "Frequency:"} <span className='font-bold text-gray-600 text-md'>{dsDetails.frequency || dsDetails.capacity || 0}</span></h4>
                     <h4>Type: <span className='font-bold text-gray-600 text-md'>{dsDetails.type}</span></h4>
-                    {dsDetails.dsname === "Dynamic Array" ? null : <h4>User-added Pivot: <span className='font-bold text-gray-600 text-md'>{dsDetails.userpivot}</span></h4>}
+                    {/* {dsDetails.dsname === "Dynamic Array" ? null : <h4>User-added Pivot: <span className='font-bold text-gray-600 text-md'>{dsDetails.userpivot}</span></h4>} */}
                 </div>
             </div>
             

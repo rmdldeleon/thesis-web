@@ -119,6 +119,10 @@ export default function HistoryTable() {
           continue
         }
 
+        if(!response.data[i].ActionSet || !response.data[i].ActionType){
+          continue
+        }
+
         let rownumber = response.data[i].RowNumber
         let batch = response.data[i].DSBatch
         let actionnumber = response.data[i].ActionSet// ActionNumber is name of column but this is actually ActionSet from actionresults
@@ -152,6 +156,7 @@ export default function HistoryTable() {
                 columns={columns}
                 autoPageSize
                 getRowId={(row) => row.rownumber} 
+                disableVirtualization
                 onSelectionModelChange={handleSelectionChange}        
             />
         </div>
