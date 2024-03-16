@@ -57,6 +57,9 @@ export const MemoryDialog = createContext();
 const CRUD = ({display, charts}) => {
     const navigate = useNavigate();
 
+    // get the user details from login page
+    const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+
     const [ dstructures, setdstructures ] = useContext(dstructuresContext)
   
     const [addModal, setAddModal] = useState([])
@@ -132,7 +135,7 @@ const CRUD = ({display, charts}) => {
                 dsbatch: result[i].DSBatch, 
                 dsname: result[i].DSName_CLSC, 
                 threaded: result[i].Threaded, 
-                frequency: result[i].Frequency || result[i].Capacity,
+                frequency: result[i].Frequency || JSON.parse(result[i].JSONData).capacity,
                 type: result[i].Type,
                 userpivot: result[i].UserAddedPivot,
                 datecreated: result[i].DateCreated,
@@ -153,7 +156,8 @@ const CRUD = ({display, charts}) => {
                 sizepointers: result[i].SizePointers,
                 JSONResults: result[i].JSONResults, 
                 ActionDate: result[i].ActionDate,
-                ActionSet: result[i].ActionSet || 0
+                ActionSet: result[i].ActionSet || 0,
+                AccountID: userDetails.AccountID
             }
 
             dsarr.push(dsobject)
@@ -168,10 +172,6 @@ const CRUD = ({display, charts}) => {
     }
 
     useEffect(() => {
-        // get the user details from login page
-        const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
-
-
         if(!userDetails){
             navigate('/');
         }
@@ -408,18 +408,17 @@ const AddDialog = ({addModal, maxIndex, datastructures, updatedsdetails, execute
             let JSONData = updatedds[i].ds.toJSON()
             let DSID = updatedds[i].dsid 
             
-            console.log(updatedds[i])
-
             // add results to actionresults table
             let insertActionResults = await axios.post('http://localhost:3001/analytics/add/insertActionResults', {actionResults : updatedds[i]});
 
             // udpate JSONData column of datstructures table
             let updateJSONData = await axios.post('http://localhost:3001/analytics/add/updateJSONData', {JSONData, DSID});
 
-            // // // update capacity
-            if(updatedds[i].dsname === "Dynamic Array"){
-                let updateCapacity = await axios.post('http://localhost:3001/analytics/add/updateCapacity', {DSData : updatedds[i]});
-            }  
+            // this has been removed since capacity in database is now the initial capacity 
+            // // update capacity
+            // if(updatedds[i].dsname === "Dynamic Array"){
+            //     let updateCapacity = await axios.post('http://localhost:3001/analytics/add/updateCapacity', {DSData : updatedds[i]});
+            // }  
         }
 
         maxIndex.setMaxIndex(maxIndex.maxIndex += count)    

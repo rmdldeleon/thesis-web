@@ -162,7 +162,7 @@ function EnhancedTableToolbar(props) {
     const { numSelected, selectedRow } = props;
     
     const handleDeleteClick = () => {
-        console.log("delete clicked")
+        console.log(selectedRow)
     };
 
     return (
