@@ -1,8 +1,16 @@
 import * as React from 'react';
-import { useContext, useEffect, useState } from 'react';
-import { LastActionDialog, SpeedDialog } from './CRUD';
+import { useContext, useEffect, useState, useRef } from 'react';
 
+import { LastActionDialog, SpeedDialog } from './CRUD';
 import DoubleAxesChart from './DoubleAxesChart';
+
+import {
+    exportComponentAsJPEG,
+    exportComponentAsPDF,
+    exportComponentAsPNG
+} from "react-component-export-image";
+
+import ReactToPrint from 'react-to-print';
 
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -17,8 +25,6 @@ import Typography from '@mui/material/Typography';
 import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
 
-import {Box, Paper} from '@mui/material'
-import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 
 const _ = require('lodash');
 
@@ -27,11 +33,31 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 export default function SpeedResult() {
+  const componentRef = useRef();
+
   const [speedDialog, setSpeedDialog, dstructures, openedDSDetails, setOpenedDSDetails] = useContext(SpeedDialog) 
 
   const [ averageData, setAverageData ] = useState({})
   const [ allResults, setAllResults ] = useState([])
   const [ allResultsNotation, setAllResultsNotation ] = useState([])
+
+  const saveAsImage = () => {
+    let className = 'disable-shadow'
+
+    // disable shadow // shadow is not renderd properly in component to image
+    componentRef.current.classList.add(className);
+    componentRef.current.querySelectorAll('*').forEach(child => {
+      child.classList.add(className);
+    });
+
+    exportComponentAsPNG(componentRef)
+
+    // enable shadow
+    componentRef.current.classList.remove(className);
+    componentRef.current.querySelectorAll('*').forEach(child => {
+      child.classList.remove(className);
+    });
+  }
 
   const handleClose = () => {
     setSpeedDialog(false);
@@ -172,13 +198,17 @@ export default function SpeedResult() {
             <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
               {openedDSDetails ? openedDSDetails.dsDetails.dsname + " Last Action Summary" : ""}
             </Typography>
-            <Button autoFocus color="inherit" onClick={handleClose}>
+            <ReactToPrint
+              trigger={() => <Button autoFocus color="inherit"> print </Button>}
+              content={() => componentRef.current}
+            />
+            <Button autoFocus color="inherit" onClick={saveAsImage}>
               save
             </Button>
           </Toolbar>
         </AppBar>
 
-        <div className='w-full h-[50vh] min-h-[450px] flex gap-5 px-5 py-4 box-border'>
+        <div className='w-full h-[50vh] min-h-[450px] flex gap-5 px-5 py-4 box-border flexCol' ref={componentRef}>
 
           {/* charts div */}
           <div className='bg-gray-50 shadow3 rounded flex-[7] relative'>

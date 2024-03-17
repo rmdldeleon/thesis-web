@@ -1609,6 +1609,29 @@ video {
   box-shadow: none !important;
 }
 
+@media print {
+  /* Your print-specific styles here */
+
+  @media print {
+    .canvasjs-chart-canvas {
+      padding: 5px !important;
+      width: 100% !important;
+      height: 400px !important;
+    }
+  }
+
+  .flexCol{
+    flex-direction: column !important;
+  }
+
+  .hlarge{
+    min-height: 450px !important;
+    background-color: red !important;
+  }
+
+  /* Additional print-specific styles for other elements if needed */
+}
+
 .placeholder\:text-gray-400::placeholder {
   --tw-text-opacity: 1;
   color: rgb(156 163 175 / var(--tw-text-opacity));

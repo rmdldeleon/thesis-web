@@ -70,7 +70,9 @@ export default function DoubleAxesChart() {
         backgroundColor: "rgb(249,250,251)",
 
         animationEnabled: true,
-        
+        exportEnabled: true,
+        responsive: true,
+        maintainAspectRatio: false,
         title:{
             text: openedDSDetails.dsDetails.dsname
         },
@@ -166,10 +168,8 @@ export default function DoubleAxesChart() {
         <div className='w-full h-full' ref={chartContainerRef}>
             <CanvasJSChart 
                 options = {data}
-                containerProps={containerProps1}
-            /* onRef={ref => this.chart = ref} */
+                containerProps={{ style: { width: '100%', height: 'auto' } }}
             />
-            {/*You can get reference to the chart instance as shown above using onRef. This allows you to access all chart properties and methods*/}
         </div>
     );
 }

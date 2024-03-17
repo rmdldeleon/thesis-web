@@ -1554,7 +1554,7 @@ const ActionSideBar = ({addModal, getModal, deleteModal, messageModal, modalCont
             <ActionSideBarItem logo={update} title="Get / Update" hoverColor="hover:bg-[#87b8ccab]" modal={getModal}/>
             <ActionSideBarItem logo={remove} title="Delete" hoverColor="hover:bg-[#d17992ab]" modal={deleteModal}/>
             <div className="mx-auto w-[75%] h-[1px] m-1 bg-[rgba(0,0,0,.1)]"></div>
-            <ActionSideBarItem logo={barChart} title="Flatten" hoverColor="hover:bg-[#d17992ab]" modal={messageModal} modalContent={modalContent}/>
+            <ActionSideBarItem logo={barChart} title="Last Action" hoverColor="hover:bg-[#d17992ab]" modal={messageModal} modalContent={modalContent}/>
             <ActionSideBarItem logo={reset} title="Reset" hoverColor="hover:bg-[#d17992ab]" modal={messageModal} modalContent={modalContent}/>
         </section>
     )
@@ -1568,7 +1568,7 @@ const ActionSideBarItem = (props) => {
     let openModal = () => {
        if(props.title==="Reset"){
             setResetDialog(true)
-       }else if(props.title==="Flatten"){
+       }else if(props.title==="Last Action"){
             setLastActionDialog(true)
        }else{
             props.modal.showModal(); 

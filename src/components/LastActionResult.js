@@ -11,7 +11,6 @@ import {
 } from "react-component-export-image";
 
 import ReactToPrint from 'react-to-print';
-import html2canvas from "html2canvas";
 
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -25,9 +24,6 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
-
-import {Box, Paper} from '@mui/material'
-import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 
 const _ = require('lodash');
 
@@ -51,27 +47,21 @@ export default function LastActionResult() {
   };
 
   const saveAsImage = () => {
-    // let className = 'disable-shadow'
+    let className = 'disable-shadow'
 
-    // // disable shadow // shadow is not renderd properly in component to image
-    // componentRef.current.classList.add(className);
-    // componentRef.current.querySelectorAll('*').forEach(child => {
-    //   child.classList.add(className);
-    // });
+    // disable shadow // shadow is not renderd properly in component to image
+    componentRef.current.classList.add(className);
+    componentRef.current.querySelectorAll('*').forEach(child => {
+      child.classList.add(className);
+    });
 
-    // exportComponentAsPNG(componentRef)
+    exportComponentAsPNG(componentRef)
 
-    // // enable shadow
-    // componentRef.current.classList.remove(className);
-    // componentRef.current.querySelectorAll('*').forEach(child => {
-    //   child.classList.remove(className);
-    // });
-  }
-
-  const printComponent = () => {
-    console.log("print")
-
-    const elementToCapture = componentRef.current
+    // enable shadow
+    componentRef.current.classList.remove(className);
+    componentRef.current.querySelectorAll('*').forEach(child => {
+      child.classList.remove(className);
+    });
   }
 
   // get average 
@@ -141,18 +131,15 @@ export default function LastActionResult() {
               trigger={() => <Button autoFocus color="inherit"> print </Button>}
               content={() => componentRef.current}
             />
-            <Button autoFocus color="inherit" onClick={printComponent}>
-              print
-            </Button>
             <Button autoFocus color="inherit" onClick={saveAsImage}>
               save
             </Button>
           </Toolbar>
         </AppBar>
 
-        <div className='w-full h-full min-h-[800px] min-w-[1000px] overflow-auto flex flex-col' ref={componentRef}>
-            {/* charts div */}
-            <div className='flex-1 flex gap-5 px-5 py-4'>
+        <div className='w-full h-full min-h-[800px] min-w-[1000px] overflow-auto flex flex-col' >
+            {/* charts-lastaction div */}
+            <div className='flex-1 flex gap-5 px-5 py-4 flexCol' ref={componentRef}>
 
               {/* charts div */}
               <div className='bg-gray-50 shadow3 rounded flex-[7] relative'>
@@ -187,7 +174,7 @@ export default function LastActionResult() {
             <div className='flex-1 flex px-5 py-4 gap-5'>
 
                 {/* fasteset overall speed div */}
-              <div className='bg-gray-50 shadow3 rounded h-full max-h-[400px] overflow-auto flex-1 flex flex-col'>
+              <div className='bg-gray-50 shadow3 rounded h-full max-h-[400px] overflow-auto flex-1 flex flex-col h450'>
                     <h1 className='text-[1.5rem] font-bold text-center min-h-[20%] flex items-center justify-center'>
                         Fastest Overall Speed
                     </h1>

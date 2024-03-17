@@ -10,7 +10,7 @@ const colors = ['#8884d8', '#82ca9d', '#ffc658'];
 
 const containerProps1 = {
   width: "100%", // Set width to 100% of the parent element
-  height: "100%", // Set height to 100% of the parent element
+  height: "100px", // Set height to 100% of the parent element
 };
 
 export default function BarsDataset() {
@@ -33,10 +33,12 @@ export default function BarsDataset() {
 
   const options = {
     backgroundColor: "rgba(0,0,0,0)",
-
-    // title: {
-    //   text: "Last Action Resut"
-    // },
+    title: {
+      text: "Last Action Resut"
+    },
+    exportEnabled: true,
+    responsive: true,
+    maintainAspectRatio: false,
     axisX: {
       title: "Data Structures" // Add X axis label
     },
@@ -74,7 +76,7 @@ export default function BarsDataset() {
     <div className='w-full h-full'>
         <CanvasJSChart 
             options = {data}
-            containerProps={containerProps1}
+            containerProps={{ style: { width: '100%', height: 'auto' } }}
           /* onRef={ref => this.chart = ref} */
         />
         {/*You can get reference to the chart instance as shown above using onRef. This allows you to access all chart properties and methods*/}
