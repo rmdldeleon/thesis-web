@@ -60,3 +60,6 @@
     -webkit-overflow-scrolling: touch;
 }
 
+.disable-shadow{
+    box-shadow: none !important;
+}

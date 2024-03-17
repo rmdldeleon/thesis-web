@@ -1,7 +1,17 @@
 import * as React from 'react';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useRef } from 'react';
+
 import { LastActionDialog } from './CRUD';
 import BarsDataset from './BarsDataSet';
+
+import {
+  exportComponentAsJPEG,
+  exportComponentAsPDF,
+  exportComponentAsPNG
+} from "react-component-export-image";
+
+import ReactToPrint from 'react-to-print';
+import html2canvas from "html2canvas";
 
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -27,6 +37,8 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 
 export default function LastActionResult() {
+  const componentRef = useRef();
+
   const [lastActionDialog, setLastActionDialog, dstructures] = useContext(LastActionDialog) 
 
   const [sortedDS, setSortedDS] = useState(() => dstructures)
@@ -35,9 +47,32 @@ export default function LastActionResult() {
   const [sortedByAverageDS, setSortedByAverageDS] = useState([])
 
   const handleClose = () => {
-
     setLastActionDialog(false);
   };
+
+  const saveAsImage = () => {
+    // let className = 'disable-shadow'
+
+    // // disable shadow // shadow is not renderd properly in component to image
+    // componentRef.current.classList.add(className);
+    // componentRef.current.querySelectorAll('*').forEach(child => {
+    //   child.classList.add(className);
+    // });
+
+    // exportComponentAsPNG(componentRef)
+
+    // // enable shadow
+    // componentRef.current.classList.remove(className);
+    // componentRef.current.querySelectorAll('*').forEach(child => {
+    //   child.classList.remove(className);
+    // });
+  }
+
+  const printComponent = () => {
+    console.log("print")
+
+    const elementToCapture = componentRef.current
+  }
 
   // get average 
   const getAverageData = () => {
@@ -82,6 +117,7 @@ export default function LastActionResult() {
 
   return (
     <React.Fragment>
+      
       <Dialog
         fullScreen
         open={lastActionDialog}
@@ -101,122 +137,120 @@ export default function LastActionResult() {
             <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
               Last Action Sumamry
             </Typography>
-            <Button autoFocus color="inherit" onClick={handleClose}>
+            <ReactToPrint
+              trigger={() => <Button autoFocus color="inherit"> print </Button>}
+              content={() => componentRef.current}
+            />
+            <Button autoFocus color="inherit" onClick={printComponent}>
+              print
+            </Button>
+            <Button autoFocus color="inherit" onClick={saveAsImage}>
               save
             </Button>
           </Toolbar>
         </AppBar>
 
-        <div className='w-full h-[50vh] min-h-[450px] flex gap-5 px-5 py-4 box-border'>
+        <div className='w-full h-full min-h-[800px] min-w-[1000px] overflow-auto flex flex-col' ref={componentRef}>
+            {/* charts div */}
+            <div className='flex-1 flex gap-5 px-5 py-4'>
 
-          {/* charts div */}
-          <div className='bg-gray-50 shadow3 rounded flex-[7] relative'>
-              <div className='h-full w-full'>
-                  <BarsDataset />
-              </div>
-          </div>
-          
-          <div className='flex-[3] h-full bg-gray-50 shadow3 rounded py-3 px-7 box-border'>
-              <div className='flex flex-col gap-3  w-full h-full'>
-
-                  <div className='flex flex-col items-center justify-center flex-[3] gap-2'>
-                      <h1 className='text-[1.5rem] font-bold '> Inputs </h1>
-                      <h2 className='text-[1.1rem] text-gray-600'>from size: {dstructures[0].JSONResults ? JSON.parse(dstructures[0].JSONResults)[0].prevSize : "dstructures empty"} </h2>
+              {/* charts div */}
+              <div className='bg-gray-50 shadow3 rounded flex-[7] relative'>
+                  <div className='h-full w-full'>
+                      <BarsDataset />
                   </div>
-                  
-                  <Divider />
-                  
-                  <div className='flex-[7] flex flex-col gap-3'>
-                      <h2>Action: {dstructures[0].actiontype} </h2>
-                      <h2>Starting Index: {dstructures[0].actioninput}</h2>
-                      <h2>Ending Index: {dstructures[0].actioncount}</h2>
-                      <h2>Action Direction: {dstructures[0].inputparameters}</h2>
-                  </div>
-                  
               </div>
-          </div>
+              
+              <div className='flex-[3] h-full bg-gray-50 shadow3 rounded py-3 px-7 box-border'>
+                  <div className='flex flex-col gap-3  w-full h-full'>
 
-          {/* Previous State */}
-          {/* <div className='flex-[2] h-full bg-gray-50 shadow3 rounded py-3 px-7 box-border'>
-              <div className='flex flex-col gap-3  w-full h-full'>
-                  <h1 className='text-center text-[1.5rem] font-bold flex-[2]'> Previous State </h1>
-
-                  <div className='flex-[8] flex flex-col gap-3'>
-                      <h2>Size: 10000</h2>
+                      <div className='flex flex-col items-center justify-center flex-[3] gap-2'>
+                          <h1 className='text-[1.5rem] font-bold '> Inputs </h1>
+                          <h2 className='text-[1.1rem] text-gray-600'>from size: {dstructures[0].JSONResults ? JSON.parse(dstructures[0].JSONResults)[0].prevSize : "dstructures empty"} </h2>
+                      </div>
+                      
+                      <Divider />
+                      
+                      <div className='flex-[7] flex flex-col gap-3'>
+                          <h2>Action: {dstructures[0].actiontype} </h2>
+                          <h2>Starting Index: {dstructures[0].actioninput}</h2>
+                          <h2>Ending Index: {dstructures[0].actioncount}</h2>
+                          <h2>Action Direction: {dstructures[0].inputparameters}</h2>
+                      </div>
+                      
                   </div>
-                  
               </div>
-          </div> */}
-        </div>
 
-        {/* data div */}
-        <div className='min-h-[450px] h-full w-full flex px-5 py-4 gap-5'>
+            </div>
 
-            {/* fasteset overall speed div */}
-           <div className='bg-gray-50 shadow3 rounded h-full max-h-[400px] overflow-auto flex-1 flex flex-col'>
-                <h1 className='text-[1.5rem] font-bold text-center min-h-[20%] flex items-center justify-center'>
-                    Fastest Overall Speed
-                </h1>
+            {/* data div */}
+            <div className='flex-1 flex px-5 py-4 gap-5'>
 
-                <div className='w-full h-full'>
-                    <List>
-                        {sortedDS.map((item, index) => (
-                            <div key={index}>
-                                <ListItemButton>
-                                  <ListItemText primary={item.dsname} secondary={item.speedms + "ms"} />
-                                </ListItemButton>
-                                {index !== sortedDS.length - 1 && <Divider />}
-                            </div>
-                        ))}
-                    </List>
-                </div>   
-           </div>
+                {/* fasteset overall speed div */}
+              <div className='bg-gray-50 shadow3 rounded h-full max-h-[400px] overflow-auto flex-1 flex flex-col'>
+                    <h1 className='text-[1.5rem] font-bold text-center min-h-[20%] flex items-center justify-center'>
+                        Fastest Overall Speed
+                    </h1>
 
-           {/* fastest average speed */}
-           <div className='bg-gray-50 shadow3 rounded h-full max-h-[400px] overflow-auto flex-1 flex flex-col'>
-                <h1 className='text-[1.5rem] font-bold text-center min-h-[20%] flex items-center justify-center'>
-                    Fastest Average Speed
-                </h1>
+                    <div className='w-full h-full'>
+                        <List>
+                            {sortedDS.map((item, index) => (
+                                <div key={index}>
+                                    <ListItemButton>
+                                      <ListItemText primary={item.dsname} secondary={item.speedms + "ms"} />
+                                    </ListItemButton>
+                                    {index !== sortedDS.length - 1 && <Divider />}
+                                </div>
+                            ))}
+                        </List>
+                    </div>   
+              </div>
 
-                <div className='w-full h-full'>
-                    <List>
-                        {sortedByAverageDS.map((item, index) => (
-                            <div key={index}>
-                                <ListItemButton>
-                                  <ListItemText primary={item.dsname} secondary={item.standardDeviation + `ms (Standard Deviation)`} />
+              {/* fastest average speed */}
+              <div className='bg-gray-50 shadow3 rounded h-full max-h-[400px] overflow-auto flex-1 flex flex-col'>
+                    <h1 className='text-[1.5rem] font-bold text-center min-h-[20%] flex items-center justify-center'>
+                        Fastest Average Speed
+                    </h1>
 
-                                  <Typography variant="body2" color="textSecondary">
-                                      {item.mean + " ms Average Speed"}
-                                  </Typography>
-                                </ListItemButton>
-                                {index !== sortedDS.length - 1 && <Divider />}
-                            </div>
-                        ))}
-                    </List>
-                </div>   
-           </div>
+                    <div className='w-full h-full'>
+                        <List>
+                            {sortedByAverageDS.map((item, index) => (
+                                <div key={index}>
+                                    <ListItemButton>
+                                      <ListItemText primary={item.dsname} secondary={item.standardDeviation + `ms (Standard Deviation)`} />
 
-           {/* lowest memory occupied */}
-           <div className='bg-gray-50 shadow3 rounded h-full max-h-[400px] overflow-auto flex-1 flex flex-col'>
-                <h1 className='text-[1.5rem] font-bold text-center min-h-[20%] flex items-center justify-center'>
-                    Lowest Memory Usage
-                </h1>
+                                      <Typography variant="body2" color="textSecondary">
+                                          {item.mean + " ms Average Speed"}
+                                      </Typography>
+                                    </ListItemButton>
+                                    {index !== sortedDS.length - 1 && <Divider />}
+                                </div>
+                            ))}
+                        </List>
+                    </div>   
+              </div>
 
-                <div className='w-full h-full'>
-                    <List>
-                        {sortedBySpaceDS.map((item, index) => (
-                            <div key={index}>
-                                <ListItemButton>
-                                  <ListItemText primary={item.dsname} secondary={item.space + " bytes"} />
-                                </ListItemButton>
-                                {index !== sortedDS.length - 1 && <Divider />}
-                            </div>
-                        ))}
-                    </List>
-                </div>   
-           </div>
-        </div>
+              {/* lowest memory occupied */}
+              <div className='bg-gray-50 shadow3 rounded h-full max-h-[400px] overflow-auto flex-1 flex flex-col'>
+                    <h1 className='text-[1.5rem] font-bold text-center min-h-[20%] flex items-center justify-center'>
+                        Lowest Memory Usage
+                    </h1>
 
+                    <div className='w-full h-full'>
+                        <List>
+                            {sortedBySpaceDS.map((item, index) => (
+                                <div key={index}>
+                                    <ListItemButton>
+                                      <ListItemText primary={item.dsname} secondary={item.space + " bytes"} />
+                                    </ListItemButton>
+                                    {index !== sortedDS.length - 1 && <Divider />}
+                                </div>
+                            ))}
+                        </List>
+                    </div>   
+              </div>
+            </div>
+        </div>               
 
       </Dialog>
     </React.Fragment>
