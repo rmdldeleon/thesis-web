@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import { useNavigate } from "react-router-dom";
+
 import Typography from '@mui/material/Typography';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
@@ -83,14 +85,13 @@ const columns = [
 ];
 
 const rowsData = [
-  { rownumber: 1, batch: 1, actionnumber: 1, datastructures: 3, size: 0, lastaction: "Add", datecreated: "09/20/24 24:00PM", lastupdated: "09/20/24 24:00PM"},
+  //{ rownumber: 1, batch: 1, actionnumber: 0, datastructures: 3, size: 0, lastaction: "N/A", datecreated: "09/20/24 24:00PM", lastupdated: "N/'A"},
 ];
 
 export default function HistoryTable() {
     const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
     const [ dstructures, setdstructures ] = React.useContext(dstructuresContext)
-
 
     const [selectedRow, setSelectedRow] = React.useState(undefined);
 
@@ -110,7 +111,7 @@ export default function HistoryTable() {
       let arr = []
 
       for(let i = 0; i < response.data.length; i++){
-        // dont show if item is the current batch used 
+        // skip if item is the current batch used 
         if(
           i < dstructures.length && 
           response.data[i].DSBatch === dstructures[i].dsbatch && 
@@ -119,7 +120,13 @@ export default function HistoryTable() {
           continue
         }
 
-        if(!response.data[i].ActionSet || !response.data[i].ActionType){
+        // skip if newly reset
+        if(!response.data[i].ActionSet || !response.data[i].ActionType){ 
+          continue
+        }
+
+        // skip if the record action is get. get action does not modify the datastructure
+        if(response.data[i].ActionType === "Get"){
           continue
         }
 
@@ -164,11 +171,28 @@ export default function HistoryTable() {
 }
 
 function EnhancedTableToolbar(props) {
+    const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+
+    const navigate = useNavigate();
+
     const { numSelected, selectedRow } = props;
     
     const handleDeleteClick = () => {
-        console.log(selectedRow)
+        console.log(selectedRow, "delete")
     };
+
+    const handleRecoverClick = async () => {
+      console.log(selectedRow, "recover")
+      let archiveDS = await axios.post('http://localhost:3001/history/archiveDS', {data: selectedRow, AccountID: userDetails.AccountID}); 
+      let archiveAS = await axios.post('http://localhost:3001/history/archiveAS', {data: selectedRow, AccountID: userDetails.AccountID});
+      let deleteDSFromBatch = await axios.post('http://localhost:3001/history/deleteDSFromBatch', {data: selectedRow, AccountID: userDetails.AccountID}); 
+      let deleteASFromBatchSet = await axios.post('http://localhost:3001/history/deleteASFromBatchSet', {data: selectedRow, AccountID: userDetails.AccountID});
+
+      //update last used batch from accounts table
+      let updateLastUsedDSBatch = await axios.post('http://localhost:3001/analytics/reset/updateLastUsedDSBatch', {data: {accountID : userDetails.AccountID, batch: selectedRow.batch}});
+
+      window.location.reload();
+    }
 
     return (
       <Toolbar
@@ -197,13 +221,13 @@ function EnhancedTableToolbar(props) {
             id="tableTitle"
             component="div"
           >
-            Versions
+            Versions <span className='text-gray-500 text-[.9rem]'>(Select a row to recover / delete)</span>
           </Typography>
         )}
   
         {numSelected > 0 ? (
           <Tooltip title="Recover">
-            <IconButton onClick={handleDeleteClick}>
+            <IconButton onClick={handleRecoverClick}>
               <DeleteIcon />
             </IconButton>
           </Tooltip>

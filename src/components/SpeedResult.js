@@ -75,6 +75,8 @@ export default function SpeedResult() {
 
           let prevSpeedms = 0
 
+          console.log(dstructures, "allresults")
+
           for(let i = 0; i < results.length; i++){
               let currentIndex = results[i].currentIndex
               let speedms = results[i].speedms
@@ -89,6 +91,7 @@ export default function SpeedResult() {
               arr.push({currentIndex, speedms, diff, sign})
           }
       } 
+
       return arr
   }
 

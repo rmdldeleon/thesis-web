@@ -6,7 +6,7 @@ const getLastActionAndDataStructure = async (userDetails, callback) => {
     const query =
     `SELECT ds.*, ar.*
     FROM (
-        SELECT ds.DSID as DSID_CLSC, ds.DSName as DSName_CLSC, ds.*
+        SELECT ds.DSBatch as DSBatch_CLSC, ds.DSID as DSID_CLSC, ds.DSName as DSName_CLSC, ds.*
         FROM accounts a
         JOIN datastructures ds ON a.AccountID = ds.AccountID
         WHERE a.AccountID = ? 
@@ -92,4 +92,23 @@ const getHighestBatch = (AccountID, callback) => {
     });
 }
 
-module.exports = { getLastActionAndDataStructure, initializeDS, updateJSONData, getHighestBatch };
+const deleteDSFromBatch = (data, AccountID, callback) => {
+    const DSBatch = data.batch   
+
+    const query = 
+    `DELETE FROM datastructures
+    WHERE AccountID = ? AND DSBatch > ?;`
+
+    const values = [AccountID, DSBatch]
+    
+    con.query(query, values, (err, results) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            callback(err, null);
+        } else {
+            callback(null, results);
+        }
+    });
+}
+
+module.exports = { getLastActionAndDataStructure, initializeDS, updateJSONData, getHighestBatch, deleteDSFromBatch };

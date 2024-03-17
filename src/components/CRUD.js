@@ -146,7 +146,7 @@ const CRUD = ({display, charts}) => {
             let dsobject = {
                 ds: dsinstance,
                 dsid: result[i].DSID_CLSC, 
-                dsbatch: result[i].DSBatch, 
+                dsbatch: result[i].DSBatch_CLSC,
                 dsname: result[i].DSName_CLSC, 
                 threaded: result[i].Threaded, 
               
@@ -566,9 +566,11 @@ const GetDialog = ({getModal, maxIndex, datastructures, updatedsdetails, execute
 
         // array for storing all results
         // will be used to get average
-        let allResults = []
+        let allResults
 
         for(let i = 0; i < datastructures.dstructures.length; i++){
+            allResults = []
+
             let speedms = 0
             let speednotation
             let spacenotation
@@ -584,7 +586,7 @@ const GetDialog = ({getModal, maxIndex, datastructures, updatedsdetails, execute
             let parameter
 
             if(index >= count){
-                parameter = "Get After"
+                parameter = "Left"
 
                 for(let j = index; j >= count; j--){ 
                     let prevSize = datastructures.dstructures[i].ds.size() // original size before the the action
@@ -609,7 +611,7 @@ const GetDialog = ({getModal, maxIndex, datastructures, updatedsdetails, execute
                     allResults.push(actionresult)
                 }
             }else if(index < count){
-                parameter = "Get Before"
+                parameter = "Right"
 
                 for(let j = index; j <= count; j++){
                     let prevSize = datastructures.dstructures[i].ds.size() // original size before the the action
@@ -651,7 +653,9 @@ const GetDialog = ({getModal, maxIndex, datastructures, updatedsdetails, execute
             updatedds[i].actioninput = index
             updatedds[i].actioncount = count
             updatedds[i].inputparameters = parameter
-
+            updatedds[i].ActionSet += 1
+            updatedds[i].JSONData = updatedds[i].ds.toJSON()
+            
             // for actionresults table 
             let JSONResults = JSON.stringify(allResults)
             updatedds[i].JSONResults = JSONResults
@@ -773,9 +777,11 @@ const DeleteDialog = ({deleteModal, maxIndex, datastructures, updatedsdetails, e
 
         // array for storing all results
         // will be used to get average
-        let allResults = []
+        let allResults
         
         for(let i = 0; i < datastructures.dstructures.length; i++){
+            allResults = []
+
             let speedms = 0
             let speednotation
             let spacenotation
@@ -791,7 +797,7 @@ const DeleteDialog = ({deleteModal, maxIndex, datastructures, updatedsdetails, e
             let parameter
 
             if(index >= count){
-                parameter = "Delete After"
+                parameter = "Left"
 
                 for(let j = index; j >= count; j--){ 
                     let prevSize = datastructures.dstructures[i].ds.size() // original size before the the action
@@ -814,9 +820,10 @@ const DeleteDialog = ({deleteModal, maxIndex, datastructures, updatedsdetails, e
                     actionresult.prevSize = prevSize
                     actionresult.currentIndex = j
                     allResults.push(actionresult)     
+
                 }
             }else if(index < count){
-                parameter = "Delete Before"
+                parameter = "Right"
 
                 for(let j = index; j <= count; j++){
                     let prevSize = datastructures.dstructures[i].ds.size() // original size before the the action
@@ -858,6 +865,8 @@ const DeleteDialog = ({deleteModal, maxIndex, datastructures, updatedsdetails, e
             updatedds[i].actioninput = index
             updatedds[i].actioncount = count
             updatedds[i].inputparameters = parameter
+            updatedds[i].ActionSet += 1
+            updatedds[i].JSONData = updatedds[i].ds.toJSON()
 
             // for actionresults table 
             let JSONResults = JSON.stringify(allResults)
@@ -866,15 +875,15 @@ const DeleteDialog = ({deleteModal, maxIndex, datastructures, updatedsdetails, e
             const formattedDateTime = currentDate.toISOString().slice(0, 19).replace('T', ' ');
             updatedds[i].ActionDate = formattedDateTime
 
-            // for datstructures table 
-            let JSONData = updatedds[i].ds.toJSON()
-            let DSID = updatedds[i].dsid
+            // // for datstructures table 
+            // let JSONData = updatedds[i].ds.toJSON()
+            // let DSID = updatedds[i].dsid
 
             // add results to actionresults table
             let insertActionResults = await axios.post('http://localhost:3001/analytics/add/insertActionResults', {actionResults : updatedds[i]});
 
-            // udpate JSONData column of datstructures table
-            let updateJSONData = await axios.post('http://localhost:3001/analytics/add/updateJSONData', {JSONData, DSID}); 
+            // // udpate JSONData column of datstructures table
+            // let updateJSONData = await axios.post('http://localhost:3001/analytics/add/updateJSONData', {JSONData, DSID}); 
         }
 
         maxIndex.setMaxIndex(updatedds[0].ds.size() -1) 
@@ -1363,7 +1372,6 @@ const DSDetailsItems = ({title, value, unit, dsDetails, dsIndex}) => {
     const [ memoryDialog, setMemoryDialog] = useContext(MemoryDialog)
 
     const speedNext = () => {
-        console.log(dstructures)
         let size = value.length
 
         if(index === size-1){

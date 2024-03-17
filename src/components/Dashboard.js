@@ -15,9 +15,6 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { styled, alpha } from '@mui/material/styles';
 
-import { useParams, Link, useNavigate} from "react-router-dom";
-import { useForm } from 'react-hook-form';
-
 import axios from 'axios';
 
 import "../css/App.css";

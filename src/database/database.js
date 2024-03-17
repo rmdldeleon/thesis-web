@@ -4,7 +4,8 @@ const { con } = require('./Connection')
 const db = {
     ...require('./AccountsQueries'),
     ...require('./DataStructuresQueries'),
-    ...require('./ActionResultsQueries')
+    ...require('./ActionResultsQueries'),
+    ...require('./ArchivedQueries')
 };
 
 module.exports = { con, db };

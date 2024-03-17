@@ -9,13 +9,13 @@ const insertActionResults = (actionResults, callback) => {
     let AccountID = actionResults.AccountID
     let JSONData = actionResults.JSONData
     
-    const values = [ActionSet, AccountID, ar.dsid, ar.dsname, ar.actiontype, ar.actioninput, ar.actioncount, ar.inputparameters, ar.speedms, ar.speednotation, ar.size, ar.sizepointers, 
+    const values = [ActionSet, AccountID, ar.dsbatch, ar.dsid, ar.dsname, ar.actiontype, ar.actioninput, ar.actioncount, ar.inputparameters, ar.speedms, ar.speednotation, ar.size, ar.sizepointers, 
     ar.pointersAdded, ar.sizeAdded, ar.space, ar.spacenotation, ar.spaceAdded, ar.threads, JSONResults, JSONData, ActionDate]
 
     const query = `
-        INSERT INTO actionresults (ActionNumber, ActionSet, AccountID, DSID, DSName, ActionType, StartingIndex, EndIndex_Count, Direction, 
+        INSERT INTO actionresults (ActionNumber, ActionSet, AccountID, DSBatch, DSID, DSName, ActionType, StartingIndex, EndIndex_Count, Direction, 
         SpeedMS, SpeedNotation, Size, SizePointers, PointersAdded, SizeAdded, SpaceOccupied, SpaceNotation, SpaceAdded, ThreadsUsed, JSONResults, JSONData, ActionDate) 
-        VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`    
+        VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`    
     
     con.query(query, values, (err, results) => {
         if (err) {
@@ -77,4 +77,25 @@ const getHistoryTableData = (AccountID, callback) => {
 }
 
 
-module.exports = { insertActionResults, updateCapacity, getHistoryTableData };
+const deleteASFromBatchSet = (data, AccountID, callback) => {
+    const DSBatch = data.batch   
+    const ActionSet = data.actionnumber
+
+    const query = 
+    `DELETE FROM actionresults
+    WHERE AccountID = ? AND DSBatch > ? OR (DSBatch = ? AND ActionSet > ?);`
+
+    const values = [AccountID, DSBatch, DSBatch, ActionSet]
+    
+    con.query(query, values, (err, results) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            callback(err, null);
+        } else {
+            callback(null, results);
+        }
+    });
+}
+
+
+module.exports = { insertActionResults, updateCapacity, getHistoryTableData, deleteASFromBatchSet };
