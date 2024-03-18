@@ -57,7 +57,7 @@ const createAccount = async (userData, callback) => {
         });
         
         const batch = 1
-        initializeDS({accountID, batch, treeliststr: userData.treeliststr, linkedliststr: userData.linkedliststr, dynamicarraystr: userData.dynamicarraystr}, (err, results) => {
+        initializeDS({accountID, batch, treeliststr: userData.treeliststr, linkedliststr: userData.linkedliststr, dynamicarraystr: userData.dynamicarraystr, frequencyCapacity: 100}, (err, results) => {
             if (err) {
                 console.error('Error initializing data structure:', err);
                 callback(err, null);

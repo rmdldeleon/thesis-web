@@ -154,7 +154,7 @@ const CRUD = ({display, charts}) => {
                 userpivot: result[i].UserAddedPivot,
                 datecreated: result[i].DateCreated,
                 JSONData: result[i].JSONData || JSONData,
-                frequency: result[i].Frequency || JSON.parse(JSONData).capacity,
+                frequency: result[i].Type === "TRADITIONAL ARRAY" ? JSON.parse(JSONData).capacity : result[i].Frequency,
                 speedms: result[i].SpeedMS,
                 threads: result[i].ThreadsUsed,
                 size: result[i].Size,
@@ -366,6 +366,10 @@ const AddDialog = ({addModal, maxIndex, datastructures, updatedsdetails, execute
                     actionresult.prevSize = prevSize
                     actionresult.currentIndex = j
                     allResults.push(actionresult)
+
+                    if(datastructures.dstructures[i].dsname === "Dynamic Array"){
+                        console.log(actionresult, j)
+                    }
                 }
             }else if(parameter === "Add After"){
                 for(let j = index; j < index + count; j++){
@@ -1217,25 +1221,27 @@ const ResetDialog = () => {
     
     const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
     const accountID = userDetails.AccountID
+
+    //const [frequencyCapacity, setFrequencyCapacity] = useState(100);
     
-    const onConfirm = async () => {        
+    const onConfirm = async (frequencyCapacity) => {      
         //getting the current highest batch of an account
         // let getHighestBatch = await axios.post('http://localhost:3001/analytics/reset/getHighestBatch', {accountID});
         // let highestBatch = getHighestBatch.data[0].DSBatch
         let highestBatch = dstructures[0].dsbatch
 
         //create new instance of datastructures in 'datastructures' table
-        let treelist = new TreeList(100)
+        let treelist = new TreeList(frequencyCapacity)
         let treeliststr = treelist.toJSON()
         
         let linkedlist = new LinkedList()
         let linkedliststr = linkedlist.toJSON()
         
-        let dynamicarray = new DynamicArray(100)
+        let dynamicarray = new DynamicArray(frequencyCapacity)
         let dynamicarraystr = dynamicarray.toJSON()
 
         let batch = highestBatch + 1
-        let data = {accountID, batch,  treeliststr, linkedliststr, dynamicarraystr}
+        let data = {accountID, batch,  treeliststr, linkedliststr, dynamicarraystr, frequencyCapacity}
 
         let initializeDS = await axios.post('http://localhost:3001/analytics/reset/initializeDS', {data});
 
@@ -1247,7 +1253,7 @@ const ResetDialog = () => {
         let newDataStructures = response.data
 
         //update states
-        retrieveDS(newDataStructures);
+        retrieveDS(newDataStructures, frequencyCapacity);
         setMaxIndex(-1)
 
         // close the dialog
@@ -1255,6 +1261,7 @@ const ResetDialog = () => {
     }
 
     const handleClose = () => {
+        //setFrequencyCapacity(100)
         setResetDialog(false)
     }
 
@@ -1265,6 +1272,20 @@ const ResetDialog = () => {
                 onClose={handleClose}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
+
+                PaperProps={{
+                    component: 'form',
+                    onSubmit: (event) => {
+                      event.preventDefault();
+                      const formData = new FormData(event.currentTarget);
+                      const formJson = Object.fromEntries(formData.entries());
+                      let frequencyCapacity = formJson.frequencyCapacity;
+                      frequencyCapacity = parseInt(frequencyCapacity, 10);  
+
+                      onConfirm(frequencyCapacity)
+                      handleClose();
+                    },
+                }}
             >
                 <DialogTitle id="alert-dialog-title">
                 {"Confirmation to reset"}
@@ -1273,10 +1294,30 @@ const ResetDialog = () => {
                 <DialogContentText id="alert-dialog-description">
                     Resetting the datastructures will revert back all datastructures in its initial state.
                 </DialogContentText>
+                <TextField
+                    autoFocus
+                    required
+                    margin="dense"
+                    id="name"
+                    name="frequencyCapacity"
+                    label="Frequency / Capacity"
+                    type="number"
+                    fullWidth
+                    variant="standard"
+                    defaultValue={100}
+                    InputProps={{
+                        inputProps: { 
+                            min: 10 
+                        }
+                    }}
+                />
                 </DialogContent>
                 <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
-                <Button onClick={onConfirm} autoFocus>
+                {/* <Button onClick={onConfirm} autoFocus>
+                    Confirm
+                </Button> */}
+                <Button type="submit">
                     Confirm
                 </Button>
                 </DialogActions>

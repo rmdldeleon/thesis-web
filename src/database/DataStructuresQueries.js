@@ -34,17 +34,19 @@ const getLastActionAndDataStructure = async (userDetails, callback) => {
     });
 }
 
-const initializeDS = ({accountID, batch, treeliststr, linkedliststr, dynamicarraystr}, callback) => {
+const initializeDS = ({accountID, batch, treeliststr, linkedliststr, dynamicarraystr, frequencyCapacity}, callback) => {
     const values = [
+        accountID, batch, frequencyCapacity,
         accountID, batch, 
-        accountID, batch, 
-        accountID, batch,]
+        accountID, batch, frequencyCapacity]
+
+        console.log(values)
 
     const query = 
     "INSERT INTO `datastructures` (`DSID`, `AccountID`, `DSBatch`, `DSName`, `Threaded`, `Frequency`, `Capacity`, `Type`, `UserAddedPivot`, `DateCreated`) \
-    VALUES (NULL, ?, ?, 'Tree List', '0', '100', NULL, 'CUSTOM LIST', '0', current_timestamp()), \
+    VALUES (NULL, ?, ?, 'Tree List', '0', ?, NULL, 'CUSTOM LIST', '0', current_timestamp()), \
     (NULL, ?, ?, 'Doubly Linked List', '0', NULL, NULL, 'TRADITIONAL LIST', '0', current_timestamp()), \
-    (NULL, ?, ?, 'Dynamic Array', '0', NULL, 100, 'TRADITIONAL ARRAY', '0', current_timestamp());"
+    (NULL, ?, ?, 'Dynamic Array', '0', NULL, ?, 'TRADITIONAL ARRAY', '0', current_timestamp());"
 
     con.query(query, values, (err, results) => {
         if (err) {
