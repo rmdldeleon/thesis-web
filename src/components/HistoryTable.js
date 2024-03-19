@@ -10,11 +10,15 @@ import Tooltip from '@mui/material/Tooltip';
 import { alpha } from '@mui/material/styles';
 
 import DeleteIcon from '@mui/icons-material/Delete';
+import RestoreIcon from '@mui/icons-material/Restore';
 
 import { DataGrid } from '@mui/x-data-grid';
 
 // imported contexts
 import { dstructuresContext } from "./mainpage";
+
+//import dialogs
+import { AlertDialog } from "./AlertDialog"
 
 import axios from 'axios';
 
@@ -171,18 +175,15 @@ export default function HistoryTable() {
 }
 
 function EnhancedTableToolbar(props) {
-    const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
-
     const navigate = useNavigate();
 
-    const { numSelected, selectedRow } = props;
-    
-    const handleDeleteClick = () => {
-        console.log(selectedRow, "delete")
-    };
+    const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
-    const handleRecoverClick = async () => {
-      console.log(selectedRow, "recover")
+    const [alertDialog, setAlertDialog] = React.useState(false);
+
+    const { numSelected, selectedRow } = props;
+
+    const handleConfirm = async () => {
       let archiveDS = await axios.post('http://localhost:3001/history/archiveDS', {data: selectedRow, AccountID: userDetails.AccountID}); 
       let archiveAS = await axios.post('http://localhost:3001/history/archiveAS', {data: selectedRow, AccountID: userDetails.AccountID});
       let deleteDSFromBatch = await axios.post('http://localhost:3001/history/deleteDSFromBatch', {data: selectedRow, AccountID: userDetails.AccountID}); 
@@ -191,8 +192,12 @@ function EnhancedTableToolbar(props) {
       //update last used batch from accounts table
       let updateLastUsedDSBatch = await axios.post('http://localhost:3001/analytics/reset/updateLastUsedDSBatch', {data: {accountID : userDetails.AccountID, batch: selectedRow.batch}});
 
-      window.location.reload();
+      window.location.reload(); // so it goes back to analytics tab
     }
+
+    const openAlertDialog = () => {
+      setAlertDialog(true)
+    };
 
     return (
       <Toolbar
@@ -221,26 +226,38 @@ function EnhancedTableToolbar(props) {
             id="tableTitle"
             component="div"
           >
-            Versions <span className='text-gray-500 text-[.9rem]'>(Select a row to recover / delete)</span>
+            Versions <span className='text-gray-500 text-[.9rem]'>(Select a row to recover)</span>
           </Typography>
         )}
-  
+
+        <AlertDialog 
+          alertDialog={alertDialog} 
+          setAlertDialog={setAlertDialog} 
+          handleConfirm={handleConfirm} 
+          text={{
+            title:"Reverting to previous state",
+            content: "Reverting to a previous state will delete all succeeding records",
+            negativeButton : "Cancel",
+            possitiveButton : "Confirm"
+          }}
+        />
+
         {numSelected > 0 ? (
-          <Tooltip title="Recover">
-            <IconButton onClick={handleRecoverClick}>
-              <DeleteIcon />
+          <Tooltip title="Revert">
+            <IconButton onClick={openAlertDialog}>
+              <RestoreIcon />
             </IconButton>
           </Tooltip>
         ) : null}
 
-        
-        {numSelected > 0 ? (
+        {/* delete button */}
+        {/* {numSelected > 0 ? (
           <Tooltip title="Delete">
             <IconButton onClick={handleDeleteClick}>
               <DeleteIcon />
             </IconButton>
           </Tooltip>
-        ) : null}
+        ) : null} */}
       </Toolbar>
     );
 }

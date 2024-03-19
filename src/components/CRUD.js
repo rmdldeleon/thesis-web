@@ -43,8 +43,12 @@ import SizeResult from "./SizeResult";
 import ThreadsResult from "./ThreadsResult"
 import MemoryResult from "./MemoryResult";
 
+//import dialogs
+import { AlertDialog } from "./AlertDialog"
+
 // imported contexts
 import { dstructuresContext } from "./mainpage";
+import { has } from "lodash";
 
 //data context
 const DialogContext = createContext();
@@ -53,6 +57,7 @@ export const SpeedDialog = createContext();
 export const SizeDialog = createContext();
 export const ThreadsDialog = createContext();
 export const MemoryDialog = createContext();
+export const AlertDialogContext = createContext();
 
 const CRUD = ({display, charts}) => {
     const navigate = useNavigate();
@@ -91,6 +96,10 @@ const CRUD = ({display, charts}) => {
 
     // index of opened dialog
     const [openedDSDetails, setOpenedDSDetails] = useState()
+
+    // alert dialog state
+    const [alertDialog, setAlertDialog] = React.useState(false);
+    const [alertDialogDetails, setAlertDialogDetails] = React.useState({})
 
     const executeQuery = (query, parameters, access) => { 
         return new Promise((resolve, reject) => {
@@ -220,6 +229,7 @@ const CRUD = ({display, charts}) => {
         <SizeDialog.Provider value={[sizeDialog, setSizeDialog, dstructures, openedDSDetails, setOpenedDSDetails]}>
         <ThreadsDialog.Provider value={[threadsDialog, setThreadsDialog, dstructures, openedDSDetails, setOpenedDSDetails]}>
         <MemoryDialog.Provider value={[memoryDialog, setMemoryDialog, dstructures, openedDSDetails, setOpenedDSDetails]}>
+        <AlertDialogContext.Provider value={[setAlertDialog, setAlertDialogDetails, dstructures]}>
             <section className={`${display} bg-[#f8f8fa] h-full w-full rounded-ss-[20px] flex flex-col rounded-ee-[8px]`}>
                 <SortHeader />
                 <ResetDialog />
@@ -228,6 +238,17 @@ const CRUD = ({display, charts}) => {
                 <SizeResult />
                 <ThreadsResult />
                 <MemoryResult />
+                <AlertDialog 
+                    alertDialog={alertDialog} 
+                    setAlertDialog={setAlertDialog} 
+                    handleConfirm={alertDialogDetails.handleConfirm} 
+                    text={{
+                        title: alertDialogDetails.title,
+                        content: alertDialogDetails.content,
+                        negativeButton : alertDialogDetails.negativeButton,
+                        possitiveButton : alertDialogDetails.possitiveButton
+                    }}
+                />
 
                 <div className='flex flex-1'>
                     <ActionSideBar addModal={addModal} getModal={getModal} deleteModal={deleteModal} messageModal={messageModal} modalContent={{messageModalContent, setMessageModalContent}}/>
@@ -251,6 +272,7 @@ const CRUD = ({display, charts}) => {
                     </div> 
                 </div>
             </section>
+        </AlertDialogContext.Provider>
         </MemoryDialog.Provider>
         </ThreadsDialog.Provider>
         </SizeDialog.Provider>
@@ -366,10 +388,6 @@ const AddDialog = ({addModal, maxIndex, datastructures, updatedsdetails, execute
                     actionresult.prevSize = prevSize
                     actionresult.currentIndex = j
                     allResults.push(actionresult)
-
-                    if(datastructures.dstructures[i].dsname === "Dynamic Array"){
-                        console.log(actionresult, j)
-                    }
                 }
             }else if(parameter === "Add After"){
                 for(let j = index; j < index + count; j++){
@@ -1412,6 +1430,9 @@ const DSDetailsItems = ({title, value, unit, dsDetails, dsIndex}) => {
     //context for memroy dialog 
     const [ memoryDialog, setMemoryDialog] = useContext(MemoryDialog)
 
+    // context for alert dialog
+    const [setAlertDialog, setAlertDialogDetails] = useContext(AlertDialogContext)
+
     const speedNext = () => {
         let size = value.length
 
@@ -1423,18 +1444,31 @@ const DSDetailsItems = ({title, value, unit, dsDetails, dsIndex}) => {
     }
 
     const openDialog = () =>{
-        if(title[0] === "Speed"){
-            setOpenedDSDetails({dsDetails, dsIndex, currentDialog : "Speed"})
-            setSpeedDialog(true)
-        }else if(title[0] === "Size"){
-            setOpenedDSDetails({dsDetails, dsIndex, currentDialog : "Size"})
-            setSizeDialog(true)
-        }else if(title[0] === "Threads"){
-            setOpenedDSDetails({dsDetails, dsIndex, currentDialog : "Threads"})
-            setThreadsDialog(true)
-        }else if(title[0] === "Memory"){
-            setOpenedDSDetails({dsDetails, dsIndex, currentDialog : "Memory"})
-            setMemoryDialog(true)
+        let hasRecord = dstructures[0].actiontype != null
+
+        if(hasRecord){
+            if(title[0] === "Speed"){
+                setOpenedDSDetails({dsDetails, dsIndex, currentDialog : "Speed"})
+                setSpeedDialog(true)
+            }else if(title[0] === "Size"){
+                setOpenedDSDetails({dsDetails, dsIndex, currentDialog : "Size"})
+                setSizeDialog(true)
+            }else if(title[0] === "Threads"){
+                setOpenedDSDetails({dsDetails, dsIndex, currentDialog : "Threads"})
+                setThreadsDialog(true)
+            }else if(title[0] === "Memory"){
+                setOpenedDSDetails({dsDetails, dsIndex, currentDialog : "Memory"})
+                setMemoryDialog(true)
+            }    
+        }else{
+            let handleConfirm = undefined
+            let title = "Notice"
+            let content = "Action cannot be done: no output is recorded for this batch"
+            let negativeButton = undefined
+            let possitiveButton = "Ok"
+
+            setAlertDialogDetails({handleConfirm, title, content, negativeButton, possitiveButton})
+            setAlertDialog(true)
         }
     }
 
@@ -1604,16 +1638,52 @@ const ActionSideBar = ({addModal, getModal, deleteModal, messageModal, modalCont
 const ActionSideBarItem = (props) => {
     const [resetDialog, setResetDialog] = useContext(DialogContext)
     const [lastActionDialog, setLastActionDialog] = useContext(LastActionDialog)
+    const [setAlertDialog, setAlertDialogDetails, dstructures] = useContext(AlertDialogContext)
 
     // previous version of dialog
     let openModal = () => {
-       if(props.title==="Reset"){
-            setResetDialog(true)
-       }else if(props.title==="Last Action"){
-            setLastActionDialog(true)
-       }else{
-            props.modal.showModal(); 
-       }
+        let size = dstructures[0].size || 0
+       
+        if(props.title==="Reset"){
+            if(size === 0){
+                let handleConfirm = undefined
+                let title = "Notice"
+                let content = "Action cannot be done: data structure sare currently empty."
+                let negativeButton = undefined
+                let possitiveButton = "Ok"
+
+                setAlertDialogDetails({handleConfirm, title, content, negativeButton, possitiveButton})
+                setAlertDialog(true)
+            }else{
+                setResetDialog(true)
+            }
+        }else if(props.title==="Last Action"){
+            if(size === 0){
+                let handleConfirm = undefined
+                let title = "Notice"
+                let content = "Action cannot be done: no output is recorded for this batch"
+                let negativeButton = undefined
+                let possitiveButton = "Ok"
+
+                setAlertDialogDetails({handleConfirm, title, content, negativeButton, possitiveButton})
+                setAlertDialog(true)
+            }else{
+                setLastActionDialog(true)
+            }
+        }else{
+            if(size === 0 && props.title !== "Add"){
+                let handleConfirm = undefined
+                let title = "Notice"
+                let content = "Action cannot be done: data structure sare currently empty."
+                let negativeButton = undefined
+                let possitiveButton = "Ok"
+
+                setAlertDialogDetails({handleConfirm, title, content, negativeButton, possitiveButton})
+                setAlertDialog(true)
+            }else{
+                props.modal.showModal(); 
+            }
+        }
     }
 
     return(  
