@@ -99,7 +99,7 @@ const deleteDSFromBatch = (data, AccountID, callback) => {
 
     const query = 
     `DELETE FROM datastructures
-    WHERE AccountID = ? AND DSBatch > ?;`
+    WHERE AccountID = ? AND DSBatch = ?;`
 
     const values = [AccountID, DSBatch]
     

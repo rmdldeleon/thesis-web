@@ -83,9 +83,9 @@ const deleteASFromBatchSet = (data, AccountID, callback) => {
 
     const query = 
     `DELETE FROM actionresults
-    WHERE AccountID = ? AND DSBatch > ? OR (DSBatch = ? AND ActionSet > ?);`
+    WHERE AccountID = ? AND DSBatch = ? AND ActionSet > ?;`
 
-    const values = [AccountID, DSBatch, DSBatch, ActionSet]
+    const values = [AccountID, DSBatch, ActionSet]
     
     con.query(query, values, (err, results) => {
         if (err) {

@@ -72,7 +72,7 @@ export default function LastActionResult() {
       if(dstructures[0].JSONResults){
           for(let i = 0; i < dstructures.length; i++){
               let results = JSON.parse(dstructures[i].JSONResults)
-
+              console.log(dstructures)
               // Step 1: Calculate the mean
               const mean = results.reduce((total, value) => total + value.speedms, 0) / results.length;
               const roundedMean = Math.floor(mean * 1e6) / 1e6;

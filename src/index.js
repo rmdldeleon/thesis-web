@@ -28,6 +28,10 @@ const router = createBrowserRouter([
     path: '/history',
     element: <App />,
   },
+  {
+    path: '/settings',
+    element: <App />,
+  },
 ])
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

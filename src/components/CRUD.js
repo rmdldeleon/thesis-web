@@ -1243,10 +1243,10 @@ const ResetDialog = () => {
     //const [frequencyCapacity, setFrequencyCapacity] = useState(100);
     
     const onConfirm = async (frequencyCapacity) => {      
-        //getting the current highest batch of an account
-        // let getHighestBatch = await axios.post('http://localhost:3001/analytics/reset/getHighestBatch', {accountID});
-        // let highestBatch = getHighestBatch.data[0].DSBatch
-        let highestBatch = dstructures[0].dsbatch
+        // getting the current highest batch of an account
+        let getHighestBatch = await axios.post('http://localhost:3001/analytics/reset/getHighestBatch', {accountID});
+        let highestBatch = getHighestBatch.data[0].DSBatch
+        // let highestBatch = dstructures[0].dsbatch
 
         //create new instance of datastructures in 'datastructures' table
         let treelist = new TreeList(frequencyCapacity)

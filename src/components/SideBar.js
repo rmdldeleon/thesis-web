@@ -11,18 +11,18 @@ import about from "../pictures/about.svg"
 import settings from "../pictures/settings.svg"
 import update from "../pictures/update.svg"
 
-const SideBar = ({setHeaderTitle, highlight, setChartsOpen, setAnalyticsOpen, setDashboardOpen, currentPanelOpened, setCurrentPanelOpened}) => {
+const SideBar = ({setHeaderTitle, highlight, setAnalyticsOpen, setDashboardOpen, currentPanelOpened, setCurrentPanelOpened, setSettingsOpen}) => {
     return(
         <section className="bg-slate-200 w-20 h-full flex flex-col rounded-es-[8px]"> 
             <div className='flex-1 flex flex-col'>
                 <SideBarItem logo={analytics} title="Analytics" setHeaderTitle={setHeaderTitle} thisHighlight={highlight.analyticsHighlight} highlight={highlight} setAnalyticsOpen = {setAnalyticsOpen} currentPanelOpened ={currentPanelOpened} setCurrentPanelOpened={setCurrentPanelOpened}/>
                 <SideBarItem logo={history} title="History" setHeaderTitle={setHeaderTitle} thisHighlight={highlight.dashboardHighlight} highlight={highlight} setDashboardOpen={setDashboardOpen} currentPanelOpened = {currentPanelOpened} setCurrentPanelOpened={setCurrentPanelOpened}/>
-                <SideBarItem logo={barChart} title="Charts" setHeaderTitle={setHeaderTitle} thisHighlight={highlight.chartsHighlight} highlight={highlight} setChartsOpen = {setChartsOpen} currentPanelOpened = {currentPanelOpened} setCurrentPanelOpened={setCurrentPanelOpened}/>
+                {/* <SideBarItem logo={barChart} title="Charts" setHeaderTitle={setHeaderTitle} thisHighlight={highlight.chartsHighlight} highlight={highlight} setChartsOpen = {setChartsOpen} currentPanelOpened = {currentPanelOpened} setCurrentPanelOpened={setCurrentPanelOpened}/> */}
             </div>
 
             <div className="">
                 <SideBarItem logo={about} title="About"/>
-                <SideBarItem logo={settings} title="Settings"/>
+                <SideBarItem logo={settings} title="Settings" setHeaderTitle={setHeaderTitle} thisHighlight={highlight.settingsHighlight} highlight={highlight} setSettingsOpen={setSettingsOpen} currentPanelOpened = {currentPanelOpened} setCurrentPanelOpened={setCurrentPanelOpened}/>
             </div>
         </section>
     )
@@ -72,6 +72,19 @@ const SideBarItem = (props) =>{
             props.setHeaderTitle("History")
 
             navigate('/history');
+        }else if(props.title==="Settings"){
+            props.setSettingsOpen('block')
+            props.setCurrentPanelOpened(() => props.setSettingsOpen)
+
+            props.highlight.setSettingsHighlight(bg)
+            if(props.highlight.setSettingsHighlight !== props.highlight.ch){
+                props.highlight.ch(hd)
+                props.highlight.sch(() => props.highlight.setSettingsHighlight)
+            }
+
+            props.setHeaderTitle("Settings")
+
+            navigate('/settings');
         }
     }
 

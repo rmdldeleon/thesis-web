@@ -158,7 +158,7 @@ export default function HistoryTable() {
     return (
         <div className='w-full h-full flex flex-col'>
             {/* Toolbar */}
-            <EnhancedTableToolbar numSelected={selectedRow ? 1 : 0} selectedRow={selectedRow}/>
+            <EnhancedTableToolbar numSelected={selectedRow ? 1 : 0} selectedRow={selectedRow} dstructures={dstructures}/>
 
             <style>{customCss}</style> {/* Inject custom CSS */}
 
@@ -181,12 +181,18 @@ function EnhancedTableToolbar(props) {
 
     const [alertDialog, setAlertDialog] = React.useState(false);
 
-    const { numSelected, selectedRow } = props;
+    const { numSelected, selectedRow, dstructures } = props;
 
     const handleConfirm = async () => {
-      let archiveDS = await axios.post('http://localhost:3001/history/archiveDS', {data: selectedRow, AccountID: userDetails.AccountID}); 
+      // handle if recovering a state while at a newly initialized ds
+      if(!dstructures[0].size){
+          let batch = dstructures[0].dsbatch
+          let deleteDSFromBatch = await axios.post('http://localhost:3001/history/deleteDSFromBatch', {data: {batch}, AccountID: userDetails.AccountID}); 
+      }
+
+      //let archiveDS = await axios.post('http://localhost:3001/history/archiveDS', {data: selectedRow, AccountID: userDetails.AccountID}); 
       let archiveAS = await axios.post('http://localhost:3001/history/archiveAS', {data: selectedRow, AccountID: userDetails.AccountID});
-      let deleteDSFromBatch = await axios.post('http://localhost:3001/history/deleteDSFromBatch', {data: selectedRow, AccountID: userDetails.AccountID}); 
+      //let deleteDSFromBatch = await axios.post('http://localhost:3001/history/deleteDSFromBatch', {data: selectedRow, AccountID: userDetails.AccountID}); 
       let deleteASFromBatchSet = await axios.post('http://localhost:3001/history/deleteASFromBatchSet', {data: selectedRow, AccountID: userDetails.AccountID});
 
       //update last used batch from accounts table

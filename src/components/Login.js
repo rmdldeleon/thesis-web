@@ -76,7 +76,8 @@ const Login = () => {
                 isVerified: 1,
                 treeliststr,
                 linkedliststr,
-                dynamicarraystr
+                dynamicarraystr,
+                // AccountStatus: "Operational"
             }
 
             // const data = {}

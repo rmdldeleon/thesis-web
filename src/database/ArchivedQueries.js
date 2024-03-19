@@ -25,13 +25,19 @@ const archiveAS = (data, AccountID, callback) => {
     const DSBatch = data.batch   
     const ActionSet = data.actionnumber
 
+    // const query = 
+    // `INSERT INTO archivedas
+    // SELECT * 
+    // FROM actionresults
+    // WHERE AccountID = ? AND DSBatch > ? OR (DSBatch = ? AND ActionSet > ?);`
+
     const query = 
     `INSERT INTO archivedas
     SELECT * 
     FROM actionresults
-    WHERE AccountID = ? AND DSBatch > ? OR (DSBatch = ? AND ActionSet > ?);`
+    WHERE AccountID = ? AND DSBatch = ? AND ActionSet > ?`
 
-    const values = [AccountID, DSBatch, DSBatch, ActionSet]
+    const values = [AccountID, DSBatch, ActionSet]
     
     con.query(query, values, (err, results) => {
         if (err) {
