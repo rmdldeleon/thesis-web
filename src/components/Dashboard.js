@@ -31,7 +31,7 @@ const Dashboard = ({display}) => {
     const [ dstructures, setdstructures ] = useContext(dstructuresContext)
 
     return(
-        <section className={`${display} bg-[#f8f8fa] h-full w-full rounded-ss-[8px] flex flex-col rounded-ee-[8px]`}>
+        <section className={`${display} bg-red-50 h-full w-full rounded-ss-[8px] flex flex-col rounded-ee-[8px]`}>
             {/* <div className="bg-[#f8f8fa] h-16 min-h-[4rem] w-full flex rounded-ss-[8px] shadow z-10">
                 <SortHeader />
             </div> */}
@@ -39,7 +39,7 @@ const Dashboard = ({display}) => {
             <main className="h-full w-full flex flex-col p-2 gap-3 ">
                 <section className="w-full h-full min-h-[300px] max-h-[50vh] flex-[4] flex gap-3">
                     <div className="w-full h-full bg-gray-100 shadow3 rounded box-border flex flex-col">
-                        <div className="flex items-center justify-center w-full min-h-[70px] bg-slate-200">
+                        <div className="flex items-center justify-center w-full min-h-[70px] bg-[#d8e4f2]">
                             <h1 className="text-[1.5rem] font-bold text-gray-800"> Active Batch </h1>
                         </div>
 
@@ -83,7 +83,7 @@ const Dashboard = ({display}) => {
                     </div>
 
                     <div className="w-full h-full bg-gray-100 shadow3 rounded box-border flex flex-col">
-                        <div className="flex items-center justify-center min-h-[70px] bg-slate-200">
+                        <div className="flex items-center justify-center min-h-[70px] bg-[#d8e4f2]">
                             <h1 className="text-[1.5rem] font-bold text-gray-800"> Last Action </h1>
                         </div>
 

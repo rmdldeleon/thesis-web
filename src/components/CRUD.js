@@ -259,7 +259,7 @@ const CRUD = ({display, charts}) => {
                     <ConfirmDialog messageModal={messageModal} content={{messageModalContent, setMessageModalContent}} ds={{dstructures, setdstructures, retrieveDS, setMaxIndex}} executeQuery={executeQuery} charts={charts}/>
         
                     <div className='flex-1 relative max-h-full max-w-full py-1 overflow-hidden'>
-                        <main className='absolute h-full w-full overflow-y-scroll px-2'>
+                        <main className='absolute h-full w-full overflow-y-scroll px-5'>
                             {/* <DSDetails dsDetails={dstructures[0]}/>
                             <DSDetails dsDetails={dstructures[1]}/>
                             <DSDetails dsDetails={dstructures[2]}/> */}
@@ -1389,8 +1389,8 @@ const DSDetails = ({dsDetails, index}) => {
 
 
     return( 
-        <section className='bg-gradient-to-l from-slate-200 to-[#f5efef] rounded-md max-w-full 
-        w-full h-[200px] min-h-[200px] my-5 flex gap-20 shadow items cursor-grab  overflow-x-hidden'>
+        <section className='bg-gradient-to-l from-red-50 to-[#f7f6ed75] rounded-md max-w-full 
+        w-full h-[200px] min-h-[200px] my-5 flex gap-20 shadow3 items cursor-grab  overflow-x-hidden'>
             <div className='h-full min-w-[400px] flex flex-col relative'>
                 <img src={about} onClick={print} className='w-[1.6rem] absolute left-1 top-1 cursor-pointer'></img>
                 <div className='flex-[2] flex justify-center items-center text-[1.5rem] font-bold font-sans text-gray-700'>
@@ -1485,7 +1485,7 @@ const DSDetailsItems = ({title, value, unit, dsDetails, dsIndex}) => {
                 </h2>
             </div>
 
-            <div className='shadow w-full h-full flex-[3] flex justify-center items-center bg-slate-300 rounded-es-lg rounded-ee-lg font-semibold text-gray-800'>
+            <div className='shadow w-full h-full flex-[3] flex justify-center items-center bg-slate-200 rounded-es-lg rounded-ee-lg font-semibold text-gray-800'>
                 <h2 className=''>
                     {title[index]}
                 </h2>
@@ -1553,7 +1553,7 @@ const SortHeader = () => {
     
     return(
         <section className='bg-[#f8f8fa] h-16 w-full flex rounded-ss-[8px] shadow z-10'>
-            <div className='min-w-[13rem] bg-[#d2d3da] rounded-ss-[8px]'></div>
+            <div className='min-w-[13rem] bg-[#d7e9f0] rounded-ss-[8px]'></div>
 
             <div className="flex w-full">
                 <Stack direction="row" justifyContent="flex-start" alignItems="center" spacing={3} marginX={4} width={"100%"}>
@@ -1624,13 +1624,13 @@ const SortHeader = () => {
 
 const ActionSideBar = ({addModal, getModal, deleteModal, messageModal, modalContent}) => {
     return(
-        <section className="bg-[#d9dde5] w-52 h-full flex flex-col p-2 px-3 gap-3"> 
-            <ActionSideBarItem logo={add} title="Add" hoverColor="hover:bg-[#b3c4b8]" modal={addModal}/>
-            <ActionSideBarItem logo={update} title="Get / Update" hoverColor="hover:bg-[#87b8ccab]" modal={getModal}/>
-            <ActionSideBarItem logo={remove} title="Delete" hoverColor="hover:bg-[#d17992ab]" modal={deleteModal}/>
+        <section className="bg-[#edeef3]  w-52 h-full flex flex-col p-2 px-3 gap-3"> 
+            <ActionSideBarItem logo={add} title="Add" hoverColor="bg-[#afdbc080]" modal={addModal}/>
+            <ActionSideBarItem logo={update} title="Get / Update" hoverColor="bg-[#ccd8ed]" modal={getModal}/>
+            <ActionSideBarItem logo={remove} title="Delete" hoverColor="bg-[#d6aeae90]" modal={deleteModal}/>
             <div className="mx-auto w-[75%] h-[1px] m-1 bg-[rgba(0,0,0,.1)]"></div>
-            <ActionSideBarItem logo={barChart} title="Last Action" hoverColor="hover:bg-[#d17992ab]" modal={messageModal} modalContent={modalContent}/>
-            <ActionSideBarItem logo={reset} title="Reset" hoverColor="hover:bg-[#d17992ab]" modal={messageModal} modalContent={modalContent}/>
+            <ActionSideBarItem logo={barChart} title="Last Action" hoverColor="bg-[#dce0e095]" modal={messageModal} modalContent={modalContent}/>
+            <ActionSideBarItem logo={reset} title="Reset" hoverColor="bg-[#dce0e095]" modal={messageModal} modalContent={modalContent}/>
         </section>
     )
 }
@@ -1687,8 +1687,8 @@ const ActionSideBarItem = (props) => {
     }
 
     return(  
-        <div onClick={openModal} className={`flex p-4 gap-2 items-center bg-[#ffffff80] ${props.hoverColor}
-        cursor-pointer rounded transition-all duration-200 shadow-sm ring-1 ring-[#f8f8fa] ring-inset`}>
+        <div onClick={openModal} className={`flex p-4 gap-2 items-center  ${props.hoverColor}
+        cursor-pointer rounded transition-all duration-200 shadow2 hover:shadow-md ring-1 ring-[#7a7e8250]`}>
             <img src={props.logo} className='w-[1.6rem]'></img>
             <span className='text-[rgba(0,0,0,.6)] font-bold text-md text-stroke'>{props.title}</span>
         </div>         

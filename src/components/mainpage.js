@@ -23,9 +23,9 @@ function App() {
   const [cpo, scpo] = useState(() => setAnalyticsOpen)
 
   const [analyticsHighlight, setAnalyticsHighlight] = useState("bg-[#f8f8fa]")
-  const [dashboardHighlight, setDashboardHighlight] = useState("transparent hover:bg-[#00000015]") // a.k.a history
-  const [settingsHighlight, setSettingsHighlight] = useState("transparent hover:bg-[#00000015]") 
-  //const [chartsHighlight, setChartsHighlight] = useState("transparent hover:bg-[#00000010]")
+  const [dashboardHighlight, setDashboardHighlight] = useState("transparent hover:bg-[#23406b20]") // a.k.a history
+  const [settingsHighlight, setSettingsHighlight] = useState("transparent hover:bg-[#23406b20]") 
+  //const [chartsHighlight, setChartsHighlight] = useState("transparent hover:bg-[#23406b20]")
   const [ch, sch] = useState(() => setAnalyticsHighlight)
 
   const [headerTitle, setHeaderTitle] = useState("Analytics")
@@ -221,7 +221,7 @@ function App() {
           <div className="flex flex-col h-screen w-screen">
                 {/* <Header headerTitle={headerTitle}/> */}
 
-                <div className="bg-[#e7e9ee] flex flex-1 rounded-es-[8px] rounded-ee-[8px]">
+                <div className="bg-[#d5e3f2] flex flex-1 rounded-es-[8px] rounded-ee-[8px]">
                     <SideBar setHeaderTitle={setHeaderTitle} 
                         highlight={{ch, sch, analyticsHighlight, setAnalyticsHighlight, dashboardHighlight, setDashboardHighlight, settingsHighlight, setSettingsHighlight}} 
                         currentPanelOpened={cpo} 

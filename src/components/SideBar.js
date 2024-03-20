@@ -13,7 +13,7 @@ import update from "../pictures/update.svg"
 
 const SideBar = ({setHeaderTitle, highlight, setAnalyticsOpen, setDashboardOpen, currentPanelOpened, setCurrentPanelOpened, setSettingsOpen}) => {
     return(
-        <section className="bg-slate-200 w-20 h-full flex flex-col rounded-es-[8px]"> 
+        <section className="bg-[#d5e3f2]  w-20 h-full flex flex-col rounded-es-[8px]"> 
             <div className='flex-1 flex flex-col'>
                 <SideBarItem logo={analytics} title="Analytics" setHeaderTitle={setHeaderTitle} thisHighlight={highlight.analyticsHighlight} highlight={highlight} setAnalyticsOpen = {setAnalyticsOpen} currentPanelOpened ={currentPanelOpened} setCurrentPanelOpened={setCurrentPanelOpened}/>
                 <SideBarItem logo={history} title="History" setHeaderTitle={setHeaderTitle} thisHighlight={highlight.dashboardHighlight} highlight={highlight} setDashboardOpen={setDashboardOpen} currentPanelOpened = {currentPanelOpened} setCurrentPanelOpened={setCurrentPanelOpened}/>
@@ -34,7 +34,7 @@ const SideBarItem = (props) =>{
     let showPanel = () => {
         props.currentPanelOpened('hidden')
         let bg = "bg-[#f8f8fa]"
-        let hd = "transparent hover:bg-[#00000010]"
+        let hd = "transparent hover:bg-[#23406b20]"
 
         if(props.title==="Analytics"){
             props.setAnalyticsOpen('block')
