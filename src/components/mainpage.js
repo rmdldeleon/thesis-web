@@ -92,7 +92,7 @@ function App() {
                     <main className="flex-1">
                         <CRUD display = {analyticsOpen} />
                         <Dashboard display={dashboardOpen}/>
-                        <Admin display={adminOpen}/>
+                        {userDetails.Role === "Admin" && <Admin display={adminOpen}/>}
                         <Settings display={settingsOpen}/>
                         {/* <Charts display = {chartsOpen} charts={{lastSpeedBarData, lastSpeedBarDataOptions, lastSizeBarData, lastSizeBarDataOptions, lastSpaceBarData, lastSpaceBarDataOptions, lastThreadsBarData, lastThreadsBarDataOptions}}/> */}
                     </main>

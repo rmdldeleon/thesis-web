@@ -13,12 +13,17 @@ import admin from "../pictures/admin.svg"
 import update from "../pictures/update.svg"
 
 const SideBar = ({setHeaderTitle, highlight, setAnalyticsOpen, setDashboardOpen, currentPanelOpened, setCurrentPanelOpened, setSettingsOpen, setAdminOpen}) => {
+    const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+    console.log(userDetails)
+
     return(
         <section className="bg-[#d5e3f2]  w-20 h-full flex flex-col rounded-es-[8px]"> 
             <div className='flex-1 flex flex-col'>
                 <SideBarItem logo={analytics} title="Analytics" setHeaderTitle={setHeaderTitle} thisHighlight={highlight.analyticsHighlight} highlight={highlight} setAnalyticsOpen = {setAnalyticsOpen} currentPanelOpened ={currentPanelOpened} setCurrentPanelOpened={setCurrentPanelOpened}/>
                 <SideBarItem logo={history} title="History" setHeaderTitle={setHeaderTitle} thisHighlight={highlight.dashboardHighlight} highlight={highlight} setDashboardOpen={setDashboardOpen} currentPanelOpened = {currentPanelOpened} setCurrentPanelOpened={setCurrentPanelOpened}/>
-                <SideBarItem logo={admin} title="Admin" setHeaderTitle={setHeaderTitle} thisHighlight={highlight.adminHighlight} highlight={highlight} setAdminOpen={setAdminOpen} currentPanelOpened = {currentPanelOpened} setCurrentPanelOpened={setCurrentPanelOpened}/>
+                { userDetails.Role === "Admin" && 
+                    <SideBarItem logo={admin} title="Admin" setHeaderTitle={setHeaderTitle} thisHighlight={highlight.adminHighlight} highlight={highlight} setAdminOpen={setAdminOpen} currentPanelOpened = {currentPanelOpened} setCurrentPanelOpened={setCurrentPanelOpened}/>
+                }
                 {/* <SideBarItem logo={barChart} title="Charts" setHeaderTitle={setHeaderTitle} thisHighlight={highlight.chartsHighlight} highlight={highlight} setChartsOpen = {setChartsOpen} currentPanelOpened = {currentPanelOpened} setCurrentPanelOpened={setCurrentPanelOpened}/> */}
             </div>
 
@@ -99,7 +104,7 @@ const SideBarItem = (props) =>{
 
             props.setHeaderTitle("Admin")
 
-            navigate('/settings');
+            navigate('/admin');
         }
     }
 

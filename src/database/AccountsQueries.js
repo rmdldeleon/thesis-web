@@ -105,4 +105,56 @@ const updateUserDetails = (data, callback) => {
     });
 }
 
-module.exports = { checkExistingAccount, checkExistingEmail, createAccount, updateLastUsedDSBatch, updateUserDetails};
+const getAllAccounts = (callback) => {
+    const query = `SELECT * FROM accounts`
+
+    //const values = []
+
+    con.query(query, (err, results) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            callback(err, null);
+        } else {
+            callback(null, results);
+        }
+    });
+}
+
+const disableAccount = (data, callback) => {
+    const query = `
+    UPDATE accounts
+    SET AccountStatus = "Disabled"
+    WHERE AccountID = ?;`
+
+    const values = [data.AccountID]
+
+    con.query(query, values, (err, results) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            callback(err, null);
+        } else {
+            callback(null, results);
+        }
+    });
+}
+
+const enableAccount = (data, callback) => {
+    const query = `
+    UPDATE accounts
+    SET AccountStatus = "Operational"
+    WHERE AccountID = ?;`
+
+    const values = [data.AccountID]
+
+    con.query(query, values, (err, results) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            callback(err, null);
+        } else {
+            callback(null, results);
+        }
+    });
+}
+
+
+module.exports = { checkExistingAccount, checkExistingEmail, createAccount, updateLastUsedDSBatch, updateUserDetails, getAllAccounts, disableAccount, enableAccount};

@@ -12,6 +12,8 @@ import {
     InputBase, InputAdornment
 } from '@mui/material'
 
+import UsersTable from "./UsersTable"
+
 const Admin = ({display}) => {
     const navigate = useNavigate();
 
@@ -19,9 +21,13 @@ const Admin = ({display}) => {
     const [userDetails, setUserDetails] = useState(JSON.parse(sessionStorage.getItem('userDetails')));
 
     return(
-        <section className={`${display} h-full w-full rounded-ss-[8px] rounded-ee-[8px] bg-red-50`}>
-            Admin
-        </section>
+        <div className={`${display} h-full w-full rounded-ss-[8px] rounded-ee-[8px] bg-red-50`}>
+            <main className="w-full h-full flex flex-col p-4">
+                <section className="h-[50%] bg-slate-100 shadow-sm">
+                    <UsersTable />
+                </section>
+            </main>
+        </div>
     )
 }
 
