@@ -40,6 +40,7 @@ const Signup = () => {
         try {
             data.Origin = "Website"
             data.Role = "User"
+            data.AccountStatus = "Operational"
 
             // for when email is already taken
             let response = await axios.post('http://localhost:3001/signup', {data});
@@ -81,7 +82,8 @@ const Signup = () => {
                 firstname : credentials.given_name,
                 lastname : credentials.family_name,
                 origin : "Google",
-                role : "User"
+                role : "User",
+                AccountStatus : "Operational"
             }
 
             // checks wheter email is already registered 

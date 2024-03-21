@@ -43,12 +43,8 @@ import SizeResult from "./SizeResult";
 import ThreadsResult from "./ThreadsResult"
 import MemoryResult from "./MemoryResult";
 
-//import dialogs
-import { AlertDialog } from "./AlertDialog"
-
 // imported contexts
-import { dstructuresContext } from "./mainpage";
-import { has } from "lodash";
+import { dstructuresContext, AlertDialogContext } from "./mainpage";
 
 //data context
 const DialogContext = createContext();
@@ -57,7 +53,6 @@ export const SpeedDialog = createContext();
 export const SizeDialog = createContext();
 export const ThreadsDialog = createContext();
 export const MemoryDialog = createContext();
-export const AlertDialogContext = createContext();
 
 const CRUD = ({display, charts}) => {
     const navigate = useNavigate();
@@ -96,10 +91,6 @@ const CRUD = ({display, charts}) => {
 
     // index of opened dialog
     const [openedDSDetails, setOpenedDSDetails] = useState()
-
-    // alert dialog state
-    const [alertDialog, setAlertDialog] = React.useState(false);
-    const [alertDialogDetails, setAlertDialogDetails] = React.useState({})
 
     const executeQuery = (query, parameters, access) => { 
         return new Promise((resolve, reject) => {
@@ -229,7 +220,6 @@ const CRUD = ({display, charts}) => {
         <SizeDialog.Provider value={[sizeDialog, setSizeDialog, dstructures, openedDSDetails, setOpenedDSDetails]}>
         <ThreadsDialog.Provider value={[threadsDialog, setThreadsDialog, dstructures, openedDSDetails, setOpenedDSDetails]}>
         <MemoryDialog.Provider value={[memoryDialog, setMemoryDialog, dstructures, openedDSDetails, setOpenedDSDetails]}>
-        <AlertDialogContext.Provider value={[setAlertDialog, setAlertDialogDetails, dstructures]}>
             <section className={`${display} bg-[#f8f8fa] h-full w-full rounded-ss-[20px] flex flex-col rounded-ee-[8px]`}>
                 <SortHeader />
                 <ResetDialog />
@@ -238,17 +228,7 @@ const CRUD = ({display, charts}) => {
                 <SizeResult />
                 <ThreadsResult />
                 <MemoryResult />
-                <AlertDialog 
-                    alertDialog={alertDialog} 
-                    setAlertDialog={setAlertDialog} 
-                    handleConfirm={alertDialogDetails.handleConfirm} 
-                    text={{
-                        title: alertDialogDetails.title,
-                        content: alertDialogDetails.content,
-                        negativeButton : alertDialogDetails.negativeButton,
-                        possitiveButton : alertDialogDetails.possitiveButton
-                    }}
-                />
+                
 
                 <div className='flex flex-1'>
                     <ActionSideBar addModal={addModal} getModal={getModal} deleteModal={deleteModal} messageModal={messageModal} modalContent={{messageModalContent, setMessageModalContent}}/>
@@ -272,7 +252,6 @@ const CRUD = ({display, charts}) => {
                     </div> 
                 </div>
             </section>
-        </AlertDialogContext.Provider>
         </MemoryDialog.Provider>
         </ThreadsDialog.Provider>
         </SizeDialog.Provider>

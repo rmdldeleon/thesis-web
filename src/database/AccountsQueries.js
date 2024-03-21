@@ -37,8 +37,8 @@ const checkExistingEmail = (userData, callback) => {
 
 const createAccount = async (userData, callback) => {
     try{
-        const query = "INSERT INTO `accounts` (`Email`, `Password`, `isVerified`, `ExpirationDate`, `Firstname`, `Lastname`, `Origin`, `Role`) VALUES (?, ?, '1', current_timestamp(), ?, ?, ?, ?);"
-        const values = [userData.Email, userData.Password, userData.Firstname, userData.Lastname, userData.Origin, userData.Role]
+        const query = "INSERT INTO `accounts` (`Email`, `Password`, `isVerified`, `ExpirationDate`, `Firstname`, `Lastname`, `Origin`, `Role`, `AccountStatus`) VALUES (?, ?, '1', current_timestamp(), ?, ?, ?, ?, ?);"
+        const values = [userData.Email, userData.Password, userData.Firstname, userData.Lastname, userData.Origin, userData.Role, userData.AccountStatus]
     
         let accountID
 
@@ -87,4 +87,22 @@ const updateLastUsedDSBatch = (data, callback) => {
     });
 }
 
-module.exports = { checkExistingAccount, checkExistingEmail, createAccount, updateLastUsedDSBatch };
+const updateUserDetails = (data, callback) => {
+    const query = `
+    UPDATE accounts
+    SET Email = ?, Password = ?, Firstname = ?, Lastname = ?
+    WHERE AccountID = ?;`
+
+    const values = [data.Email, data.Password, data.Firstname, data.Lastname, data.AccountID]
+
+    con.query(query, values, (err, results) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            callback(err, null);
+        } else {
+            callback(null, results);
+        }
+    });
+}
+
+module.exports = { checkExistingAccount, checkExistingEmail, createAccount, updateLastUsedDSBatch, updateUserDetails};

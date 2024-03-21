@@ -38,9 +38,12 @@ const Login = () => {
             data.Origin = "Website"
             
             const response = await axios.post('http://localhost:3001/login', {data,});
+            let AccountStatus = response.data[0].AccountStatus
 
             if(!response.data[0]){ // if array is empty
                 setError("root", { message: "Login failed. Please try again.",});
+            }else if(AccountStatus === "Disabled"){
+                setError("root", { message: "Account is disabled.",})
             }else{
                 // pass the user account details in json format
                 const userDetails = JSON.stringify(response.data[0])
@@ -77,7 +80,7 @@ const Login = () => {
                 treeliststr,
                 linkedliststr,
                 dynamicarraystr,
-                // AccountStatus: "Operational"
+                AccountStatus: "Operational"
             }
 
             // const data = {}
@@ -90,10 +93,15 @@ const Login = () => {
                 response = await axios.post('http://localhost:3001/signup', {data});           
             } 
 
-            // pass the user account details in json format
-            const userDetails = JSON.stringify(response.data[0])
-            sessionStorage.setItem('userDetails', userDetails);
-            navigate('/analytics');
+            let AccountStatus = response.data[0].AccountStatus
+            if(AccountStatus === "Disabled"){
+                setError("root", { message: "Account is disabled.",})
+            }else{
+                 // pass the user account details in json format
+                const userDetails = JSON.stringify(response.data[0])
+                sessionStorage.setItem('userDetails', userDetails);
+                navigate('/analytics');
+            }
         }catch (error) {
           console.error('Error from handleGoogleLogin() function', error);
         }

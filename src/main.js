@@ -11,7 +11,7 @@ const { loginRoutes } = require('./routers/login');
 const { signupRoutes } = require('./routers/signup')
 const { analyticsRoutes } = require('./routers/analytics')
 const { historyRoutes } = require('./routers/history')
-
+const { settingsRoutes } = require('./routers/settings')
 
 // global variables
 const app = express()
@@ -27,6 +27,7 @@ app.use('/login', loginRoutes)
 app.use('/signup', signupRoutes)
 app.use('/analytics', analyticsRoutes)
 app.use('/history', historyRoutes)
+app.use('/settings', settingsRoutes)
 
 // listeners
 app.listen(PORT, () => {
