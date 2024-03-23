@@ -14,7 +14,6 @@ import update from "../pictures/update.svg"
 
 const SideBar = ({setHeaderTitle, highlight, setAnalyticsOpen, setDashboardOpen, currentPanelOpened, setCurrentPanelOpened, setSettingsOpen, setAdminOpen}) => {
     const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
-    console.log(userDetails)
 
     return(
         <section className="bg-[#d5e3f2]  w-20 h-full flex flex-col rounded-es-[8px]"> 

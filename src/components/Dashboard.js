@@ -70,13 +70,13 @@ const Dashboard = ({display}) => {
                                 <Divider />
 
                                 <ListItemButton>
-                                    <ListItemText primary={"Date Created"} secondary={dstructures[0].datecreated} />
+                                    <ListItemText primary={"Date Created"} secondary={new Date(dstructures[0].datecreated).toLocaleString()} />
                                 </ListItemButton>
 
                                 <Divider />
 
                                 <ListItemButton>
-                                    <ListItemText primary={"Last Updated"} secondary={dstructures[0].ActionDate || "No data"} />
+                                    <ListItemText primary={"Last Action Date"} secondary={new Date(dstructures[0].ActionDate).toLocaleString() || "No data"} />
                                 </ListItemButton>
                             </List>
                         </div>

@@ -43,6 +43,8 @@ import SizeResult from "./SizeResult";
 import ThreadsResult from "./ThreadsResult"
 import MemoryResult from "./MemoryResult";
 
+import DynamicArrayDialog from "./DynamicArrayDialog"
+
 // imported contexts
 import { dstructuresContext, AlertDialogContext } from "./mainpage";
 
@@ -56,7 +58,7 @@ export const MemoryDialog = createContext();
 
 const CRUD = ({display, charts}) => {
     const navigate = useNavigate();
-
+ 
     // get the user details from login page
     const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
@@ -227,8 +229,7 @@ const CRUD = ({display, charts}) => {
                 <SpeedResult />
                 <SizeResult />
                 <ThreadsResult />
-                <MemoryResult />
-                
+                <MemoryResult />           
 
                 <div className='flex flex-1'>
                     <ActionSideBar addModal={addModal} getModal={getModal} deleteModal={deleteModal} messageModal={messageModal} modalContent={{messageModalContent, setMessageModalContent}}/>
@@ -1324,9 +1325,12 @@ const ResetDialog = () => {
 }
 
 const DSDetails = ({dsDetails, index}) => {
+    const [ dynamicArrayDialog, setDynamicArrayDialog ] = useState(false)
 
     const print = () => {
-        console.log(dsDetails)
+        if(dsDetails.dsname === "Dynamic Array"){
+            setDynamicArrayDialog(true)
+        }
     }
 
     useEffect(() => {
@@ -1370,6 +1374,9 @@ const DSDetails = ({dsDetails, index}) => {
     return( 
         <section className='bg-gradient-to-l from-red-50 to-[#f7f6ed75] rounded-md max-w-full 
         w-full h-[200px] min-h-[200px] my-5 flex gap-20 shadow3 items cursor-grab  overflow-x-hidden'>
+
+            <DynamicArrayDialog dsDetails={dsDetails} dynamicArrayDialog={dynamicArrayDialog} setDynamicArrayDialog={setDynamicArrayDialog}/>
+
             <div className='h-full min-w-[400px] flex flex-col relative'>
                 <img src={about} onClick={print} className='w-[1.6rem] absolute left-1 top-1 cursor-pointer'></img>
                 <div className='flex-[2] flex justify-center items-center text-[1.5rem] font-bold font-sans text-gray-700'>
