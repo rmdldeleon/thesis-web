@@ -44,6 +44,7 @@ import ThreadsResult from "./ThreadsResult"
 import MemoryResult from "./MemoryResult";
 
 import DynamicArrayDialog from "./DynamicArrayDialog"
+import DoublyLinkedListDialog from "./DoublyLinkedListDialog";
 
 // imported contexts
 import { dstructuresContext, AlertDialogContext } from "./mainpage";
@@ -1326,10 +1327,13 @@ const ResetDialog = () => {
 
 const DSDetails = ({dsDetails, index}) => {
     const [ dynamicArrayDialog, setDynamicArrayDialog ] = useState(false)
+    const [ doublyLinkedListDialog, setDoublyLinkedListDialog ] = useState(false)
 
     const print = () => {
         if(dsDetails.dsname === "Dynamic Array"){
             setDynamicArrayDialog(true)
+        }else if(dsDetails.dsname === "Doubly Linked List"){
+            setDoublyLinkedListDialog(true)
         }
     }
 
@@ -1376,6 +1380,7 @@ const DSDetails = ({dsDetails, index}) => {
         w-full h-[200px] min-h-[200px] my-5 flex gap-20 shadow3 items cursor-grab  overflow-x-hidden'>
 
             <DynamicArrayDialog dsDetails={dsDetails} dynamicArrayDialog={dynamicArrayDialog} setDynamicArrayDialog={setDynamicArrayDialog}/>
+            <DoublyLinkedListDialog dsDetails={dsDetails} doublyLinkedListDialog={doublyLinkedListDialog} setDoublyLinkedListDialog={setDoublyLinkedListDialog} />
 
             <div className='h-full min-w-[400px] flex flex-col relative'>
                 <img src={about} onClick={print} className='w-[1.6rem] absolute left-1 top-1 cursor-pointer'></img>

@@ -15,10 +15,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
 import Tooltip from '@mui/material/Tooltip';
 
-import DA1 from '../pictures/DA1.png'
-import DA2 from '../pictures/DA2.png'
-import DA3 from '../pictures/DA3.png'
-
 import DynamicArray from '../datastructures/DynamicArray';
 
 const _ = require('lodash');
@@ -36,17 +32,17 @@ const Transition = React.forwardRef(function Transition(props, ref) {
         // }
 
 
-export default function DynamicArrayDialog({dsDetails, dynamicArrayDialog, setDynamicArrayDialog}) {
+export default function DoublyLinkedListDialog({dsDetails, doublyLinkedListDialog, setDoublyLinkedListDialog}) {
 
   const handleClose = () => {
     console.log(dsDetails)
-    setDynamicArrayDialog(false);
+    setDoublyLinkedListDialog(false);
   };
 
   const handleDownload = () => {
     const link = document.createElement('a');
-    link.download = 'LinkedList.js';
-    link.href = 'http://localhost:3000/LinkedList.js'; // Adjust the URL as needed
+    link.download = 'DynamicArray.js';
+    link.href = 'http://localhost:3000/DynamicArray.js'; // Adjust the URL as needed
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -68,7 +64,7 @@ export default function DynamicArrayDialog({dsDetails, dynamicArrayDialog, setDy
     <React.Fragment>
       <Dialog
         fullScreen
-        open={dynamicArrayDialog}
+        open={doublyLinkedListDialog}
         onClose={handleClose}
         TransitionComponent={Transition}
       >
@@ -129,13 +125,6 @@ export default function DynamicArrayDialog({dsDetails, dynamicArrayDialog, setDy
                             </Tooltip>
                             <Divider /> */}
 
-                            <Tooltip title="A special property of traditional arrays. The maximum number of items the array can hold before it create and move to a larger array.">
-                              <ListItemButton> 
-                                    <ListItemText primary={"Capacity"} secondary={"Default capacity is 100."} />
-                              </ListItemButton>
-                            </Tooltip>
-                            <Divider />
-
                             <ListItemButton>
                                   <ListItemText primary={"Made by"} secondary={"Ralph Matthew De Leon"} />
                             </ListItemButton>
@@ -162,14 +151,14 @@ export default function DynamicArrayDialog({dsDetails, dynamicArrayDialog, setDy
 
                     <div className='w-full h-full overflow-auto'>
                         <List>                    
-                            <Tooltip title="Adds an item to the end of the array. Has to create and move to a larger array when capacity is reached.">
+                            <Tooltip title="Adds an item at the end of the list.">
                               <ListItemButton> 
-                                    <ListItemText primary={"add(item)"} secondary={"O(n)"} />
+                                    <ListItemText primary={"add(item)"} secondary={"O(1)"} />
                               </ListItemButton>
                             </Tooltip>
                             <Divider />
 
-                            <Tooltip title="Adds an item after the given index. Has to move all items from the item next to given index to right by one place.">
+                            <Tooltip title="Adds an item after the given index.">
                               <ListItemButton> 
                                     <ListItemText primary={"addAfter(index, item)"} secondary={"O(n)"} />
                               </ListItemButton>
@@ -178,19 +167,19 @@ export default function DynamicArrayDialog({dsDetails, dynamicArrayDialog, setDy
 
                             <Tooltip title="Retrieves the item from the given index.">
                               <ListItemButton> 
-                                    <ListItemText primary={"get(index)"} secondary={"O(1)"} />
+                                    <ListItemText primary={"get(index)"} secondary={"O(n)"} />
                               </ListItemButton>
                             </Tooltip>
                             <Divider />
 
                             <Tooltip title="Updates the item from the given index.">
                               <ListItemButton> 
-                                    <ListItemText primary={"update(index, item)"} secondary={"O(1)"}/>
+                                    <ListItemText primary={"update(index, item)"} secondary={"O(n)"}/>
                               </ListItemButton>
                             </Tooltip>
                             <Divider />
 
-                            <Tooltip title="Removes the item from the given index. Has to move all items from the item next to given index to left by one place.">
+                            <Tooltip title="Removes the item from the given index.">
                               <ListItemButton> 
                                     <ListItemText primary={"delete(index)"} secondary={"O(n)"}/>
                               </ListItemButton>
@@ -204,9 +193,9 @@ export default function DynamicArrayDialog({dsDetails, dynamicArrayDialog, setDy
             <section className='h-[50%] min-h-[400px] w-full flex gap-5 p-5'>
                 <div className='w-full h-full bg-gray-100 shadow3 rounded flex'>
                     <div className="min-w-[65%] w-full h-full flex flex-col overflow-auto ">
-                        <div className="flex-[1] min-h-[30%] text-[1.5rem] font-bold text-gray-800 flex items-end justify-center"> What is Dynamic Array </div>
+                        <div className="flex-[1] min-h-[30%] text-[1.5rem] font-bold text-gray-800 flex items-end justify-center"> What is Doubly Linked List </div>
                         <div className="flex-[2] text-[1rem] font-semibold text-gray-700 text-justify px-[10%] py-[5%]"> 
-                            Dynamic array is an index-based linear data structure and is a modified version of the traditional array. Unlike the traditional array in some programming languages that have a fixed size, a dynamic array can grow or shrink dynamically based on the number of elements it contains.  Dynamic arrays typically employ techniques such as automatic resizing, memory reallocation, and efficient indexing to provide efficient access and manipulation of elements. In languages, such as javascript, dynamic array is the default implementation of the array.
+                            The Doubly Linked List serves as an upgrade to the traditional Singly Linked List. It retains the core properties of its predecessor. In a Singly Linked List, each node or item possesses only a pointer pointing to the next node. Consequently, traversal is restricted to moving from the start to the end, or from left to right. However, the Doubly Linked List introduces an additional pointer in each node, pointing to the previous node. This enhancement allows traversal from either direction. As a result, traversal becomes more efficient, permitting traversal to begin from either the start (head) or the end (tail), whichever is closer to the specified index.
                         </div>
                     </div>
 
@@ -215,67 +204,25 @@ export default function DynamicArrayDialog({dsDetails, dynamicArrayDialog, setDy
                             <h1 className='text-[1.2rem] font-bold'>Read Operation</h1>
                             
                             <div className='flex flex-col gap-2 text-justify'>
-                              <li>When it comes to read operations, arrays are the usually on the top as it can access any element instantaenously. </li>
-                            
+                              <li> Read operations or traversal is the Linked List's weakness as it does not have a direct acess to each element unlike arrays.</li>
+                              <li> Doubly Linked List traversal starts from either head or tail, whichever is closer to the specified index.</li>
+                              <li> Altough the Big O Notation for read operation in Doubly Linked List is O(n), it's worst case is actually only traversing half of the list, when the specified index is exactly at the middle.</li>
                             </div >
                         </div>
 
                         <Divider />
 
                         <div className='w-full h-full flex flex-col gap-4 items-center justify-center'>
-                            <h1 className='text-[1.2rem] font-bold'>Read Operation</h1>
+                            <h1 className='text-[1.2rem] font-bold'>Write Operation</h1>
                             
                             <div className='flex flex-col gap-2 text-justify'>
-                              <li> Write operations are array's weakness. When the capacity is reached, array has to create an entire new array with larger size before transfering the items.</li>
-                              <li> When doing write operation somewhere in the middle of the array, it has to move all items to right one by one in order to make a space.</li>
+                              <li> Write operations is where Doubly Linked List shines. When adding a node/item at the end of the list, it is rated as O(1) as it only have to connect the pointer from its sibling.</li>
+                              <li> In adding or deleting somwhere in the middle of the list, Big O notation becomes O(n) as it still has to traverse the list to get to the specified index.</li>
+                              <li> All Linked List are dynamic in size or capacity as its object references are stored in the sibling node, unlike array which has to take a space in heap memory in advance.</li>
                             </div >
                         </div>
                     </div>       
                 </div>
-            </section>
-
-            <section className='gap-5 p-5'>
-              <div className='w-full h-full bg-gray-100 shadow3 rounded flex flex-col'>
-                  <div className='w-full h-full min-h-[100px] max-h-[150px] text-gray-800 font-bold text-[1.8rem] flex items-center justify-center bg-[#d8e4f2]'>
-                      <h1> Adding an item in index 2</h1>
-                  </div>
-                  
-                  <div className='w-full h-full flex flex-col p-10 gap-5'>
-                      <div className='w-full h-auto text-[1.2rem] text-gray-600 font-semibold'>
-                        <h3>
-                          1. Initial state of the array.
-                        </h3>
-                      </div>
-                      
-                      <div className='relative ml-5 w-[30%] h-auto'>
-                        <img src={DA1} alt='image representation of array in its initial stae.' className='w-auto h-auto' />    
-                      </div>
-                  </div>
-
-                  <div className='w-full h-full flex flex-col p-10 gap-5'>
-                      <div className='w-full h-auto text-[1.2rem] text-gray-600 font-semibold'>
-                        <h3>
-                          2. Moving all elements from the specified index to right by 1 place.
-                        </h3>
-                      </div>
-                      
-                      <div className='relative ml-5 w-[30%] h-auto'>
-                        <img src={DA2} alt='image representation of array in its initial stae.' className='w-auto h-auto' />    
-                      </div>
-                  </div>
-
-                  <div className='w-full h-full flex flex-col p-10 gap-5'>
-                      <div className='w-full h-auto text-[1.2rem] text-gray-600 font-semibold'>
-                        <h3>
-                          3. Putting the given item to the index
-                        </h3>
-                      </div>
-                      
-                      <div className='relative ml-5 w-[30%] h-auto'>
-                        <img src={DA3} alt='image representation of array in its initial stae.' className='w-auto h-auto' />    
-                      </div>
-                  </div>
-              </div>
             </section>
         </main>
 
