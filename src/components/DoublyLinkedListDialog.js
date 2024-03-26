@@ -17,6 +17,12 @@ import Tooltip from '@mui/material/Tooltip';
 
 import DynamicArray from '../datastructures/DynamicArray';
 
+import DLL1 from "../pictures/DLL1.png"
+import DLL2 from "../pictures/DLL2.png"
+import DLL3 from "../pictures/DLL3.png"
+import DLL4 from "../pictures/DLL4.png"
+
+
 const _ = require('lodash');
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -223,6 +229,62 @@ export default function DoublyLinkedListDialog({dsDetails, doublyLinkedListDialo
                         </div>
                     </div>       
                 </div>
+            </section>
+
+            <section className='gap-5 p-5'>
+              <div className='w-full h-full bg-gray-100 shadow3 rounded flex flex-col'>
+                  <div className='w-full h-full min-h-[100px] max-h-[150px] text-gray-800 font-bold text-[1.8rem] flex items-center justify-center bg-[#d8e4f2]'>
+                      <h1> Adding an item in index 3 (4th Item)</h1>
+                  </div>
+                  
+                  <div className='w-full h-full flex flex-col p-10 gap-5'>
+                      <div className='w-full h-auto text-[1.2rem] text-gray-600 font-semibold'>
+                        <h3>
+                          1. Initial state of the list. With 'A' as Head and 'F' as TAIL.
+                        </h3>
+                      </div>
+                      
+                      <div className='relative ml-5 w-[40%] h-auto'>
+                        <img src={DLL1} alt='image representation of array in its initial stae.' className='w-auto h-auto' />    
+                      </div>
+                  </div>
+
+                  <div className='w-full h-full flex flex-col p-10 gap-5'>
+                      <div className='w-full h-auto text-[1.2rem] text-gray-600 font-semibold'>
+                        <h3>
+                          2. Next step is to get to index 2. Traversal starts whichever pointer (HEAD and TAIL) is closer to the specified index.
+                        </h3>
+                      </div>
+                      
+                      <div className='relative ml-5 w-[40%] h-auto'>
+                        <img src={DLL2} alt='image representation of array in its initial stae.' className='w-auto h-auto' />    
+                      </div>
+                  </div>
+
+                  <div className='w-full h-full flex flex-col p-10 gap-5'>
+                      <div className='w-full h-auto text-[1.2rem] text-gray-600 font-semibold'>
+                        <h3>
+                          3. Create the node with the given item and point its 'Prev' and 'Next' pointer to 'C' and 'D'
+                        </h3>
+                      </div>
+                      
+                      <div className='relative ml-5 w-[40%] h-auto'>
+                        <img src={DLL3} alt='image representation of array in its initial stae.' className='w-auto h-auto' />    
+                      </div>
+                  </div>
+
+                  <div className='w-full h-full flex flex-col p-10 gap-5'>
+                      <div className='w-full h-auto text-[1.2rem] text-gray-600 font-semibold'>
+                        <h3>
+                          4. Point the 'Next' of 'C', and 'Prev' of 'D' to the new node. We have access to node 'C' and 'D' from step 2.
+                        </h3>
+                      </div>
+                      
+                      <div className='relative ml-5 w-[40%] h-auto'>
+                        <img src={DLL4} alt='image representation of array in its initial stae.' className='w-auto h-auto' />    
+                      </div>
+                  </div>
+              </div>
             </section>
         </main>
 

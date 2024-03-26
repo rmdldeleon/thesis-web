@@ -237,7 +237,7 @@ export default function DynamicArrayDialog({dsDetails, dynamicArrayDialog, setDy
             <section className='gap-5 p-5'>
               <div className='w-full h-full bg-gray-100 shadow3 rounded flex flex-col'>
                   <div className='w-full h-full min-h-[100px] max-h-[150px] text-gray-800 font-bold text-[1.8rem] flex items-center justify-center bg-[#d8e4f2]'>
-                      <h1> Adding an item in index 2</h1>
+                      <h1> Adding an item in index 1 (2nd Item)</h1>
                   </div>
                   
                   <div className='w-full h-full flex flex-col p-10 gap-5'>
