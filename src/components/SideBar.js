@@ -12,7 +12,7 @@ import settings from "../pictures/settings.svg"
 import admin from "../pictures/admin.svg"
 import update from "../pictures/update.svg"
 
-const SideBar = ({setHeaderTitle, highlight, setAnalyticsOpen, setDashboardOpen, currentPanelOpened, setCurrentPanelOpened, setSettingsOpen, setAdminOpen}) => {
+const SideBar = ({setHeaderTitle, highlight, setAnalyticsOpen, setDashboardOpen, currentPanelOpened, setCurrentPanelOpened, setSettingsOpen, setAdminOpen, setAboutOpen}) => {
     const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
     return(
@@ -27,7 +27,7 @@ const SideBar = ({setHeaderTitle, highlight, setAnalyticsOpen, setDashboardOpen,
             </div>
 
             <div className="">
-                <SideBarItem logo={about} title="About"/>
+                <SideBarItem logo={about} title="About" setHeaderTitle={setHeaderTitle} thisHighlight={highlight.aboutHighlight} highlight={highlight} setAboutOpen={setAboutOpen} currentPanelOpened={currentPanelOpened} setCurrentPanelOpened={setCurrentPanelOpened}/>
                 <SideBarItem logo={settings} title="Settings" setHeaderTitle={setHeaderTitle} thisHighlight={highlight.settingsHighlight} highlight={highlight} setSettingsOpen={setSettingsOpen} currentPanelOpened = {currentPanelOpened} setCurrentPanelOpened={setCurrentPanelOpened}/>
             </div>
         </section>
@@ -104,6 +104,19 @@ const SideBarItem = (props) =>{
             props.setHeaderTitle("Admin")
 
             navigate('/admin');
+        }else if(props.title==="About"){
+            props.setAboutOpen('block')
+            props.setCurrentPanelOpened(() => props.setAboutOpen)
+
+            props.highlight.setAboutHighlight(bg)
+            if(props.highlight.setAboutHighlight !== props.highlight.ch){
+                props.highlight.ch(hd)
+                props.highlight.sch(() => props.highlight.setAboutHighlight)
+            }
+
+            props.setHeaderTitle("About")
+
+            navigate('/about');
         }
     }
 

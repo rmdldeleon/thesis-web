@@ -9,6 +9,7 @@ import Charts from "./Charts"
 import Dashboard from "./Dashboard";
 import Settings from "./Settings"
 import Admin from "./Admin"
+import About from "./About"
 
 //import dialogs
 import { AlertDialog } from "./AlertDialog"
@@ -29,6 +30,7 @@ function App() {
   const [dashboardOpen, setDashboardOpen] = useState('hidden')
   const [settingsOpen, setSettingsOpen] = useState('hidden')
   const [adminOpen, setAdminOpen] = useState('hidden')
+  const [aboutOpen, setAboutOpen] = useState('hidden')
 
   const [cpo, scpo] = useState(() => setAnalyticsOpen)
 
@@ -37,6 +39,7 @@ function App() {
   const [dashboardHighlight, setDashboardHighlight] = useState("transparent hover:bg-[#23406b20]") // a.k.a history
   const [settingsHighlight, setSettingsHighlight] = useState("transparent hover:bg-[#23406b20]") 
   const [adminHighlight, setAdminHighlight] = useState("transparent hover:bg-[#23406b20]") 
+  const [aboutHighlight, setAboutHighlight] = useState("transparent hover:bg-[#23406b20]")
 
   const [ch, sch] = useState(() => setAnalyticsHighlight)
 
@@ -80,19 +83,21 @@ function App() {
 
                 <div className="bg-[#d5e3f2] flex flex-1 rounded-es-[8px] rounded-ee-[8px]">
                     <SideBar setHeaderTitle={setHeaderTitle} 
-                        highlight={{ch, sch, analyticsHighlight, setAnalyticsHighlight, dashboardHighlight, setDashboardHighlight, settingsHighlight, setSettingsHighlight, adminHighlight, setAdminHighlight}} 
+                        highlight={{ch, sch, analyticsHighlight, setAnalyticsHighlight, dashboardHighlight, setDashboardHighlight, settingsHighlight, setSettingsHighlight, adminHighlight, setAdminHighlight, aboutHighlight, setAboutHighlight}} 
                         currentPanelOpened={cpo} 
                         setCurrentPanelOpened={scpo} 
                         setDashboardOpen={setDashboardOpen} 
                         setAnalyticsOpen = {setAnalyticsOpen} 
                         setSettingsOpen = {setSettingsOpen}
                         setAdminOpen = {setAdminOpen}
+                        setAboutOpen = {setAboutOpen}
                       />
 
                     <main className="flex-1">
                         <CRUD display = {analyticsOpen} />
                         <Dashboard display={dashboardOpen}/>
                         {userDetails.Role === "Admin" && <Admin display={adminOpen}/>}
+                        <About  display={aboutOpen}/>
                         <Settings display={settingsOpen}/>
                         {/* <Charts display = {chartsOpen} charts={{lastSpeedBarData, lastSpeedBarDataOptions, lastSizeBarData, lastSizeBarDataOptions, lastSpaceBarData, lastSpaceBarDataOptions, lastThreadsBarData, lastThreadsBarDataOptions}}/> */}
                     </main>

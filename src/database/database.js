@@ -5,7 +5,8 @@ const db = {
     ...require('./AccountsQueries'),
     ...require('./DataStructuresQueries'),
     ...require('./ActionResultsQueries'),
-    ...require('./ArchivedQueries')
+    ...require('./ArchivedQueries'),
+    ...require('./General')
 };
 
 module.exports = { con, db };

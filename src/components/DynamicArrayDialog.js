@@ -205,7 +205,7 @@ export default function DynamicArrayDialog({dsDetails, dynamicArrayDialog, setDy
                 <div className='w-full h-full bg-gray-100 shadow3 rounded flex'>
                     <div className="min-w-[65%] w-full h-full flex flex-col overflow-auto ">
                         <div className="flex-[1] min-h-[30%] text-[1.5rem] font-bold text-gray-800 flex items-end justify-center"> What is Dynamic Array </div>
-                        <div className="flex-[2] text-[1rem] font-semibold text-gray-700 text-justify px-[10%] py-[5%]"> 
+                        <div className="flex-[2] text-[1rem] font-semibold text-gray-700 text-justify px-[10%] py-[5%] leading-loose"> 
                             Dynamic array is an index-based linear data structure and is a modified version of the traditional array. Unlike the traditional array in some programming languages that have a fixed size, a dynamic array can grow or shrink dynamically based on the number of elements it contains.  Dynamic arrays typically employ techniques such as automatic resizing, memory reallocation, and efficient indexing to provide efficient access and manipulation of elements. In languages, such as javascript, dynamic array is the default implementation of the array.
                         </div>
                     </div>
@@ -214,7 +214,7 @@ export default function DynamicArrayDialog({dsDetails, dynamicArrayDialog, setDy
                         <div className='w-full h-full flex flex-col gap-4 items-center justify-center'>
                             <h1 className='text-[1.2rem] font-bold'>Read Operation</h1>
                             
-                            <div className='flex flex-col gap-2 text-justify'>
+                            <div className='flex flex-col gap-2 text-justify leading-loose'>
                               <li>When it comes to read operations, arrays are the usually on the top as it can access any element instantaenously. </li>
                             
                             </div >
@@ -225,7 +225,7 @@ export default function DynamicArrayDialog({dsDetails, dynamicArrayDialog, setDy
                         <div className='w-full h-full flex flex-col gap-4 items-center justify-center'>
                             <h1 className='text-[1.2rem] font-bold'>Read Operation</h1>
                             
-                            <div className='flex flex-col gap-2 text-justify'>
+                            <div className='flex flex-col gap-2 text-justify leading-loose'>
                               <li> Write operations are array's weakness. When the capacity is reached, array has to create an entire new array with larger size before transfering the items.</li>
                               <li> When doing write operation somewhere in the middle of the array, it has to move all items to right one by one in order to make a space.</li>
                             </div >

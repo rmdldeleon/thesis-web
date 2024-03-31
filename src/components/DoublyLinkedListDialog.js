@@ -200,7 +200,7 @@ export default function DoublyLinkedListDialog({dsDetails, doublyLinkedListDialo
                 <div className='w-full h-full bg-gray-100 shadow3 rounded flex'>
                     <div className="min-w-[65%] w-full h-full flex flex-col overflow-auto ">
                         <div className="flex-[1] min-h-[30%] text-[1.5rem] font-bold text-gray-800 flex items-end justify-center"> What is Doubly Linked List </div>
-                        <div className="flex-[2] text-[1rem] font-semibold text-gray-700 text-justify px-[10%] py-[5%]"> 
+                        <div className="flex-[2] text-[1rem] font-semibold text-gray-700 text-justify px-[10%] py-[5%] leading-loose"> 
                             The Doubly Linked List serves as an upgrade to the traditional Singly Linked List. It retains the core properties of its predecessor. In a Singly Linked List, each node or item possesses only a pointer pointing to the next node. Consequently, traversal is restricted to moving from the start to the end, or from left to right. However, the Doubly Linked List introduces an additional pointer in each node, pointing to the previous node. This enhancement allows traversal from either direction. As a result, traversal becomes more efficient, permitting traversal to begin from either the start (head) or the end (tail), whichever is closer to the specified index.
                         </div>
                     </div>
@@ -209,7 +209,7 @@ export default function DoublyLinkedListDialog({dsDetails, doublyLinkedListDialo
                         <div className='w-full h-full flex flex-col gap-4 items-center justify-center'>
                             <h1 className='text-[1.2rem] font-bold'>Read Operation</h1>
                             
-                            <div className='flex flex-col gap-2 text-justify'>
+                            <div className='flex flex-col gap-2 text-justify leading-loose'>
                               <li> Read operations or traversal is the Linked List's weakness as it does not have a direct acess to each element unlike arrays.</li>
                               <li> Doubly Linked List traversal starts from either head or tail, whichever is closer to the specified index.</li>
                               <li> Altough the Big O Notation for read operation in Doubly Linked List is O(n), it's worst case is actually only traversing half of the list, when the specified index is exactly at the middle.</li>
@@ -221,7 +221,7 @@ export default function DoublyLinkedListDialog({dsDetails, doublyLinkedListDialo
                         <div className='w-full h-full flex flex-col gap-4 items-center justify-center'>
                             <h1 className='text-[1.2rem] font-bold'>Write Operation</h1>
                             
-                            <div className='flex flex-col gap-2 text-justify'>
+                            <div className='flex flex-col gap-2 text-justify leading-loose'>
                               <li> Write operations is where Doubly Linked List shines. When adding a node/item at the end of the list, it is rated as O(1) as it only have to connect the pointer from its sibling.</li>
                               <li> In adding or deleting somwhere in the middle of the list, Big O notation becomes O(n) as it still has to traverse the list to get to the specified index.</li>
                               <li> All Linked List are dynamic in size or capacity as its object references are stored in the sibling node, unlike array which has to take a space in heap memory in advance.</li>
