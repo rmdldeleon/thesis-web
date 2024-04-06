@@ -125,7 +125,7 @@ export default function LastActionResult() {
               <CloseIcon />
             </IconButton>
             <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-              Last Action Sumamry
+              Last Action Summary
             </Typography>
             <ReactToPrint
               trigger={() => <Button autoFocus color="inherit"> print </Button>}
