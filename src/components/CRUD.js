@@ -489,7 +489,7 @@ const AddDialog = ({addModal, maxIndex, datastructures, updatedsdetails, execute
 
         const index = indexInput;
         const count = countInput
-        const parameter = selectedRadio;
+        const parameter = index === '' ? '' : "Add After";
 
         add(datastructures, index, count, parameter)
 
@@ -535,15 +535,15 @@ const AddDialog = ({addModal, maxIndex, datastructures, updatedsdetails, execute
 
                     <div className="flex gap-5 ">
                         <div className="flex items-center gap-x-3 cursor-pointer">
-                            <input required id="push-everything" name="add-parameter" value="Add Before" onClick={handleRadioChange} type="radio" disabled={isRadioDisabled[1]} 
-                            className={`${isRadioDisabled[0]} cursor-pointer h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600`}/>
-                            <label htmlFor="push-everything" className={`${isRadioDisabled[0]} cursor-pointer text-sm font-medium leading-6 text-gray-900`}>Add Before</label>
+                            <input required id="push-everything" name="add-parameter" value="Add Before" onClick={handleRadioChange} type="radio" disabled //disabled={isRadioDisabled[1]} 
+                            className={`${isRadioDisabled[0]} hidden cursor-pointer h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600`}/>
+                            <label htmlFor="push-everything" className={`${isRadioDisabled[0]} hidden cursor-pointer text-sm font-medium leading-6 text-gray-900`}>Add Before</label>
                         </div>
 
                         <div className="flex items-center gap-x-3 cursor-pointer">
-                            <input id="push-email" name="add-parameter" value="Add After" type="radio" onClick={handleRadioChange} disabled={isRadioDisabled[1]} 
-                            className={`${isRadioDisabled[0]} cursor-pointer h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600`}/>
-                            <label htmlFor="push-email" className={`${isRadioDisabled[0]} cursor-pointer text-sm font-medium leading-6 text-gray-900`}>Add After</label>
+                            <input id="push-email" name="add-parameter" value="Add After" type="radio" onClick={handleRadioChange} disabled //disabled={isRadioDisabled[1]} 
+                            className={`${isRadioDisabled[0]} hidden cursor-pointer h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600`}/>
+                            <label htmlFor="push-email" className={`${isRadioDisabled[0]} hidden cursor-pointer text-sm font-medium leading-6 text-gray-900`}>Add After</label>
                         </div>
                     </div>
 
