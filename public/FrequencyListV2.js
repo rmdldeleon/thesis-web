@@ -610,19 +610,28 @@ export default class FrequencyListV2 {
     // returns the node at the given index
     getNode(index) {
         if (index < 0 || index > this._size-1) throw new Error("index out of bounds");
-
-        // to avoid traversing the pivottree if index is head or tail
-        if(index === 0){
-            return this.head
-        }else if(index === this._size -1){
-            return this.tail
-        }
-
-        // this includes the key or index of the pivotNode
-        const pivotNode = this.findClosestPivot(index);
-
-        let closestPivotIndex = pivotNode.key
-        let current = pivotNode.value;
+         
+         // getting the closest pivot pointer from the given index.
+         // this includes the key or index of the pivotNode
+         const pivotNode = this.findClosestPivot(index);
+         let closestPivotIndex
+         let current
+         
+         if(!pivotNode){ // if pivot node is empty; no pivot  pointers yet, choose between head or tail.
+             let tailIndex = this.size -1
+             let headIndex = 0
+     
+             if((index - headIndex) < (tailIndex - index)){ // tail is closer
+                 closestPivotIndex = this.size-1
+                 current = this.tail
+             }else{ // head is closer
+                 closestPivotIndex = 0
+                 current = this.head
+             }
+         }else{
+             closestPivotIndex = pivotNode.key
+             current = pivotNode.value;
+         }
 
         //traverse the list from the closest pivot
         if (index < closestPivotIndex) {
