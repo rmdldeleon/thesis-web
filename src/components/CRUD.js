@@ -50,6 +50,7 @@ import MemoryResult from "./MemoryResult";
 import DynamicArrayDialog from "./DynamicArrayDialog"
 import DoublyLinkedListDialog from "./DoublyLinkedListDialog";
 import FrequencyListV1Dialog from "./FrequencyListV1Dialog";
+import FrequencyListV2Dialog from "./FrequencyListV2Dialog";
 
 // imported contexts
 import { dstructuresContext, AlertDialogContext } from "./mainpage";
@@ -1396,6 +1397,7 @@ const DSDetails = ({dsDetails, index}) => {
     const [ dynamicArrayDialog, setDynamicArrayDialog ] = useState(false)
     const [ doublyLinkedListDialog, setDoublyLinkedListDialog ] = useState(false)
     const [ frequencyListV1Dialog, setFrequencyListV1Dialog ] = useState(false)
+    const [ frequencyListV2Dialog, setFrequencyListV2Dialog ] = useState(false)
 
     const print = () => {
         if(dsDetails.dsname === "Dynamic Array"){
@@ -1404,6 +1406,8 @@ const DSDetails = ({dsDetails, index}) => {
             setDoublyLinkedListDialog(true)
         }else if(dsDetails.dsname === "Frequency List V1"){
             setFrequencyListV1Dialog(true)
+        }else if(dsDetails.dsname === "Frequency List V2"){
+            setFrequencyListV2Dialog(true)
         }
     }
 
@@ -1452,6 +1456,7 @@ const DSDetails = ({dsDetails, index}) => {
             <DynamicArrayDialog dsDetails={dsDetails} dynamicArrayDialog={dynamicArrayDialog} setDynamicArrayDialog={setDynamicArrayDialog}/>
             <DoublyLinkedListDialog dsDetails={dsDetails} doublyLinkedListDialog={doublyLinkedListDialog} setDoublyLinkedListDialog={setDoublyLinkedListDialog} />
             <FrequencyListV1Dialog dsDetails={dsDetails} frequencyListV1Dialog={frequencyListV1Dialog} setFrequencyListV1Dialog={setFrequencyListV1Dialog}/>
+            <FrequencyListV2Dialog dsDetails={dsDetails} frequencyListV2Dialog={frequencyListV2Dialog} setFrequencyListV2Dialog={setFrequencyListV2Dialog}/>
 
             <div className='h-full min-w-[400px] flex flex-col relative'>
                 <img src={about} onClick={print} className='w-[1.6rem] absolute left-1 top-1 cursor-pointer'></img>
