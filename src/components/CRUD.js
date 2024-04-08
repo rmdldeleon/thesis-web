@@ -7,6 +7,8 @@ import { useForm } from 'react-hook-form';
 
 import axios from 'axios';
 
+import pako from 'pako'; // Import Pako.js for compression
+
 import { 
     Stack, InputLabel, MenuItem, FormControl, Select, ToggleButton, ToggleButtonGroup, TextField,
     Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, ListItemText, ListItemButton, List,
@@ -34,6 +36,8 @@ import barChart from "../pictures/bar chart.svg"
 import reset from "../pictures/reset.svg"
 
 import TreeList from "../datastructures/TreeList"
+import FrequencyListV1 from "../datastructures/FrequencyListV1"
+import FrequencyListV2 from "../datastructures/FrequencyListV2"
 import LinkedList from "../datastructures/LinkedList"
 import DynamicArray from "../datastructures/DynamicArray";
 
@@ -45,6 +49,7 @@ import MemoryResult from "./MemoryResult";
 
 import DynamicArrayDialog from "./DynamicArrayDialog"
 import DoublyLinkedListDialog from "./DoublyLinkedListDialog";
+import FrequencyListV1Dialog from "./FrequencyListV1Dialog";
 
 // imported contexts
 import { dstructuresContext, AlertDialogContext } from "./mainpage";
@@ -124,11 +129,24 @@ const CRUD = ({display, charts}) => {
         for(let i = 0; i < result.length; i++){
             let dsinstance
       
-            if(result[i].DSName_CLSC === "Tree List"){
+            // if(result[i].DSName_CLSC === "Tree List"){
+            //     if(result[i].JSONData){
+            //         dsinstance = TreeList.parse(result[i].JSONData)
+            //     }else{
+            //         dsinstance = new TreeList(frequencycapacity || 100)
+            //     }
+            // }
+            if(result[i].DSName_CLSC === "Frequency List V2"){
                 if(result[i].JSONData){
-                    dsinstance = TreeList.parse(result[i].JSONData)
+                    dsinstance = FrequencyListV2.parse(result[i].JSONData)
                 }else{
-                    dsinstance = new TreeList(frequencycapacity || 100)
+                    dsinstance = new FrequencyListV2(frequencycapacity || 100)
+                }
+            }else if(result[i].DSName_CLSC === "Frequency List V1"){
+                if(result[i].JSONData){
+                    dsinstance = FrequencyListV1.parse(result[i].JSONData)
+                }else{
+                    dsinstance = new FrequencyListV1(frequencycapacity || 100)
                 }
             }else if(result[i].DSName_CLSC === "Doubly Linked List"){
                 if(result[i].JSONData){
@@ -145,6 +163,21 @@ const CRUD = ({display, charts}) => {
             }
 
             let JSONData = dsinstance.toJSON()
+            let initialProperty = dsinstance.getLastActionResult()
+
+            // Decompression process for JSONResults
+            let JSONResults = null
+            if(result[i].JSONResults){
+                // Decode the Base64 string
+                const decodedBase64 = atob(result[i].JSONResults);
+                // Convert the decoded Base64 string back to a Uint8Array
+                const uint8Array = Uint8Array.from(decodedBase64, c => c.charCodeAt(0));
+                // Decompress the Uint8Array using Pako.js
+                JSONResults = pako.inflate(uint8Array, { to: 'string' });
+                // // Parse the decompressed string to get back the original JSON data
+                // JSONResults = JSON.parse(decompressedData);
+            }
+            
 
             let dsobject = {
                 ds: dsinstance,
@@ -161,8 +194,8 @@ const CRUD = ({display, charts}) => {
                 speedms: result[i].SpeedMS,
                 threads: result[i].ThreadsUsed,
                 size: result[i].Size,
-                space: result[i].SpaceOccupied,
-                spaceAdded: result[i].SpaceAdded,
+                space: result[i].SpaceOccupied || initialProperty.space,
+                spaceAdded: result[i].SpaceAdded || initialProperty.space,
                 sizeAdded: result[i].SizeAdded,
                 pointersAdded: result[i].PointersAdded,
                 actiontype: result[i].ActionType,
@@ -172,7 +205,7 @@ const CRUD = ({display, charts}) => {
                 speednotation: result[i].SpeedNotation,
                 spacenotation: result[i].SpaceNotation,
                 sizepointers: result[i].SizePointers,
-                JSONResults: result[i].JSONResults, 
+                JSONResults: JSONResults, 
                 ActionDate: result[i].ActionDate,
                 ActionSet: result[i].ActionSet || 0,
                 AccountID: userDetails.AccountID
@@ -416,16 +449,25 @@ const AddDialog = ({addModal, maxIndex, datastructures, updatedsdetails, execute
             updatedds[i].ActionSet += 1
             updatedds[i].JSONData = updatedds[i].ds.toJSON()
 
+            // COMPRESSING THE JSONRESULTS 
             // for actionresults table 
             let JSONResults = JSON.stringify(allResults)
-            updatedds[i].JSONResults = JSONResults
+            // conver to Unit8Array
+            const toUnit8Array = new TextEncoder().encode(JSONResults);
+            // Compress JSONResults using Pako.js
+            const compressedData = pako.deflate(toUnit8Array)
+            // Encode the compressed data to Base64
+            const compressedJSONResults = btoa(String.fromCharCode.apply(null, compressedData));
+            updatedds[i].JSONResults = compressedJSONResults
+
             const currentDate = new Date();
             const formattedDateTime = currentDate.toISOString().slice(0, 19).replace('T', ' ');
             updatedds[i].ActionDate = formattedDateTime
 
-
             // add results to actionresults table
             let insertActionResults = await axios.post('http://localhost:3001/analytics/add/insertActionResults', {actionResults : updatedds[i]});
+
+            updatedds[i].JSONResults = JSONResults // so JSONResults doesnt become the compressed version for other components
 
             // // udpate JSONData column of datstructures table
             // let updateJSONData = await axios.post('http://localhost:3001/analytics/add/updateJSONData', {JSONData, DSID});
@@ -659,15 +701,25 @@ const GetDialog = ({getModal, maxIndex, datastructures, updatedsdetails, execute
             updatedds[i].ActionSet += 1
             updatedds[i].JSONData = updatedds[i].ds.toJSON()
             
+            // COMPRESSING THE JSONRESULTS 
             // for actionresults table 
             let JSONResults = JSON.stringify(allResults)
-            updatedds[i].JSONResults = JSONResults
+            // conver to Unit8Array
+            const toUnit8Array = new TextEncoder().encode(JSONResults);
+            // Compress JSONResults using Pako.js
+            const compressedData = pako.deflate(toUnit8Array)
+            // Encode the compressed data to Base64
+            const compressedJSONResults = btoa(String.fromCharCode.apply(null, compressedData));
+            updatedds[i].JSONResults = compressedJSONResults
+
             const currentDate = new Date();
             const formattedDateTime = currentDate.toISOString().slice(0, 19).replace('T', ' ');
             updatedds[i].ActionDate = formattedDateTime
 
             // add results to actionresults table
             let insertActionResults = await axios.post('http://localhost:3001/analytics/add/insertActionResults', {actionResults : updatedds[i]});
+
+            updatedds[i].JSONResults = JSONResults // so JSONResults doesnt become the compressed version for other components
         }
 
         updatedsdetails(updatedds)
@@ -871,9 +923,17 @@ const DeleteDialog = ({deleteModal, maxIndex, datastructures, updatedsdetails, e
             updatedds[i].ActionSet += 1
             updatedds[i].JSONData = updatedds[i].ds.toJSON()
 
+            // COMPRESSING THE JSONRESULTS 
             // for actionresults table 
             let JSONResults = JSON.stringify(allResults)
-            updatedds[i].JSONResults = JSONResults
+            // conver to Unit8Array
+            const toUnit8Array = new TextEncoder().encode(JSONResults);
+            // Compress JSONResults using Pako.js
+            const compressedData = pako.deflate(toUnit8Array)
+            // Encode the compressed data to Base64
+            const compressedJSONResults = btoa(String.fromCharCode.apply(null, compressedData));
+            updatedds[i].JSONResults = compressedJSONResults
+
             const currentDate = new Date();
             const formattedDateTime = currentDate.toISOString().slice(0, 19).replace('T', ' ');
             updatedds[i].ActionDate = formattedDateTime
@@ -885,12 +945,13 @@ const DeleteDialog = ({deleteModal, maxIndex, datastructures, updatedsdetails, e
             // add results to actionresults table
             let insertActionResults = await axios.post('http://localhost:3001/analytics/add/insertActionResults', {actionResults : updatedds[i]});
 
+            updatedds[i].JSONResults = JSONResults // so JSONResults doesnt become the compressed version for other components
+
             // // udpate JSONData column of datstructures table
             // let updateJSONData = await axios.post('http://localhost:3001/analytics/add/updateJSONData', {JSONData, DSID}); 
         }
 
         maxIndex.setMaxIndex(updatedds[0].ds.size() -1) 
-
         updatedsdetails(updatedds)
     }
 
@@ -1230,17 +1291,23 @@ const ResetDialog = () => {
         // let highestBatch = dstructures[0].dsbatch
 
         //create new instance of datastructures in 'datastructures' table
-        let treelist = new TreeList(frequencyCapacity)
-        let treeliststr = treelist.toJSON()
+        // let treelist = new TreeList(frequencyCapacity)
+        // let treeliststr = treelist.toJSON()
+        
+        let frequencylistv2 = new FrequencyListV2(100)
+        let frequencylistv2str = frequencylistv2.toJSON()
+
+        let frequencylistv1 = new FrequencyListV1(100)
+        let frequencylistv1str = frequencylistv1.toJSON()
         
         let linkedlist = new LinkedList()
         let linkedliststr = linkedlist.toJSON()
         
-        let dynamicarray = new DynamicArray(frequencyCapacity)
+        let dynamicarray = new DynamicArray(100)
         let dynamicarraystr = dynamicarray.toJSON()
 
         let batch = highestBatch + 1
-        let data = {accountID, batch,  treeliststr, linkedliststr, dynamicarraystr, frequencyCapacity}
+        let data = {accountID, batch, frequencylistv2str, frequencylistv1str, linkedliststr, dynamicarraystr, frequencyCapacity}
 
         let initializeDS = await axios.post('http://localhost:3001/analytics/reset/initializeDS', {data});
 
@@ -1328,12 +1395,15 @@ const ResetDialog = () => {
 const DSDetails = ({dsDetails, index}) => {
     const [ dynamicArrayDialog, setDynamicArrayDialog ] = useState(false)
     const [ doublyLinkedListDialog, setDoublyLinkedListDialog ] = useState(false)
+    const [ frequencyListV1Dialog, setFrequencyListV1Dialog ] = useState(false)
 
     const print = () => {
         if(dsDetails.dsname === "Dynamic Array"){
             setDynamicArrayDialog(true)
         }else if(dsDetails.dsname === "Doubly Linked List"){
             setDoublyLinkedListDialog(true)
+        }else if(dsDetails.dsname === "Frequency List V1"){
+            setFrequencyListV1Dialog(true)
         }
     }
 
@@ -1381,6 +1451,7 @@ const DSDetails = ({dsDetails, index}) => {
 
             <DynamicArrayDialog dsDetails={dsDetails} dynamicArrayDialog={dynamicArrayDialog} setDynamicArrayDialog={setDynamicArrayDialog}/>
             <DoublyLinkedListDialog dsDetails={dsDetails} doublyLinkedListDialog={doublyLinkedListDialog} setDoublyLinkedListDialog={setDoublyLinkedListDialog} />
+            <FrequencyListV1Dialog dsDetails={dsDetails} frequencyListV1Dialog={frequencyListV1Dialog} setFrequencyListV1Dialog={setFrequencyListV1Dialog}/>
 
             <div className='h-full min-w-[400px] flex flex-col relative'>
                 <img src={about} onClick={print} className='w-[1.6rem] absolute left-1 top-1 cursor-pointer'></img>
@@ -1633,13 +1704,14 @@ const ActionSideBarItem = (props) => {
 
     // previous version of dialog
     let openModal = () => {
+        let hasActionRecord = dstructures[0].JSONResults // jsonresults will only have a vanlue after an action
         let size = dstructures[0].size || 0
        
         if(props.title==="Reset"){
-            if(size === 0){
+            if(!hasActionRecord){
                 let handleConfirm = undefined
                 let title = "Notice"
-                let content = "Action cannot be done: data structure sare currently empty."
+                let content = "Action cannot be done: datastructures are already in its initial state"
                 let negativeButton = undefined
                 let possitiveButton = "Ok"
 
@@ -1649,7 +1721,7 @@ const ActionSideBarItem = (props) => {
                 setResetDialog(true)
             }
         }else if(props.title==="Last Action"){
-            if(size === 0){
+            if(!hasActionRecord){
                 let handleConfirm = undefined
                 let title = "Notice"
                 let content = "Action cannot be done: no output is recorded for this batch"
@@ -1665,7 +1737,7 @@ const ActionSideBarItem = (props) => {
             if(size === 0 && props.title !== "Add"){
                 let handleConfirm = undefined
                 let title = "Notice"
-                let content = "Action cannot be done: data structure sare currently empty."
+                let content = "Action cannot be done: data structures are currently empty."
                 let negativeButton = undefined
                 let possitiveButton = "Ok"
 

@@ -27,8 +27,13 @@ export default class DynamicArray{
 
         for(let i = 0; i < capacity; i++){
             this.#array.push(null)
-            this.#space += 4
+
+            // for system
+            this.#space += 4 // null variable
         }
+
+        // for system
+        this.#space += 8 + 8 // for size and capacity property
     }
 
     // JSON function
@@ -127,39 +132,39 @@ export default class DynamicArray{
 
     // add functions
     add(item){
-        this.#sizeAdded = 0
+        // for system
         this.#spaceAdded = 0
+        this.#sizeAdded = 0
         
         const startTime = performance.now();
 
         let index = this.#size;
 
-        if(this.isFull()){
+        if(this.isFull()){ // array is full and has to enlarge
             this.#enlargeArray()
             this.#speednotation = "O(n)"
             this.#spacenotation = "O(n)"
-            this.#sizeAdded = this.#size
+            this.#sizeAdded = this.#size // size added from array expansion
         }else{
             this.#speednotation = "O(1)"
-            this.#spacenotation = "O(n)"
-            this.#sizeAdded = 0
+            this.#spacenotation = "O(1)"
         }
         
         this.#array[index] = item
+
+        this.#size += 1;
+
+        // for system
+        this.#spaceAdded += 2 // null to reference
+        this.#space += 2
 
         const endTime = performance.now();
 
         let rawElapsedTime = endTime - startTime;
         let result = Math.floor(rawElapsedTime * 1e6) / 1e6
 
-
-        // result
         this.#lastAction = "Add"
         this.#speedms = result
-        this.#size += 1;
-       
-        this.#space += 4
-        this.#spaceAdded += 4
         
         return {
             capacity: this.#capacity,
@@ -171,7 +176,7 @@ export default class DynamicArray{
             sizepointers: this.#sizepointers,
             space: this.#space,
             spaceAdded: this.#spaceAdded,
-            spacenotation: this.#spacenotation,
+            spacenotation: this.#spacenotation, 
             threads: this.#threads,
             pointersAdded: this.#pointersAdded
         }
@@ -187,33 +192,32 @@ export default class DynamicArray{
             this.#enlargeArray()
             this.#speednotation = "O(n)"
             this.#spacenotation = "O(n)"
-            this.#sizeAdded = this.#size
-        }else if(index === this.#size-1){
+            this.#sizeAdded = this.#size // size added from array expansion
+        }else if(index === this.#size-1){ // adding at tail
             this.#speednotation = "O(1)" 
             this.#spacenotation = "O(n)"
-            this.#sizeAdded = 0
-        }else{
+        }else{ // adding somewhere in the middle
             this.#speednotation = "O(n)"
             this.#spacenotation = "O(n)"
-            this.#sizeAdded = 0
         }
 
         this.#moveItemsToRight(index+1)
 
         this.#array[index+1] = item;
+        // for system
+        this.#space += 2 // null to reference (initial 4 + 2)
+        this.#spaceAdded += 2
 
+        this.#size += 1;
+
+        // for system 
         const endTime = performance.now();
 
         let rawElapsedTime = endTime - startTime;
         let result = Math.floor(rawElapsedTime * 1e6) / 1e6
 
-
-        // result
         this.#lastAction = "Add After Index"
         this.#speedms = result
-        this.#size += 1;
-        this.#space += 4
-        this.#spaceAdded += 4
 
         return {
             capacity: this.#capacity,
@@ -295,28 +299,26 @@ export default class DynamicArray{
         if(index === this.#size-1){
             this.#speednotation = "O(1)"
             this.#spacenotation = "O(n)"
-            this.#sizeAdded = 0
         }else{
             this.#speednotation = "O(n)"
             this.#spacenotation = "O(n)"
-            this.#sizeAdded = 0
         }
 
         this.#moveItemsToLeft(index+1)
         this.#array[this.#size-1] = null
+
+        this.#size -= 1;
 
         const endTime = performance.now();
 
         let rawElapsedTime = endTime - startTime;
         let result = Math.floor(rawElapsedTime * 1e6) / 1e6
 
-
         // result
         this.#lastAction = "Delete"
         this.#speedms = result
-        this.#size -= 1;
-        this.#space -= 4
-        this.#spaceAdded -= 4
+        this.#space -= 2
+        this.#spaceAdded -= 2
 
         return {
             capacity: this.#capacity,
@@ -337,6 +339,7 @@ export default class DynamicArray{
     get(index){
         this.#sizeAdded = 0
         this.#spaceAdded = 0
+        this.#pointersAdded = 0
 
         const startTime = performance.now();
 
@@ -351,7 +354,7 @@ export default class DynamicArray{
         this.#lastAction = "Get / Update"
         this.#speedms = result
         this.#speednotation = "O(1)"
-        this.#spacenotation = "O(n)"
+        this.#spacenotation = "O(1)"
 
         return {
             capacity: this.#capacity,

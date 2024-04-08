@@ -286,7 +286,7 @@ export default function MemoryResult() {
                                   <ListItemText primary={"Index: " + item.currentIndex} secondary={item.spaceAdded + ` bytes`} />
 
                                   <Typography variant="body2" color="textSecondary">
-                                      {`(${item.sign} ${item.diff} ms)`}
+                                      {`(${item.sign} ${item.diff} bytes)`}
                                   </Typography>
                                 </ListItemButton>
                                 {index !== allResults.length - 1 && <Divider />}

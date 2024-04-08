@@ -18,6 +18,8 @@ import '@fontsource/roboto/700.css';
 import TreeList from "../datastructures/TreeList"
 import LinkedList from "../datastructures/LinkedList"
 import DynamicArray from "../datastructures/DynamicArray";
+import FrequencyListV1 from "../datastructures/FrequencyListV1"
+import FrequencyListV2 from "../datastructures/FrequencyListV2"
 
 import '../css/index.css';
 
@@ -57,8 +59,13 @@ const Login = () => {
 
     const handleGoogleLogin = async (credentialResponse) => {
         try{
-            let treelist = new TreeList(100)
-            let treeliststr = treelist.toJSON()
+            // let treelist = new TreeList(100)
+            // let treeliststr = treelist.toJSON()
+            let frequencylistv2 = new FrequencyListV2(100)
+            let frequencylistv2str = frequencylistv2.toJSON()
+
+            let frequencylistv1 = new FrequencyListV1(100)
+            let frequencylistv1str = frequencylistv1.toJSON()
         
             let linkedlist = new LinkedList()
             let linkedliststr = linkedlist.toJSON()
@@ -77,7 +84,9 @@ const Login = () => {
                 Origin : "Google",
                 Role : "User",
                 isVerified: 1,
-                treeliststr,
+                // treeliststr,
+                frequencylistv2str,
+                frequencylistv1str,
                 linkedliststr,
                 dynamicarraystr,
                 AccountStatus: "Operational"
