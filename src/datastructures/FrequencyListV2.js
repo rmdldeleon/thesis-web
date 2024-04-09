@@ -258,6 +258,7 @@ export class PivotTree {
 
     movePointersRight(index) {
         this._movePointersRight(this.root, index);
+        
     }
     
     // visits all the node
@@ -265,12 +266,14 @@ export class PivotTree {
         if (node === null) return;
 
         // update value or delete
+
         if (node.key >= index) {
             // if not tail
             if(node.value.next){
                 node.value = node.value.next;
             }else{ // if tail
-                this._deleteNode(this.root, node.key)
+                // console.log(index)
+                // this._deleteNode(this.root, node.key)
             }
         }
 
@@ -634,6 +637,7 @@ export default class FrequencyListV2 {
          }
 
         //traverse the list from the closest pivot
+        
         if (index < closestPivotIndex) {
             for(let i = index; i < closestPivotIndex; i++){
                 current = current.prev;
@@ -704,7 +708,7 @@ export default class FrequencyListV2 {
             this.space -= node.prev ? 4 : 2 + 4
             this.spaceAdded -= node.prev ? 4 : 2 + 4 
         }
-       
+
         this._size--;
         this._sizeAdded -= 1 // for system
 
@@ -714,9 +718,11 @@ export default class FrequencyListV2 {
         // for system
         this.speednotation = "O(n)" // where n is the number of pivot pointers
         this.spacenotation = "O(log n)"
+
         // for when the pivotTree will delete a pivot pointer
-       
         if((this._size + 1) % this.frequency === 0){
+            this.pivotTree.delete(this.size-1)
+
             this._sizepointers -= 1
             this.pointersAdded -= 1
 
