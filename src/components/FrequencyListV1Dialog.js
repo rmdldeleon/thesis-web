@@ -22,7 +22,8 @@ import FLV14 from '../pictures/FLV14.png'
 import FLV15 from '../pictures/FLV15.png'
 import FLV6 from '../pictures/FLV6.png'
 
-import DynamicArray from '../datastructures/DynamicArray';
+// imported contexts
+import { domainContext, dstructuresContext, AlertDialogContext } from "./mainpage";
 
 const _ = require('lodash');
 
@@ -40,16 +41,16 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 
 export default function FrequencyListV1Dialog({dsDetails, frequencyListV1Dialog, setFrequencyListV1Dialog}) {
+  const [domain, server] = useContext(domainContext)
 
   const handleClose = () => {
-    console.log(dsDetails)
     setFrequencyListV1Dialog(false);
   };
 
   const handleDownload = () => {
     const link = document.createElement('a');
     link.download = 'FrequencyListV1.js';
-    link.href = 'http://localhost:3000/FrequencyListV1.js'; 
+    link.href = `${server}/FrequencyListV1.js`; 
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -240,7 +241,7 @@ export default function FrequencyListV1Dialog({dsDetails, frequencyListV1Dialog,
                         <Divider />
 
                         <div className='w-full h-full flex flex-col gap-4 items-center justify-center'>
-                            <h1 className='text-[1.2rem] font-bold'>Read Operation</h1>
+                            <h1 className='text-[1.2rem] font-bold'>Write Operation</h1>
                             
                             <div className='flex flex-col gap-2 text-justify leading-loose'>
                                 <li> 

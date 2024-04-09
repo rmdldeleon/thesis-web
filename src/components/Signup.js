@@ -25,6 +25,8 @@ const schema = z.object({
 })
 
 const Signup = () => {
+    const domain = 'localhost:3001'
+
     const navigate = useNavigate();
 
     //forms
@@ -43,14 +45,14 @@ const Signup = () => {
             data.AccountStatus = "Operational"
 
             // for when email is already taken
-            let response = await axios.post('http://localhost:3001/signup', {data});
+            let response = await axios.post(`${domain}/signup`, {data});
 
             if (response.data[0]) {
                 setError("root", { message: "Email is already taken." });
             } else if(data.Password !== data.ConfirmPassword){
                 setError("root", { message: "Password does not match" });
             } else {
-                response = await axios.post('http://localhost:3001/signup/createAccount', {data});
+                response = await axios.post(`${domain}/signup/createAccount`, {data});
                 
                 reset();
                 
@@ -87,10 +89,10 @@ const Signup = () => {
             }
 
             // checks wheter email is already registered 
-            let response = await axios.post('http://localhost:3001/signup', {data});
+            let response = await axios.post(`${domain}/signup`, {data});
             
             if (!response.data[0]) { // no account yet, register the credentials
-                let createdAccountResult = await axios.post('http://localhost:3001/signup/createAccount', {data});
+                let createdAccountResult = await axios.post(`${domain}/signup/createAccount`, {data});
                 data.accountID = createdAccountResult.data.insertId;                
             } 
 

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useContext, useEffect, useState, useRef } from 'react';
 
 import { useNavigate } from "react-router-dom";
 
@@ -22,6 +23,8 @@ import { AlertDialog } from "./AlertDialog"
 
 import axios from 'axios';
 
+// imported contexts
+import { domainContext } from "./mainpage";
 
 // data
 const customCss = `
@@ -93,6 +96,8 @@ const rowsData = [
 ];
 
 export default function HistoryTable() {
+    const [domain] = useContext(domainContext)
+
     const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
     const [ dstructures, setdstructures ] = React.useContext(dstructuresContext)
@@ -110,7 +115,7 @@ export default function HistoryTable() {
       let AccountID = userDetails.AccountID
 
       // get table data
-      let response = await axios.post('http://localhost:3001/history/getHistoryTableData', {AccountID});
+      let response = await axios.post(`${domain}/history/getHistoryTableData`, {AccountID});
 
       let arr = []
 
@@ -175,6 +180,8 @@ export default function HistoryTable() {
 }
 
 function EnhancedTableToolbar(props) {
+    const [domain] = useContext(domainContext)
+
     const navigate = useNavigate();
 
     const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
@@ -187,16 +194,16 @@ function EnhancedTableToolbar(props) {
       // handle if recovering a state while at a newly initialized ds
       if(!dstructures[0].size){
           let batch = dstructures[0].dsbatch
-          let deleteDSFromBatch = await axios.post('http://localhost:3001/history/deleteDSFromBatch', {data: {batch}, AccountID: userDetails.AccountID}); 
+          let deleteDSFromBatch = await axios.post(`${domain}/history/deleteDSFromBatch`, {data: {batch}, AccountID: userDetails.AccountID}); 
       }
 
       //let archiveDS = await axios.post('http://localhost:3001/history/archiveDS', {data: selectedRow, AccountID: userDetails.AccountID}); 
-      let archiveAS = await axios.post('http://localhost:3001/history/archiveAS', {data: selectedRow, AccountID: userDetails.AccountID});
+      let archiveAS = await axios.post(`${domain}/history/archiveAS`, {data: selectedRow, AccountID: userDetails.AccountID});
       //let deleteDSFromBatch = await axios.post('http://localhost:3001/history/deleteDSFromBatch', {data: selectedRow, AccountID: userDetails.AccountID}); 
-      let deleteASFromBatchSet = await axios.post('http://localhost:3001/history/deleteASFromBatchSet', {data: selectedRow, AccountID: userDetails.AccountID});
+      let deleteASFromBatchSet = await axios.post(`${domain}/history/deleteASFromBatchSet`, {data: selectedRow, AccountID: userDetails.AccountID});
 
       //update last used batch from accounts table
-      let updateLastUsedDSBatch = await axios.post('http://localhost:3001/analytics/reset/updateLastUsedDSBatch', {data: {accountID : userDetails.AccountID, batch: selectedRow.batch}});
+      let updateLastUsedDSBatch = await axios.post(`${domain}/analytics/reset/updateLastUsedDSBatch`, {data: {accountID : userDetails.AccountID, batch: selectedRow.batch}});
 
       window.location.reload(); // so it goes back to analytics tab
     }

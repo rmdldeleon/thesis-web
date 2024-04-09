@@ -24,6 +24,9 @@ import FLV6 from '../pictures/FLV6.png'
 
 import DynamicArray from '../datastructures/DynamicArray';
 
+// imported contexts
+import { domainContext, dstructuresContext, AlertDialogContext } from "./mainpage";
+
 const _ = require('lodash');
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -40,6 +43,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 
 export default function FrequencyListV2Dialog({dsDetails, frequencyListV2Dialog, setFrequencyListV2Dialog}) {
+  const [domain, server] = useContext(domainContext)
 
   const handleClose = () => {
     console.log(dsDetails)
@@ -49,7 +53,7 @@ export default function FrequencyListV2Dialog({dsDetails, frequencyListV2Dialog,
   const handleDownload = () => {
     const link = document.createElement('a');
     link.download = 'FrequencyListV2.js';
-    link.href = 'http://localhost:3000/FrequencyListV2.js'; 
+    link.href = `${server}/FrequencyListV2.js`; 
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -89,7 +93,7 @@ export default function FrequencyListV2Dialog({dsDetails, frequencyListV2Dialog,
               {dsDetails.dsname}
             </Typography>
 
-            <Tooltip title="Download the FrequencyListV1 class implementation in javascript">
+            <Tooltip title="Download the FrequencyListV2 class implementation in javascript">
               <Button autoFocus color="inherit" onClick={handleDownload}>
                 Download 
               </Button>
@@ -239,7 +243,7 @@ export default function FrequencyListV2Dialog({dsDetails, frequencyListV2Dialog,
                         <Divider />
 
                         <div className='w-full h-full flex flex-col gap-4 items-center justify-center'>
-                            <h1 className='text-[1.2rem] font-bold'>Read Operation</h1>
+                            <h1 className='text-[1.2rem] font-bold'>Write Operation</h1>
                             
                             <div className='flex flex-col gap-2 text-justify leading-loose'>
                                 <li> 

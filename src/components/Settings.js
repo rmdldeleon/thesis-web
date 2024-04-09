@@ -19,10 +19,12 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import EmailIcon from '@mui/icons-material/Email';
 
 // imported contexts
-import { dstructuresContext, AlertDialogContext } from "./mainpage";
+import { domainContext, dstructuresContext, AlertDialogContext } from "./mainpage";
 import { set } from "lodash";
 
 const Settings = ({display}) => {
+    const [domain] = useContext(domainContext)
+
     const navigate = useNavigate();
 
     // get the user details from login page
@@ -105,7 +107,7 @@ const Settings = ({display}) => {
         
         // email conditions
         let data = {Email: userDetails.Email, Origin: userDetails.Origin}
-        let response = await axios.post('http://localhost:3001/signup', {data});
+        let response = await axios.post(`${domain}/signup`, {data});
         if(email !== userDetails.Email && !response.data[0]){ // email already exist
             emailErrors.push("Email is already taken.")
             success = false
@@ -132,7 +134,7 @@ const Settings = ({display}) => {
 
             data = {Email: email, Password, Firstname: firstname, Lastname: lastname, AccountID: userDetails.AccountID}
 
-            let response = await axios.post('http://localhost:3001/settings/updateUserDetails', {data});
+            let response = await axios.post(`${domain}/settings/updateUserDetails`, {data});
 
             // updating userDetails session item
             let newUserDetails = {...userDetails}

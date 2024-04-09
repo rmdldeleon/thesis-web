@@ -21,6 +21,9 @@ import DA3 from '../pictures/DA3.png'
 
 import DynamicArray from '../datastructures/DynamicArray';
 
+// imported contexts
+import { domainContext, dstructuresContext, AlertDialogContext } from "./mainpage";
+
 const _ = require('lodash');
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -37,6 +40,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 
 export default function DynamicArrayDialog({dsDetails, dynamicArrayDialog, setDynamicArrayDialog}) {
+  const [domain, server] = useContext(domainContext)
 
   const handleClose = () => {
     console.log(dsDetails)
@@ -45,8 +49,8 @@ export default function DynamicArrayDialog({dsDetails, dynamicArrayDialog, setDy
 
   const handleDownload = () => {
     const link = document.createElement('a');
-    link.download = 'LinkedList.js';
-    link.href = 'http://localhost:3000/LinkedList.js'; // Adjust the URL as needed
+    link.download = 'DynamicArray.js';
+    link.href = `${server}/DynamicArray.js`; // Adjust the URL as needed
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

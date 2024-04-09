@@ -24,6 +24,8 @@ import FrequencyListV2 from "../datastructures/FrequencyListV2"
 import '../css/index.css';
 
 const Login = () => {
+    const domain = 'localhost:3001'
+
     const navigate = useNavigate();
 
     //forms
@@ -39,7 +41,8 @@ const Login = () => {
         try {
             data.Origin = "Website"
             
-            const response = await axios.post('http://localhost:3001/login', {data,});
+            const response = await axios.post(`http://${domain}/login`, {data,});
+            console.log(response)
             let AccountStatus = response.data[0].AccountStatus
 
             if(!response.data[0]){ // if array is empty
@@ -95,11 +98,11 @@ const Login = () => {
             // const data = {}
 
             // checks wheter email is already registered 
-            let response = await axios.post('http://localhost:3001/signup', {data});
+            let response = await axios.post(`http://${domain}/signup`, {data});
             
             if (!response.data[0]) { // no account yet, register the credentials
-                let createdAccountResult = await axios.post('http://localhost:3001/signup/createAccount', {data});
-                response = await axios.post('http://localhost:3001/signup', {data});           
+                let createdAccountResult = await axios.post(`http://${domain}/signup/createAccount`, {data});
+                response = await axios.post(`http://${domain}/signup`, {data});           
             } 
 
             let AccountStatus = response.data[0].AccountStatus

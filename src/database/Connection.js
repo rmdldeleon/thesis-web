@@ -1,4 +1,4 @@
-const mysql = require('mysql');
+const mysql = require('mysql2');
 
 const con = mysql.createConnection({
     host: process.env.DB_HOST  || 'localhost',
@@ -9,6 +9,16 @@ const con = mysql.createConnection({
     connectionLimit: 10,
     queueLimit: 0
 });
+
+// const con = mysql.createConnection({
+//     host: 'sql.freedb.tech',
+//     user: 'freedb_rmdldeleon',
+//     password: '4sSxjd8MTBv6#?y',
+//     database: 'freedb_custom_list',
+//     // waitForConnection: true,
+//     // connectionLimit: 10,
+//     // queueLimit: 0
+// });
 
 con.connect((err) => {
     if(err){

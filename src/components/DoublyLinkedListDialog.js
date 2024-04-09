@@ -15,13 +15,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
 import Tooltip from '@mui/material/Tooltip';
 
-import DynamicArray from '../datastructures/DynamicArray';
-
 import DLL1 from "../pictures/DLL1.png"
 import DLL2 from "../pictures/DLL2.png"
 import DLL3 from "../pictures/DLL3.png"
 import DLL4 from "../pictures/DLL4.png"
 
+// imported contexts
+import { domainContext, dstructuresContext, AlertDialogContext } from "./mainpage";
 
 const _ = require('lodash');
 
@@ -39,6 +39,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 
 export default function DoublyLinkedListDialog({dsDetails, doublyLinkedListDialog, setDoublyLinkedListDialog}) {
+  const [domain, server] = useContext(domainContext)
 
   const handleClose = () => {
     console.log(dsDetails)
@@ -47,8 +48,8 @@ export default function DoublyLinkedListDialog({dsDetails, doublyLinkedListDialo
 
   const handleDownload = () => {
     const link = document.createElement('a');
-    link.download = 'DynamicArray.js';
-    link.href = 'http://localhost:3000/DynamicArray.js'; // Adjust the URL as needed
+    link.download = 'LinkedList.js';
+    link.href = `${server}/LinkedList.js`; // Adjust the URL as needed
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -88,7 +89,7 @@ export default function DoublyLinkedListDialog({dsDetails, doublyLinkedListDialo
               {dsDetails.dsname}
             </Typography>
 
-            <Tooltip title="Download the dynamic array class implementation in javascript">
+            <Tooltip title="Download the Doubly Linked List class implementation in javascript">
               <Button autoFocus color="inherit" onClick={handleDownload}>
                 Download 
               </Button>

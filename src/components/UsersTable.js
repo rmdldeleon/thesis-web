@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useContext, useEffect, useState, useRef } from 'react';
 
 import { useNavigate } from "react-router-dom";
 
@@ -15,7 +16,7 @@ import HowToRegIcon from '@mui/icons-material/HowToReg';
 import { DataGrid } from '@mui/x-data-grid';
 
 // imported contexts
-import { dstructuresContext, AlertDialogContext } from "./mainpage";
+import { domainContext, dstructuresContext, AlertDialogContext } from "./mainpage";
 
 //import dialogs
 import { AlertDialog } from "./AlertDialog"
@@ -92,6 +93,8 @@ const rowsData = [
 ];
 
 export default function UsersTable() {
+    const [domain] = useContext(domainContext)
+
     const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
     // use context

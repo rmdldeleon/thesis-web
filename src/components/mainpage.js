@@ -16,8 +16,12 @@ import { AlertDialog } from "./AlertDialog"
 
 export const AlertDialogContext = createContext();
 export const dstructuresContext = createContext();
+export const domainContext = createContext();
 
 function App() {
+  const domain = `http://localhost:3001` // domain name
+  const server = `http://localhost:3000` // server 
+
   const navigate = useNavigate();
 
   // get the user details from login page
@@ -63,6 +67,7 @@ function App() {
   }, [])
 
   return (
+    <domainContext.Provider value={[domain, server]}>
     <dstructuresContext.Provider value={[dstructures, setdstructures]}>
     <AlertDialogContext.Provider value={[setAlertDialog, setAlertDialogDetails, dstructures]}>
         <AlertDialog 
@@ -106,6 +111,7 @@ function App() {
         </div>
     </AlertDialogContext.Provider>    
     </dstructuresContext.Provider>
+    </domainContext.Provider>
   );
 }
 

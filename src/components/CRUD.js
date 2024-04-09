@@ -5,6 +5,8 @@ import React, {
 import { useParams, Link, useNavigate} from "react-router-dom";
 import { useForm } from 'react-hook-form';
 
+import Tooltip from '@mui/material/Tooltip';
+
 import axios from 'axios';
 
 import pako from 'pako'; // Import Pako.js for compression
@@ -53,7 +55,7 @@ import FrequencyListV1Dialog from "./FrequencyListV1Dialog";
 import FrequencyListV2Dialog from "./FrequencyListV2Dialog";
 
 // imported contexts
-import { dstructuresContext, AlertDialogContext } from "./mainpage";
+import { domainContext, dstructuresContext, AlertDialogContext } from "./mainpage";
 
 //data context
 const DialogContext = createContext();
@@ -64,6 +66,8 @@ export const ThreadsDialog = createContext();
 export const MemoryDialog = createContext();
 
 const CRUD = ({display, charts}) => {
+    const [domain] = useContext(domainContext)
+
     const navigate = useNavigate();
  
     // get the user details from login page
@@ -236,7 +240,7 @@ const CRUD = ({display, charts}) => {
         const fetchData = async () => {
             try {                
                 //get the last actions and datastructure 
-                let response = await axios.post('http://localhost:3001/analytics', {userDetails});
+                let response = await axios.post(`${domain}/analytics`, {userDetails});
 
                 console.log(response, "response")
 
@@ -298,6 +302,8 @@ const CRUD = ({display, charts}) => {
 }
 
 const AddDialog = ({addModal, maxIndex, datastructures, updatedsdetails, executeQuery}) =>{
+    const [domain] = useContext(domainContext)
+
     const formRef = useRef(null);
 
     const [selectedRadio, setSelectedRadio] = useState('');
@@ -466,7 +472,7 @@ const AddDialog = ({addModal, maxIndex, datastructures, updatedsdetails, execute
             updatedds[i].ActionDate = formattedDateTime
 
             // add results to actionresults table
-            let insertActionResults = await axios.post('http://localhost:3001/analytics/add/insertActionResults', {actionResults : updatedds[i]});
+            let insertActionResults = await axios.post(`${domain}/analytics/add/insertActionResults`, {actionResults : updatedds[i]});
 
             updatedds[i].JSONResults = JSONResults // so JSONResults doesnt become the compressed version for other components
 
@@ -559,6 +565,8 @@ const AddDialog = ({addModal, maxIndex, datastructures, updatedsdetails, execute
 }
 
 const GetDialog = ({getModal, maxIndex, datastructures, updatedsdetails, executeQuery}) =>{
+    const [domain] = useContext(domainContext)
+
     const formRef = useRef(null);
 
     const [indexInput, setIndexInput] = useState('');
@@ -718,7 +726,7 @@ const GetDialog = ({getModal, maxIndex, datastructures, updatedsdetails, execute
             updatedds[i].ActionDate = formattedDateTime
 
             // add results to actionresults table
-            let insertActionResults = await axios.post('http://localhost:3001/analytics/add/insertActionResults', {actionResults : updatedds[i]});
+            let insertActionResults = await axios.post(`${domain}/analytics/add/insertActionResults`, {actionResults : updatedds[i]});
 
             updatedds[i].JSONResults = JSONResults // so JSONResults doesnt become the compressed version for other components
         }
@@ -781,6 +789,8 @@ const GetDialog = ({getModal, maxIndex, datastructures, updatedsdetails, execute
 }
 
 const DeleteDialog = ({deleteModal, maxIndex, datastructures, updatedsdetails, executeQuery}) =>{
+    const [domain] = useContext(domainContext)
+
     const formRef = useRef(null);
 
     const [indexInput, setIndexInput] = useState('');
@@ -944,7 +954,7 @@ const DeleteDialog = ({deleteModal, maxIndex, datastructures, updatedsdetails, e
             // let DSID = updatedds[i].dsid
 
             // add results to actionresults table
-            let insertActionResults = await axios.post('http://localhost:3001/analytics/add/insertActionResults', {actionResults : updatedds[i]});
+            let insertActionResults = await axios.post(`${domain}/analytics/add/insertActionResults`, {actionResults : updatedds[i]});
 
             updatedds[i].JSONResults = JSONResults // so JSONResults doesnt become the compressed version for other components
 
@@ -1274,6 +1284,8 @@ const ConfirmDialog = ({messageModal, content, ds, executeQuery, charts}) =>{
 }
 
 const ResetDialog = () => { 
+    const [domain] = useContext(domainContext)
+
     const 
         [resetDialog, setResetDialog, 
         dstructures, setdstructures, 
@@ -1287,7 +1299,7 @@ const ResetDialog = () => {
     
     const onConfirm = async (frequencyCapacity) => {      
         // getting the current highest batch of an account
-        let getHighestBatch = await axios.post('http://localhost:3001/analytics/reset/getHighestBatch', {accountID});
+        let getHighestBatch = await axios.post(`${domain}/analytics/reset/getHighestBatch`, {accountID});
         let highestBatch = getHighestBatch.data[0].DSBatch
         // let highestBatch = dstructures[0].dsbatch
 
@@ -1310,13 +1322,13 @@ const ResetDialog = () => {
         let batch = highestBatch + 1
         let data = {accountID, batch, frequencylistv2str, frequencylistv1str, linkedliststr, dynamicarraystr, frequencyCapacity}
 
-        let initializeDS = await axios.post('http://localhost:3001/analytics/reset/initializeDS', {data});
+        let initializeDS = await axios.post(`${domain}/analytics/reset/initializeDS`, {data});
 
         //update last used batch from accounts table
-        let updateLastUsedDSBatch = await axios.post('http://localhost:3001/analytics/reset/updateLastUsedDSBatch', {data});
+        let updateLastUsedDSBatch = await axios.post(`${domain}/analytics/reset/updateLastUsedDSBatch`, {data});
 
         //get the last actions and datastructure 
-        let response = await axios.post('http://localhost:3001/analytics', {userDetails});
+        let response = await axios.post(`${domain}/analytics`, {userDetails});
         let newDataStructures = response.data
 
         //update states
@@ -1459,7 +1471,9 @@ const DSDetails = ({dsDetails, index}) => {
             <FrequencyListV2Dialog dsDetails={dsDetails} frequencyListV2Dialog={frequencyListV2Dialog} setFrequencyListV2Dialog={setFrequencyListV2Dialog}/>
 
             <div className='h-full min-w-[400px] flex flex-col relative'>
-                <img src={about} onClick={print} className='w-[1.6rem] absolute left-1 top-1 cursor-pointer'></img>
+                <Tooltip title="How it works">
+                    <img src={about} onClick={print} className='w-[1.6rem] absolute left-1 top-1 cursor-pointer'></img>
+                </Tooltip>
                 <div className='flex-[2] flex justify-center items-center text-[1.5rem] font-bold font-sans text-gray-700'>
                     <h1>{dsDetails.dsname}</h1>
                 </div>
@@ -1541,8 +1555,12 @@ const DSDetailsItems = ({title, value, unit, dsDetails, dsIndex}) => {
 
     return(
         <div className='relative bg-[#ffffff80] min-h-full w-[200px] min-w-[200px] rounded-lg flex flex-col shadow1'>
-            <img src={about} onClick={openDialog} className='w-[1.5rem] absolute left-1 top-1 cursor-pointer'></img>
-            <img src={next} onClick={speedNext} className='w-[1.6rem] absolute right-1 top-1 cursor-pointer'></img>
+            <Tooltip title="Last action summary">
+                <img src={about} onClick={openDialog} className='w-[1.5rem] absolute left-1 top-1 cursor-pointer'></img>
+            </Tooltip>
+            <Tooltip title="Next data">
+                <img src={next} onClick={speedNext} className='w-[1.6rem] absolute right-1 top-1 cursor-pointer'></img>
+            </Tooltip>
             <div className='flex flex-col w-full h-full justify-center items-center flex-[7]'>
                 <h1 className='flex-[8] flex justify-center items-center text-[1.5rem] font-bold relative top-3'>
                     {value[index] === null ? "N/A" : value[index]}
