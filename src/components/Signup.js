@@ -25,7 +25,7 @@ const schema = z.object({
 })
 
 const Signup = () => {
-    const domain = 'localhost:3001'
+    const domain = 'http://localhost:3001'
 
     const navigate = useNavigate();
 

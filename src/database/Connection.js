@@ -5,9 +5,9 @@ const con = mysql.createConnection({
     user: process.env.DB_USERNAME || 'root',
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'custom_list',
-    waitForConnection: true,
-    connectionLimit: 10,
-    queueLimit: 0
+    // waitForConnection: true,
+    // connectionLimit: 10,
+    // queueLimit: 0
 });
 
 // const con = mysql.createConnection({
