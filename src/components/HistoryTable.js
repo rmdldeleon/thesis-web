@@ -112,6 +112,7 @@ export default function HistoryTable() {
     };
 
     const setHistoryTableData = async () => {
+      
       let AccountID = userDetails.AccountID
 
       // get table data
@@ -150,7 +151,7 @@ export default function HistoryTable() {
 
         arr.push({ rownumber, batch, actionnumber, datastructures, size, lastaction, datecreated, lastupdated})
       }
-    
+      
       setRows(arr)
     }
 
@@ -192,7 +193,7 @@ function EnhancedTableToolbar(props) {
 
     const handleConfirm = async () => {
       // handle if recovering a state while at a newly initialized ds
-      if(!dstructures[0].size){
+      if(!dstructures[0].actiontype){
           let batch = dstructures[0].dsbatch
           let deleteDSFromBatch = await axios.post(`${domain}/history/deleteDSFromBatch`, {data: {batch}, AccountID: userDetails.AccountID}); 
       }

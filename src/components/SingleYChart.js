@@ -132,37 +132,37 @@ export default function DoubleAxesChart() {
     const [data, setData] = useState(options)
 
     useEffect(() => {
-        if(openedDSDetails && openedDSDetails.dsDetails.JSONResults){
-
-            if(openedDSDetails.currentDialog === "Size"){ // if speed is 
-                if(dsname === "Dynamic Array"){
-                    options.axisY.title = "Capacity Added"
-                    options.data[0].name = "Capacity Added"
-                    options.subtitles[0].text = "Index and Capacity Added"
-                }else{
-                    options.axisY.title = "Pointers Added"
-                    options.data[0].name = "Pointers Added"
-                    options.subtitles[0].text = "Index and Pointers Added"
-                }
-          
-                options.data[0].dataPoints = sizeDataPoints()
-            
-                options.axisX.interval = calculateInterval(JSONResults.length)
-                options.axisX.title = "Index"
-            }else if(openedDSDetails.currentDialog === "Threads"){
-                options.axisY.title = "Threads Used"
-                options.data[0].name = "Threads Used"
-                options.subtitles[0].text = "Index and Threads Used"
-
-                options.data[0].dataPoints = threadsDataPoints()
-
-                options.axisX.interval = calculateInterval(JSONResults.length)
-                options.axisX.title = "Index"
-            }
-
-            setData(options)
-        }
-    }, [dstructures])
+	    if (openedDSDetails && openedDSDetails.dsDetails.JSONResults) {
+	        // Create a copy of the options object
+	        const updatedOptions = { ...options };
+	
+	        if (openedDSDetails.currentDialog === "Size") {
+	            if (dsname === "Dynamic Array") {
+	                updatedOptions.axisY.title = "Capacity Added";
+	                updatedOptions.data[0].name = "Capacity Added";
+	                updatedOptions.subtitles[0].text = "Index and Capacity Added";
+	            } else {
+	                updatedOptions.axisY.title = "Pointers Added";
+	                updatedOptions.data[0].name = "Pointers Added";
+	                updatedOptions.subtitles[0].text = "Index and Pointers Added";
+	            }
+	            
+	            updatedOptions.data[0].dataPoints = sizeDataPoints();
+	        } else if (openedDSDetails.currentDialog === "Threads") {
+	            updatedOptions.axisY.title = "Threads Used";
+	            updatedOptions.data[0].name = "Threads Used";
+	            updatedOptions.subtitles[0].text = "Index and Threads Used";
+	
+	            updatedOptions.data[0].dataPoints = threadsDataPoints();
+	        }
+	
+	        updatedOptions.axisX.interval = calculateInterval(JSONResults.length);
+	        updatedOptions.axisX.title = "Index";
+	
+	        // Update the state with the modified options
+	        setData(updatedOptions);
+	    }
+	}, [dstructures]);
 
     return (
         <div className='w-full h-full' ref={chartContainerRef}>

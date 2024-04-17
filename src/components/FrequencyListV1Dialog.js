@@ -49,8 +49,8 @@ export default function FrequencyListV1Dialog({dsDetails, frequencyListV1Dialog,
 
   const handleDownload = () => {
     const link = document.createElement('a');
-    link.download = 'FrequencyListV1.js';
-    link.href = `${server}/FrequencyListV1.js`; 
+    link.href = `/FrequencyListV1.js`; // Adjust the URL as needed
+    link.setAttribute('download', 'FrequencyListV1.js'); // Set download attribute to force download
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

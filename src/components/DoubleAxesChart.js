@@ -188,38 +188,37 @@ export default function DoubleAxesChart() {
     const [data, setData] = useState(options)
 
     useEffect(() => {
-        if(openedDSDetails && openedDSDetails.dsDetails.JSONResults){
-     
-            if(openedDSDetails.currentDialog === "Speed"){ // if speed is opened
-                options.data[0].dataPoints = speedmsDataPoints()
-                options.data[0].name = "Speed in Milliseconds"
-
-                options.data[1].dataPoints = notationDataPoints()
-
-                options.subtitles[0].text = "Speed in Milliseconds and Notation"
-                
-                options.axisY.title = "Speed in Milliseconds"
-                options.axisX.title = "Index"
-                options.axisX.interval = calculateInterval(JSONResults.length)
-
-                setData(options)
-            }else if (openedDSDetails.currentDialog === "Memory"){
-                options.data[0].dataPoints = spaceDataPoints()
-                options.data[0].name = "Space Added"
-
-                options.data[1].dataPoints = notationDataPoints()
-
-                options.subtitles[0].text = "Size Added and Notation"
-                
-                options.axisY.title = "Space Added"
-                options.axisX.title = "Index"
-                options.axisX.interval = calculateInterval(JSONResults.length)
-
-                setData(options)
-            }
-           
-        }
-    }, [dstructures])
+	    if (openedDSDetails && openedDSDetails.dsDetails.JSONResults) {
+	        // Create a copy of the options object
+	        const updatedOptions = { ...options };
+	
+	        if (openedDSDetails.currentDialog === "Speed") {
+	            updatedOptions.data[0].dataPoints = speedmsDataPoints();
+	            updatedOptions.data[0].name = "Speed in Milliseconds";
+	
+	            updatedOptions.data[1].dataPoints = notationDataPoints();
+	
+	            updatedOptions.subtitles[0].text = "Speed in Milliseconds and Notation";
+	
+	            updatedOptions.axisY.title = "Speed in Milliseconds";
+	        } else if (openedDSDetails.currentDialog === "Memory") {
+	            updatedOptions.data[0].dataPoints = spaceDataPoints();
+	            updatedOptions.data[0].name = "Space Added";
+	
+	            updatedOptions.data[1].dataPoints = notationDataPoints();
+	
+	            updatedOptions.subtitles[0].text = "Size Added and Notation";
+	
+	            updatedOptions.axisY.title = "Space Added";
+	        }
+	
+	        updatedOptions.axisX.title = "Index";
+	        updatedOptions.axisX.interval = calculateInterval(JSONResults.length);
+	
+	        // Update the state with the modified options
+	        setData(updatedOptions);
+	    }
+	}, [dstructures]);
 
     return (
         <div className='w-full h-full' ref={chartContainerRef}>

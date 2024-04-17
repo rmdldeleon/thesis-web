@@ -19,8 +19,13 @@ export const dstructuresContext = createContext();
 export const domainContext = createContext();
 
 function App() {
-  const domain = `http://localhost:3001` // domain name
-  const server = `http://localhost:3000` // server 
+  const domain = `https://custom-list.online:3001` // domain name
+  const server = `https://custom-list.online` // server 
+  
+  // if userdetails is empty. user trying to directly access mainpage without login
+  if(!sessionStorage.getItem('userDetails')){
+    window.location.href = '/';
+  }
 
   const navigate = useNavigate();
 
@@ -55,11 +60,20 @@ function App() {
   
   useEffect(() => {
     navigate('/analytics');
-
+    localStorage.setItem('isLoggedIn', true);
+    
     // for back button - redirects user to login
     const handleBackButton = () => {
+      // Send a message to other tabs
+      const channel = new BroadcastChannel('auth_channel');
+      channel.postMessage({ type: 'logout' });
+      // Clear login state from localStorage
+      localStorage.removeItem('isLoggedIn');
+
+      sessionStorage.clear();
       navigate('/')
     };
+
     window.addEventListener('popstate', handleBackButton);
     return () => {
       window.removeEventListener('popstate', handleBackButton);

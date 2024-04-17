@@ -52,8 +52,8 @@ export default function FrequencyListV2Dialog({dsDetails, frequencyListV2Dialog,
 
   const handleDownload = () => {
     const link = document.createElement('a');
-    link.download = 'FrequencyListV2.js';
-    link.href = `${server}/FrequencyListV2.js`; 
+    link.href = `/FrequencyListV2`; // Adjust the URL as needed
+    link.setAttribute('download', 'FrequencyListV2'); // Set download attribute to force download
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

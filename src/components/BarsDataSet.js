@@ -27,7 +27,7 @@ export default function BarsDataset() {
 
         arr.push(obj)
     }
-    
+
     return arr
   }
 
@@ -68,8 +68,14 @@ export default function BarsDataset() {
 
 
   useEffect(() => {
-      options.data[0].dataPoints = dataPoints()
-      setData(options)
+    // Create a copy of options
+    const updatedOptions = { ...options };
+    
+    // Update dataPoints array in the copied options
+    updatedOptions.data[0].dataPoints = dataPoints();
+    
+    // Update state with the modified options
+    setData(updatedOptions);
   }, [dstructures])
 
   return (

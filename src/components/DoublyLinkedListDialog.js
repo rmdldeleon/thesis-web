@@ -48,8 +48,8 @@ export default function DoublyLinkedListDialog({dsDetails, doublyLinkedListDialo
 
   const handleDownload = () => {
     const link = document.createElement('a');
-    link.download = 'LinkedList.js';
-    link.href = `${server}/LinkedList.js`; // Adjust the URL as needed
+    link.href = `/LinkedList.js`; // Adjust the URL as needed
+    link.setAttribute('download', 'LinkedList.js'); // Set download attribute to force download
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

@@ -118,8 +118,10 @@ export default function UsersTable() {
     };
 
     const setUsersTableData = async () => {
+    	
         // get table data
-        let response = await axios.post('http://localhost:3001/admin/getAllAccounts');
+        let response = await axios.post(`${domain}/admin/getAllAccounts`);
+        console.log(response.data)
 
         let arr = []
 
@@ -175,6 +177,8 @@ export default function UsersTable() {
 
 // toolbar component
 function EnhancedTableToolbar(props) {
+	const [domain] = useContext(domainContext)
+	
     const navigate = useNavigate();
 
     const userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
@@ -188,7 +192,7 @@ function EnhancedTableToolbar(props) {
     const openDisableAccountDialog = () => {
         const handleConfirm = async () => {
             let data = {AccountID: selectedRow.accountID}
-            let response = await axios.post('http://localhost:3001/admin/disableAccount', {data});
+            let response = await axios.post(`${domain}/admin/disableAccount`, {data});
     
             props.setUsersTableData()
             props.handleClearSelection()
@@ -207,7 +211,7 @@ function EnhancedTableToolbar(props) {
         const handleConfirm = async () => {
             console.log("asd")
             let data = {AccountID: selectedRow.accountID}
-            let response = await axios.post('http://localhost:3001/admin/enableAccount', {data});
+            let response = await axios.post(`${domain}/admin/enableAccount`, {data});
     
             props.setUsersTableData()
             props.handleClearSelection() 

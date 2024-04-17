@@ -49,8 +49,8 @@ export default function DynamicArrayDialog({dsDetails, dynamicArrayDialog, setDy
 
   const handleDownload = () => {
     const link = document.createElement('a');
-    link.download = 'DynamicArray.js';
-    link.href = `${server}/DynamicArray.js`; // Adjust the URL as needed
+    link.href = `/DynamicArray.js`; // Adjust the URL as needed
+    link.setAttribute('download', 'DynamicArray.js'); // Set download attribute to force download
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

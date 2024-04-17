@@ -49,8 +49,6 @@ const About = ({display}) => {
             Type,
             Message
         };
-
-        console.log(userDetails)
       
         emailjs.send('service_wrzvoe3', 'template_f9thhv8', formData, 'hC3yXmiRWMq_cihQI')
             .then((result) => {

@@ -73,7 +73,7 @@ export default function SizeResult() {
                 let sizeAdded = size - prevSize
 
                 // is actually capacity, did this for code simplicity in printing it
-                let pointers = dsDetails.frequency
+                let pointers = dsDetails.capacity || dsDetails.frequency
                 let pointersAdded = dsDetails.sizeAdded
                 let primaryText = "Capacity"
 
