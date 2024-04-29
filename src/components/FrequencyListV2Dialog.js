@@ -256,7 +256,7 @@ export default function FrequencyListV2Dialog({dsDetails, frequencyListV2Dialog,
                                     This makes the speed notation O(log n).
                                 </li>
                                 <li> 
-                                    As AVL Tree dynamci in size in nature, it does not suffer from getting an O(n) in speed from time to time for expanding its capacity.
+                                    As AVL Tree dynamic in size in nature, it does not suffer from getting an O(n) in speed from time to time for expanding its capacity.
                                 </li>
                             </div >
                         </div>

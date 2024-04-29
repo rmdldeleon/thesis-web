@@ -226,7 +226,7 @@ export default function SizeResult() {
            {/* All Runs */}
            <div className='bg-gray-50 shadow3 rounded h-full max-h-[400px] overflow-auto flex-1 flex flex-col'>
                 <h1 className='text-[1.5rem] font-bold text-center min-h-[20%] flex items-center justify-center'>
-                    All Runs (Speed)
+                    All Runs ({openedDSDetails ? openedDSDetails.dsDetails.type === "TRADITIONAL ARRAY" ? "Capacity" : "Pivot Pointers" : null})
                 </h1>
 
                 <div className='w-full h-full'>
